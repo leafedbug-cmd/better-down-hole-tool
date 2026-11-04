@@ -1,0 +1,1129 @@
+/* The Better Down Hole Tool – mobile-first prototype for Ditch Witch of Arkansas.
+   Data: site/data/catalog.json + site/data/roadmaps/<id>.json, generated from hddadvisor.com public APIs
+   by tools/build_data.py. Compatibility rules mirror hddadvisor.com's own configurator logic. */
+
+const IMG_HOST = 'https://www.hddadvisor.com';
+const DEALER = {
+  name: 'Ditch Witch of Arkansas',
+  email: 'sales@dwopg.com',            // Orange Power Group sales inbox, listed on dwopg.com / ditchwitchark.com
+  site: 'https://ditchwitchark.com/',
+  stores: [
+    { city: 'Little Rock', addr: '13319 Interstate 30 E., Little Rock, AR 72209', phone: '(501) 316-3200', tel: '+15013163200',
+      map: 'https://maps.google.com/?q=13319+Interstate+30+E,+Little+Rock,+AR+72209' },
+    { city: 'Springdale', addr: '368 Albano Dr, Springdale, AR 72762', phone: '(479) 419-9771', tel: '+14794199771',
+      map: 'https://maps.google.com/?q=368+Albano+Dr,+Springdale,+AR+72762' },
+  ],
+  hours: 'Mon–Fri 7:30 am – 5:00 pm',
+};
+
+/* ---------- tiny helpers ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const img = (id, w = 400, h = 200) => (id ? `${IMG_HOST}/Image/Thumbnail/${id}?width=${w}&height=${h}` : 'img/placeholder.svg');
+// small profile thumbnails are mirrored locally (tools/fetch_images.py); fall back to hddadvisor.com, then a placeholder
+const imgTag = (id, w, h, alt = '', cls = '') => !id ? `<img src="img/placeholder.svg" alt="">` :
+  `<img ${cls ? `class="${cls}"` : ''} src="img/parts/${id}.png" data-remote="${img(id, w, h)}" alt="${esc(alt)}" loading="lazy" decoding="async" onerror="imgFallback(this)">`;
+const photoTag = (id, alt = '') =>
+  `<img src="${img(id, 800, 800)}" alt="${esc(alt)}" decoding="async" onerror="this.onerror=null;this.src='img/parts/${id}.png'">`;
+window.imgFallback = (el) => {
+  if (el.dataset.remote) { const r = el.dataset.remote; delete el.dataset.remote; el.src = r; }
+  else { el.onerror = null; el.src = 'img/placeholder.svg'; }
+};
+const ICON = {
+  chev: '<svg class="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7-1.4-1.4L13.2 12 7.6 6.4z"/></svg>',
+  info: '<svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>',
+  check: '<svg viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>',
+  search: '<svg viewBox="0 0 24 24"><path d="M15.5 14h-.8l-.3-.3A6.5 6.5 0 1 0 14 15.5l.3.3v.8l5 5 1.5-1.5zm-6 0a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z"/></svg>',
+  share: '<svg viewBox="0 0 24 24"><path d="M18 16a3 3 0 0 0-2.4 1.2l-7-3.5a3 3 0 0 0 0-1.4l7-3.5A3 3 0 1 0 15 7l-7 3.5a3 3 0 1 0 0 3l7 3.5A3 3 0 1 0 18 16z"/></svg>',
+  link: '<svg viewBox="0 0 24 24"><path d="M3.9 12a3.1 3.1 0 0 1 3.1-3.1h4V7H7a5 5 0 0 0 0 10h4v-1.9H7A3.1 3.1 0 0 1 3.9 12zM8 13h8v-2H8zm9-6h-4v1.9h4a3.1 3.1 0 0 1 0 6.2h-4V17h4a5 5 0 0 0 0-10z"/></svg>',
+  sms: '<svg viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM9 11H7V9h2zm4 0h-2V9h2zm4 0h-2V9h2z"/></svg>',
+  mail: '<svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5z"/></svg>',
+  print: '<svg viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zm-3 11H8v-5h8zm3-7a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM18 3H6v4h12z"/></svg>',
+  save: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
+  phone: '<svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></svg>',
+  trash: '<svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg>',
+  pin: '<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>',
+  pipe: '<svg viewBox="0 0 40 40"><rect x="2" y="15" width="7" height="10" rx="1.5" fill="#FF6600"/><rect x="9" y="17" width="22" height="6" fill="#bbb"/><rect x="31" y="15" width="7" height="10" rx="1.5" fill="#FF6600"/></svg>',
+};
+
+/* ---------- storage ---------- */
+const store = {
+  get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+const SAVED_KEY = 'hdda.saved.v1', LAST_KEY = 'hdda.last.v1';
+const getSaved = () => store.get(SAVED_KEY, []);
+function updateSavedBadge() {
+  const n = getSaved().length, b = $('#saved-count');
+  b.hidden = !n; b.textContent = n;
+}
+
+/* ---------- config <-> URL ---------- */
+const b64e = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const b64d = (s) => { try { return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))))); } catch { return null; } };
+const newCfg = (m, p, r) => ({ m, p, r, mode: 'Bit', sel: {}, acc: {}, q: {} });
+function cfgFromQuery(q) {
+  const c = q.get('c') && b64d(q.get('c'));
+  if (!c || !c.r) return null;
+  return Object.assign(newCfg(), c);
+}
+const shareUrl = (cfg, view = 'summary') => `${location.origin}${location.pathname}#/${view}?c=${b64e(cfg)}`;
+
+/* ---------- data ---------- */
+let CATALOG = null;
+const RM_CACHE = new Map();
+async function loadCatalog() {
+  if (!CATALOG) {
+    CATALOG = await (await fetch('data/catalog.json')).json();
+    $('#data-date').textContent = CATALOG.fetched;
+  }
+  return CATALOG;
+}
+async function loadRoadmap(id) {
+  if (!RM_CACHE.has(id)) {
+    const r = await fetch(`data/roadmaps/${id}.json`);
+    if (!r.ok) throw new Error('Tooling data not available for this drill/pipe yet.');
+    RM_CACHE.set(id, await r.json());
+  }
+  return RM_CACHE.get(id);
+}
+const machine = (id) => CATALOG.machines.find((m) => m.id === +id);
+const pipeOf = (m, pid) => m?.pipes.find((p) => p.id === +pid);
+
+/* ---------- compatibility engine (mirrors hddadvisor.com isPartsCompatible) ---------- */
+function swapGender(c) {
+  if (c.includes('M') && !c.includes('MM')) return c.replace('M', 'F');
+  if (c.includes('F')) return c.replace('F', 'M');
+  return c;
+}
+function compat(L, R) {
+  if (!L || !R) return false;
+  if (L.type === 'Collar' && R.type === 'Drill_Pipe') return (R.collars || []).includes(L.id);
+  if (L.rc != null && R.type === 'Collar') return L.rc === R.id;
+  if (R.lc != null && L.type === 'Collar') return R.lc === L.id;
+  if (!R.cl) return false; // empty connections never "match" (stricter than the original, avoids false positives)
+  return [L.cr, L.cr2].filter(Boolean).map(swapGender).includes(R.cl);
+}
+function linkOK(L, R, P) {
+  if (compat(L.part, R)) return true;
+  if (L.accChoice > 0) return compat(P[L.accChoice], R);
+  if (L.accChoice === 0) return false;
+  return L.accs.some((a) => compat(P[a], R));
+}
+/* Walk the string from the rig outwards. Returns one row per section with status:
+   done (user picked) | auto (only one fits) | pending (needs a pick) | skip (nothing fits = not needed) | locked (waiting on an earlier pick) */
+function compute(rm, cfg) {
+  const P = rm.parts, rows = [], secs = rm.sections.filter((x) => x.mode === cfg.mode), n = secs.length;
+  const item = (o) => ({ part: P[o.id], accs: o.acc || [], accChoice: undefined });
+  const fitsAfter = (F, o) => !F || F.some((L) => linkOK(L, P[o.id], P));
+  // collars are sleeves, not threaded joints: the part before a collar still mates with the part after it
+  const after = (items, F) => (items.every((x) => x.part.type === 'Collar') ? (F ? [...items, ...F] : null) : items);
+  // lookahead: from frontier F at section i, can the string still reach the bit / backreamer?
+  const memo = new Map();
+  const canFinish = (i, F) => {
+    if (i >= n) return true;
+    const k = `${i}|${F ? F.map((L) => L.part.id + ':' + L.accChoice).join(',') : '-'}`;
+    if (memo.has(k)) return memo.get(k);
+    memo.set(k, false);
+    const c = secs[i].opts.filter((o) => fitsAfter(F, o));
+    const ok = c.length ? c.some((o) => canFinish(i + 1, after([item(o)], F))) : i < n - 1 && canFinish(i + 1, F);
+    memo.set(k, ok); return ok;
+  };
+  let F = null, locked = false;
+  secs.forEach((s, i) => {
+    const row = { sec: s, status: '', cands: [], sel: [], acc: {}, hidden: 0 };
+    rows.push(row);
+    if (locked) { row.status = 'locked'; return; }
+    const fits = s.opts.filter((o) => fitsAfter(F, o));
+    if (!fits.length) { row.status = 'skip'; return; }
+    const viable = fits.filter((o) => canFinish(i + 1, after([item(o)], F)));
+    row.cands = viable.length ? viable : fits;
+    row.hidden = fits.length - row.cands.length;
+    const want = (cfg.sel[s.id] || []).filter((id) => row.cands.some((o) => o.id === id));
+    if (want.length) { row.sel = want; row.status = 'done'; }
+    else if (row.cands.length === 1) { row.sel = [row.cands[0].id]; row.status = 'auto'; }
+    else { row.status = 'pending'; locked = true; }
+    // auto-add an adapter/accessory on the upstream part when the chosen part only fits through it
+    if (F) for (const L of F) {
+      if (L.accChoice !== undefined || !L.accs.length) continue;
+      const needs = row.sel.map((id) => P[id]).filter((R) => !compat(L.part, R));
+      if (!needs.length) continue;
+      const a = L.accs.find((a) => needs.some((R) => compat(P[a], R)));
+      if (a) { L.accChoice = a; L.row.acc[L.part.id] = { id: a, auto: true }; }
+    }
+    if (row.sel.length) {
+      const items = row.sel.map((id) => {
+        const opt = s.opts.find((o) => o.id === id), accs = opt.acc || [];
+        let ch = cfg.acc[`${s.id}.${id}`];
+        if (ch !== undefined && ch !== 0 && !accs.includes(ch)) ch = undefined;
+        if (ch > 0) row.acc[id] = { id: ch, auto: false };
+        return { part: P[id], accs, accChoice: ch, row };
+      });
+      F = after(items, F);
+    }
+  });
+  return rows;
+}
+function lineItems(rm, cfg, rows) {
+  const P = rm.parts, out = [];
+  for (const r of rows) for (const id of r.sel) {
+    out.push({ key: `${r.sec.id}.${id}`, sec: r.sec.name, part: P[id], auto: r.status === 'auto' });
+    const a = r.acc[id];
+    if (a) out.push({ key: `${r.sec.id}.${id}.a${a.id}`, sec: `${r.sec.name} add-on`, part: P[a.id], acc: true, auto: a.auto });
+  }
+  for (const l of out) l.qty = cfg.q[l.key] ?? 1;
+  return out;
+}
+const connStr = (p) => [p.cl, [p.cr, p.cr2].filter(Boolean).join(' & ')].filter(Boolean).join(' → ');
+const pnTxt = (p) => p.pn || 'ask dealer';
+
+/* ---------- UI shell ---------- */
+const app = $('#app');
+function setStepper(step, cfg) {
+  const el = $('#stepper');
+  if (!step) { el.hidden = true; return; }
+  const m = cfg?.m && machine(cfg.m), p = m && pipeOf(m, cfg.p);
+  const steps = [
+    ['Drill', m ? m.model : '', '#/drill'],
+    ['Pipe', p ? p.name : '', m ? `#/pipe/${m.id}` : null],
+    ['Build', cfg?.r ? cfg.mode : '', cfg?.r ? `#/build?c=${b64e(cfg)}` : null],
+    ['Parts list', '', cfg?.r ? `#/summary?c=${b64e(cfg)}` : null],
+  ];
+  el.innerHTML = `<ol>${steps.map(([t, sub, href], i) => {
+    const cls = i + 1 < step ? 'done' : i + 1 === step ? 'cur' : '';
+    const inner = `<i class="n">${i + 1 < step ? '✓' : i + 1}</i>${t}${sub ? `<em class="lbl-sub">${esc(sub)}</em>` : ''}`;
+    return `<li class="${cls}">${href && i + 1 !== step ? `<a href="${href}">${inner}</a>` : `<span aria-current="${i + 1 === step ? 'step' : 'false'}">${inner}</span>`}</li>`;
+  }).join('')}</ol>`;
+  el.hidden = false;
+}
+function setActionbar(html) {
+  const ab = $('#actionbar');
+  ab.hidden = !html; ab.innerHTML = html || '';
+}
+let toastT;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function openSheet(html, onMount) {
+  const sh = $('#sheet'), bd = $('#sheet-backdrop');
+  sh.innerHTML = `<div class="sheet-grab"></div>${html}`;
+  sh.hidden = bd.hidden = false;
+  requestAnimationFrame(() => { sh.classList.add('show'); bd.classList.add('show'); });
+  document.body.style.overflow = 'hidden';
+  $$('[data-close]', sh).forEach((b) => b.addEventListener('click', closeSheet));
+  onMount && onMount(sh);
+}
+function closeSheet() {
+  const sh = $('#sheet'), bd = $('#sheet-backdrop');
+  sh.classList.remove('show'); bd.classList.remove('show');
+  document.body.style.overflow = '';
+  setTimeout(() => { sh.hidden = bd.hidden = true; sh.innerHTML = ''; }, 220);
+}
+$('#sheet-backdrop').addEventListener('click', closeSheet);
+document.addEventListener('keydown', (e) => e.key === 'Escape' && !$('#sheet').hidden && closeSheet());
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return true; }
+  catch {
+    const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy'); ta.remove(); return ok;
+  }
+}
+
+/* ---------- views ---------- */
+function viewHome() {
+  setStepper(0); setActionbar('');
+  const last = store.get(LAST_KEY, null), saved = getSaved().slice(0, 3);
+  let lastHtml = '';
+  if (last?.cfg) {
+    lastHtml = `<a class="choice" href="#/build?c=${b64e(last.cfg)}"><div class="pipe-ico">${ICON.pipe}</div>
+      <div class="c-main"><div class="small muted">Pick up where you left off</div><div class="c-title">${esc(last.title)}</div></div>${ICON.chev}</a>`;
+  }
+  app.innerHTML = `
+  <section class="hero">
+    <img src="img/hero-wide.jpg" alt="" fetchpriority="high">
+    <div class="hero-body">
+      <h1>Build the right drill string. <em>From your phone.</em></h1>
+      <p><b>The Better Down Hole Tool.</b> Pick your drill and pipe, tap through the tooling from rig to bit, and send the parts list to Ditch Witch of Arkansas.</p>
+      <a class="btn btn-primary btn-block" href="#/drill" style="max-width:360px">Start: pick your drill ${ICON.chev.replace('class="chev"', 'style="fill:#fff"')}</a>
+    </div>
+  </section>
+  ${ME.member ? `<a class="choice rig-cta" href="#/garage"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="small muted">${esc(ME.company.name)}</div><div class="c-title">My rigs &amp; loadouts</div></div>${ICON.chev}</a>` :
+    `<a class="choice rig-cta" href="#/account"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">Save loadouts for every rig</div><div class="c-sub">Free crew account. Optional: guests can build and share.</div></div>${ICON.chev}</a>`}
+  ${lastHtml ? `<div class="section-head"><h2>Continue</h2></div>${lastHtml}` : ''}
+  ${saved.length ? `<div class="section-head"><h2>My saved strings</h2><a class="linkbtn" href="#/saved">See all</a></div>
+    <div class="stack">${saved.map(savedRow).join('')}</div>` : ''}
+  <div class="section-head"><h2>How it works</h2></div>
+  <div class="howto"><ol style="display:contents">
+    <li><span class="num">1</span><div><h3>Pick your drill</h3><p>All current Ditch Witch® and Vermeer® models.</p></div></li>
+    <li><span class="num">2</span><div><h3>Pick your pipe</h3><p>Only pipe that fits your drill is shown.</p></div></li>
+    <li><span class="num">3</span><div><h3>Build the string</h3><p>Threads are matched for you, and adapters are added automatically.</p></div></li>
+    <li><span class="num">4</span><div><h3>Send it</h3><p>Text, email or share the parts list, or ask your dealer for a quote.</p></div></li>
+  </ol></div>
+  <div class="section-head"><h2>Your dealer</h2></div>
+  ${dealerCard()}`;
+}
+function savedRow(s) {
+  return `<div class="choice" style="cursor:default">
+    <div class="pipe-ico">${ICON.pipe}</div>
+    <a class="c-main" href="#/summary?c=${b64e(s.cfg)}" style="text-decoration:none">
+      <div class="c-title">${esc(s.name)}</div>
+      <div class="c-sub">${esc(s.title)} · ${new Date(s.ts).toLocaleDateString()}</div></a>
+    <a class="iconbtn" href="#/build?c=${b64e(s.cfg)}" aria-label="Edit">${ICON.chev}</a></div>`;
+}
+function dealerCard(compact) {
+  return `<div class="card pad stack">
+    <div><small class="muted" style="font-weight:800;letter-spacing:.1em">YOUR DEALER</small><h2>${DEALER.name}</h2>
+    <div class="small muted">${DEALER.hours} · part of Orange Power Group</div></div>
+    ${DEALER.stores.map((s) => `<div class="store">
+      <div><h3>${s.city}</h3><div class="addr">${s.addr}</div></div>
+      <div class="store-actions">
+        <a class="btn btn-dark" href="tel:${s.tel}">${ICON.phone} ${s.phone}</a>
+        <a class="btn btn-ghost" href="${s.map}" target="_blank" rel="noopener">${ICON.pin} Directions</a>
+      </div></div>`).join('')}
+    ${compact ? '' : `<a class="btn btn-outline btn-block" href="mailto:${DEALER.email}?subject=${encodeURIComponent('HDD tooling question')}">${ICON.mail} ${DEALER.email}</a>`}
+  </div>`;
+}
+
+/* Step 1 – drill */
+let drillFilter = { brand: 'all', q: '' };
+async function viewDrill() {
+  await loadCatalog();
+  setStepper(1, null); setActionbar('');
+  app.innerHTML = `
+    <h1>Which drill are you running?</h1>
+    <p class="muted" style="margin:6px 0 14px">Tap your model. You can search too, like “JT25” or “D24”.</p>
+    <div class="stack">
+      <div class="searchbox">${ICON.search}<input id="q" type="search" inputmode="search" autocomplete="off" placeholder="Search drill model" value="${esc(drillFilter.q)}" aria-label="Search drill model"><button class="clear" id="clear" aria-label="Clear" ${drillFilter.q ? '' : 'hidden'}>×</button></div>
+      <div class="seg" role="group" aria-label="Brand">
+        ${[['all', 'All'], ['Ditch Witch', 'Ditch Witch®'], ['Vermeer', 'Vermeer®']].map(([v, l]) => `<button data-brand="${v}" aria-pressed="${drillFilter.brand === v}">${l}</button>`).join('')}
+      </div>
+    </div>
+    <div id="drills"></div>`;
+  const draw = () => {
+    const q = drillFilter.q.trim().toLowerCase().replace(/\s+/g, '');
+    const list = CATALOG.machines.filter((m) => (drillFilter.brand === 'all' || m.brand === drillFilter.brand) && (!q || `${m.brand}${m.model}`.toLowerCase().replace(/\s+/g, '').includes(q)));
+    const groups = ['Compact', 'Mid-size', 'Large'].map((g) => [g, list.filter((m) => m.size === g)]).filter(([, l]) => l.length);
+    const sub = { Compact: 'up to ~10k lb class', 'Mid-size': '~12k–40k lb class', Large: '60k lb class and up' };
+    $('#drills').innerHTML = !list.length ? `<div class="empty">No drill matches “${esc(drillFilter.q)}”.</div>` :
+      groups.map(([g, l]) => `<div class="section-head"><h2>${g}</h2><span class="small muted">${sub[g]}</span></div>
+        <div class="tiles">${l.map((m) => {
+          const n = m.pipes.length;
+          return `<a class="tile ${m.brand === 'Vermeer' ? 'vermeer' : ''}" href="#/pipe/${m.id}">
+            <div><div class="t-brand">${esc(m.brand)}</div><div class="t-model">${esc(m.model)}</div></div>
+            <div class="t-meta">${n ? `${n} pipe option${n === 1 ? '' : 's'}` : 'Ask your dealer'}</div></a>`;
+        }).join('')}</div>`).join('') +
+      (drillFilter.brand !== 'Ditch Witch' ? `<div class="note" style="margin-top:16px">${ICON.info.replace('<svg', '<svg width="20" height="20" style="flex:none;fill:#e05500"')}<span>Running a Vermeer®? Ditch Witch drill pipe HIWS1® and HXT® is compatible with all Vermeer® Firestick® threads.</span></div>` : '');
+  };
+  draw();
+  const q = $('#q');
+  q.addEventListener('input', () => { drillFilter.q = q.value; $('#clear').hidden = !q.value; draw(); });
+  $('#clear').addEventListener('click', () => { q.value = ''; drillFilter.q = ''; $('#clear').hidden = true; draw(); q.focus(); });
+  $$('[data-brand]').forEach((b) => b.addEventListener('click', () => {
+    drillFilter.brand = b.dataset.brand;
+    $$('[data-brand]').forEach((x) => x.setAttribute('aria-pressed', x === b)); draw();
+  }));
+}
+
+/* Step 2 – pipe */
+async function viewPipe(mid) {
+  await loadCatalog();
+  const m = machine(mid);
+  if (!m) return viewNotFound();
+  setStepper(2, { m: m.id }); setActionbar('');
+  const ctx = loCtx.for({ m: m.id });
+  app.innerHTML = `
+    ${ctx ? loBanner(ctx, 'NEW LOADOUT · STEP 1 OF 2: PIPE') : ''}
+    ${ctx ? `<a class="linkbtn" href="#/rig/${ctx.machine.id}">‹ Back to ${esc(rigName(ctx.machine))}</a>` : '<a class="linkbtn" href="#/drill">‹ Change drill</a>'}
+    <h1>${esc(m.brand)} ${esc(m.model)}: pick your drill pipe</h1>
+    <p class="muted" style="margin:6px 0 14px">Only pipe that works with the ${esc(m.model)} is listed.</p>
+    <div class="stack">${m.pipes.map((p) => p.roadmap ? `
+      <a class="choice" href="#/build?c=${b64e(newCfg(m.id, p.id, p.roadmap))}">
+        <div class="pipe-ico">${ICON.pipe}</div>
+        <div class="c-main"><div class="c-title">${esc(p.name)}</div>
+          <div class="c-sub">${p.pn ? `Part # <b style="font-family:ui-monospace,Menlo,monospace;color:#e05500">${esc(p.pn)}</b>` : ''}</div></div>${ICON.chev}</a>` : `
+      <div class="choice" aria-disabled="true" style="opacity:.55;cursor:not-allowed"><div class="pipe-ico">${ICON.pipe}</div>
+        <div class="c-main"><div class="c-title">${esc(p.name)}</div><div class="c-sub">${p.pn ? `Part # ${esc(p.pn)} · ` : ''}Tooling data not loaded yet, so ask your dealer</div></div></div>`).join('') ||
+      `<div class="empty">No pipe is listed for this drill. Call your dealer.</div>`}
+    </div>
+    ${m.brand === 'Vermeer' ? `<div class="note" style="margin-top:16px"><span>Ditch Witch drill pipe HIWS1® and HXT® is compatible with all Vermeer® Firestick® threads.</span></div>` : ''}`;
+  mountLoBanner();
+}
+
+/* Step 3 – build */
+let buildCfg = null;
+async function viewBuild(q) {
+  await loadCatalog();
+  const cfg = cfgFromQuery(q);
+  if (!cfg) return viewNotFound();
+  buildCfg = cfg;
+  let rm;
+  app.innerHTML = '<div class="stack"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>';
+  try { rm = await loadRoadmap(cfg.r); } catch (e) { app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  renderBuild(rm);
+}
+function titleOf(cfg) {
+  const m = machine(cfg.m), p = pipeOf(m, cfg.p);
+  return `${m ? m.model : 'Drill'} · ${p ? p.name : 'pipe'} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config`;
+}
+function persistBuild(replace = true) {
+  const url = `#/build?c=${b64e(buildCfg)}`;
+  if (replace) history.replaceState(null, '', url);
+  store.set(LAST_KEY, { cfg: buildCfg, title: titleOf(buildCfg) });
+  setStepper(3, buildCfg);
+}
+function partRow(p, { selected, multi, sel = true, compact } = {}) {
+  return `<div class="part ${selected ? 'sel' : ''} ${multi ? 'multi' : ''}" ${sel ? `role="button" tabindex="0" data-pick="${p.id}" aria-pressed="${!!selected}"` : ''}>
+    <div class="thumb">${imgTag(p.img, 240, 120, p.name)}</div>
+    <div class="p-main"><div class="p-name">${esc(p.name)}</div>
+      <div class="p-pn">${p.pn ? `#${esc(p.pn)}` : '<span class="muted">Part # from dealer</span>'}</div>
+      ${connStr(p) ? `<div class="p-conn">${esc(connStr(p))}</div>` : ''}
+      ${!compact && p.short ? `<div class="p-short">${esc(p.short)}</div>` : ''}</div>
+    <div class="p-act">
+      <button class="iconbtn" data-info="${p.id}" aria-label="Details for ${esc(p.name)}">${ICON.info}</button>
+      ${sel ? `<span class="check">${selected ? ICON.check : ''}</span>` : ''}
+    </div></div>`;
+}
+function renderBuild(rm, focusNext) {
+  const cfg = buildCfg, P = rm.parts, m = machine(cfg.m), p = pipeOf(m, cfg.p);
+  const rows = compute(rm, cfg);
+  const items = lineItems(rm, cfg, rows);
+  const pending = rows.find((r) => r.status === 'pending');
+  persistBuild();
+  const strip = rows.filter((r) => r.sel.length).map((r) => {
+    const id = r.sel[0], pp = P[id], a = r.acc[id];
+    return `<button class="seg-img" data-jump="${r.sec.id}" title="${esc(pp.name)}">${imgTag(pp.img, 340, 100, pp.name)}<span>${esc(r.sec.name)}</span></button>` +
+      (a ? `<button class="seg-img" data-jump="${r.sec.id}">${imgTag(P[a.id].img, 200, 100, P[a.id].name)}<span>Add-on</span></button>` : '');
+  }).join('') + (pending ? `<div class="gap" title="Next: ${esc(pending.sec.name)}"></div>` : '');
+
+  let n = 0;
+  const secHtml = rows.map((r) => {
+    const s = r.sec; n++;
+    const multi = s.multi;
+    let body = '', chip = '';
+    if (r.status === 'skip') {
+      chip = '<span class="pill">Not needed</span>';
+      body = `<p class="sec-note">Nothing in this step fits your selections, so it's skipped.</p>`;
+    } else if (r.status === 'locked') {
+      chip = '<span class="pill">Waiting</span>';
+      body = `<p class="sec-note">Choose ${esc(pending?.sec.name || 'the step above')} first.</p>`;
+    } else if (r.status === 'pending') {
+      chip = `<span class="pill pill-orange">Choose ${multi ? 'one or more' : 'one'}</span>`;
+      const shown = r.cands.slice(0, 5);
+      body = `<p class="sec-note">${r.cands.length} option${r.cands.length > 1 ? 's' : ''} fit the part before it${r.hidden ? ` (${r.hidden} more hidden because nothing downstream fits them)` : ''}.</p>
+        ${shown.map((o) => partRow(P[o.id], { multi })).join('')}
+        ${r.cands.length > shown.length ? `<button class="btn btn-outline btn-block more" data-browse="${s.id}">See all ${r.cands.length} ${esc(s.name.toLowerCase())} options</button>` : ''}`;
+    } else {
+      chip = r.status === 'auto' ? '<span class="pill pill-ok">Auto-matched</span>' : `<span class="pill pill-dark">Selected${r.sel.length > 1 ? ` · ${r.sel.length}` : ''}</span>`;
+      body = r.sel.map((id) => {
+        const opt = s.opts.find((o) => o.id === id), accs = (opt.acc || []), a = r.acc[id];
+        const accHtml = accs.length ? `<div class="acc"><div class="acc-title"><span>Add-on / adapter</span>${a?.auto ? '<span class="pill pill-ok">Auto-added to fit</span>' : ''}</div>
+          <div class="chips">
+            <button class="chip" data-acc="${s.id}.${id}" data-accid="0" aria-pressed="${!a}">None</button>
+            ${accs.map((aid) => `<button class="chip" data-acc="${s.id}.${id}" data-accid="${aid}" aria-pressed="${a?.id === aid}">${esc(P[aid].name)}${P[aid].pn ? `<small>#${esc(P[aid].pn)}</small>` : ''}</button>`).join('')}
+          </div></div>` : '';
+        return partRow(P[id], { selected: true, multi, sel: false }) + accHtml;
+      }).join('') + (r.cands.length > 1 ? `<button class="linkbtn" data-browse="${s.id}">${multi ? 'Add or remove options' : `Change (${r.cands.length} options fit)`}</button>` : '');
+    }
+    const dot = r.status === 'done' || r.status === 'auto' ? '✓' : n;
+    const cls = { done: 'done', auto: 'done', pending: 'pending', skip: 'skip', locked: 'locked' }[r.status];
+    return `<div class="sec ${cls}" id="sec-${s.id}"><span class="sec-dot">${dot}</span><div class="sec-body">
+      <div class="sec-head"><h3>${esc(s.name)}</h3>${chip}</div>${body}</div></div>`;
+  }).join('');
+
+  const donePct = rows.filter((r) => ['done', 'auto', 'skip'].includes(r.status)).length;
+  const ctx = loCtx.for(cfg);
+  app.innerHTML = `
+    ${ctx ? loBanner(ctx, ctx.loadout ? 'EDITING LOADOUT' : 'NEW LOADOUT') : ''}
+    <div class="build-grid"><div>
+      <div class="build-title"><div><a class="linkbtn" href="#/pipe/${cfg.m}" style="padding-left:0">‹ Change pipe</a>
+        <h1>${esc(m?.model || '')} drill string</h1><div class="small muted">${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''}</div></div></div>
+      <div class="seg" role="group" aria-label="Configuration type" style="margin:14px 0">
+        <button data-mode="Bit" aria-pressed="${cfg.mode === 'Bit'}">Bit config<small>pilot bore</small></button>
+        <button data-mode="Backreamer" aria-pressed="${cfg.mode === 'Backreamer'}">Backreamer config<small>pullback</small></button>
+      </div>
+      <div class="preview"><div class="preview-head"><span>RIG</span><span>${cfg.mode === 'Bit' ? 'BIT' : 'REAMER'} END →</span></div>
+        <div class="strip"><span class="rig">${esc(m?.model || 'RIG')}</span>${strip || '<span class="small muted">Your string appears here</span>'}</div></div>
+      <div class="timeline" style="margin-top:18px">${secHtml}</div>
+      ${!pending && rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note" style="margin-top:14px">${ICON.info.replace('<svg', '<svg width="20" height="20" style="flex:none;fill:#e05500"')}<span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} in Ditch Witch's data fits this string.</b> Try a different choice in an earlier step, or <a href="#/dealer">ask your dealer</a> for the right tooling.</span></div>` : ''}
+    </div>
+    <aside class="build-aside">
+      <div class="aside-card"><h3>Parts so far</h3>
+        <ul class="mini-list">${items.map((l) => `<li><span>${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">Nothing yet</li>'}</ul>
+        <a class="btn btn-primary btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">Review parts list</a>
+        <button class="btn btn-ghost btn-block" style="margin-top:8px" data-save>${ICON.save} ${ctx ? 'Save loadout' : 'Save this string'}</button>
+      </div>
+    </aside></div>`;
+
+  setActionbar(`<div class="ab-info"><strong>${items.length} part${items.length === 1 ? '' : 's'}</strong>${pending ? `Next: ${esc(pending.sec.name)}` : `${donePct}/${rows.length} steps done`}</div>
+    ${ctx ? `<button class="btn ${pending ? 'btn-ghost' : 'btn-primary'}" data-save>${ICON.save} Save loadout</button>` : `<button class="btn btn-ghost btn-sm" data-save aria-label="Save">${ICON.save}</button>`}
+    ${ctx && !pending ? '' : `<a class="btn btn-primary" href="#/summary?c=${b64e(cfg)}">${pending ? 'Parts list' : 'Done: parts list'}</a>`}`);
+  mountLoBanner();
+
+  // events
+  $$('[data-mode]').forEach((b) => b.addEventListener('click', () => { cfg.mode = b.dataset.mode; renderBuild(rm); window.scrollTo({ top: 0 }); }));
+  const pick = (sid, id) => {
+    const s = rm.sections.find((x) => x.id === sid);
+    const cur = compute(rm, cfg).find((r) => r.sec.id === sid);
+    if (s.multi) {
+      const set = new Set(cur.sel); set.has(id) ? set.delete(id) : set.add(id);
+      cfg.sel[sid] = [...set];
+    } else cfg.sel[sid] = [id];
+    return s;
+  };
+  $$('.sec [data-pick]').forEach((el) => {
+    const go = (e) => {
+      if (e.target.closest('[data-info]')) return;
+      const sid = +el.closest('.sec').id.slice(4);
+      const s = pick(sid, +el.dataset.pick);
+      renderBuild(rm, !s.multi ? sid : null);
+    };
+    el.addEventListener('click', go);
+    el.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), go(e)));
+  });
+  $$('[data-info]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); showPart(rm, +b.dataset.info); }));
+  $$('[data-browse]').forEach((b) => b.addEventListener('click', () => browseSheet(rm, +b.dataset.browse)));
+  $$('[data-acc]').forEach((b) => b.addEventListener('click', () => { cfg.acc[b.dataset.acc] = +b.dataset.accid; renderBuild(rm); }));
+  $$('[data-jump]').forEach((b) => b.addEventListener('click', () => $(`#sec-${b.dataset.jump}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })));
+  $$('[data-save]').forEach((b) => b.addEventListener('click', () => saveSheet(cfg)));
+  if (focusNext) {
+    const nxt = compute(rm, cfg).find((r) => r.status === 'pending');
+    const el = nxt && $(`#sec-${nxt.sec.id}`);
+    if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    else if (!nxt) toast('Drill string complete ✓');
+  }
+}
+function browseSheet(rm, sid) {
+  const cfg = buildCfg, P = rm.parts;
+  const row = compute(rm, cfg).find((r) => r.sec.id === sid);
+  const s = row.sec, multi = s.multi;
+  const soils = [...new Set(row.cands.flatMap((o) => (P[o.id].soil || '').split(',').map((x) => x.trim()).filter(Boolean)))];
+  let q = '', soil = '', chosen = new Set(row.sel);
+  openSheet(`<div class="sheet-top"><div><h2>${esc(s.name)}</h2><div class="small muted">${row.cands.length} options fit your string${multi ? ' · pick one or more' : ''}</div></div>
+      <button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body">
+      ${row.cands.length > 6 ? `<div class="searchbox" style="margin-bottom:8px">${ICON.search}<input id="bq" type="search" placeholder="Search name, size or part #" aria-label="Search options"></div>` : ''}
+      ${soils.length > 1 ? `<div class="filters"><button class="chip" data-soil="" aria-pressed="true">All ground</button>${soils.map((x) => `<button class="chip" data-soil="${esc(x)}" aria-pressed="false">${esc(x)}</button>`).join('')}</div>` : ''}
+      <div id="blist"></div></div>
+    ${multi ? `<div class="sheet-foot"><button class="btn btn-primary btn-block" id="bdone">Done</button></div>` : ''}`, (sh) => {
+    const draw = () => {
+      const t = q.toLowerCase();
+      const list = row.cands.filter((o) => { const pp = P[o.id]; return (!t || `${pp.name} ${pp.pn} ${pp.short || ''}`.toLowerCase().includes(t)) && (!soil || (pp.soil || '').includes(soil)); });
+      $('#blist', sh).innerHTML = list.map((o) => partRow(P[o.id], { selected: chosen.has(o.id), multi })).join('') || '<div class="empty">No matches</div>';
+      $$('[data-pick]', sh).forEach((el) => el.addEventListener('click', (e) => {
+        if (e.target.closest('[data-info]')) return;
+        const id = +el.dataset.pick;
+        if (multi) { chosen.has(id) ? chosen.delete(id) : chosen.add(id); draw(); }
+        else { cfg.sel[sid] = [id]; closeSheet(); renderBuild(rm, sid); }
+      }));
+      $$('[data-info]', sh).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); showPart(rm, +b.dataset.info, true); }));
+    };
+    draw();
+    $('#bq', sh)?.addEventListener('input', (e) => { q = e.target.value; draw(); });
+    $$('[data-soil]', sh).forEach((b) => b.addEventListener('click', () => { soil = b.dataset.soil; $$('[data-soil]', sh).forEach((x) => x.setAttribute('aria-pressed', x === b)); draw(); }));
+    $('#bdone', sh)?.addEventListener('click', () => { cfg.sel[sid] = [...chosen]; closeSheet(); renderBuild(rm, chosen.size ? sid : null); });
+  });
+}
+function showPart(rm, id, stacked) {
+  const p = rm.parts[id];
+  const photos = [...new Set([...(p.imgs || []), p.img].filter(Boolean))];
+  const specs = Object.entries({ 'Part #': p.pn || 'Ask your dealer', Connection: connStr(p), 'Recommended ground': p.soil, ...(p.specs || {}) }).filter(([, v]) => v);
+  const prev = stacked ? $('#sheet').innerHTML : null;
+  openSheet(`<div class="sheet-top"><div><div class="small muted" style="font-weight:800;letter-spacing:.06em">${esc((p.type || '').replace(/_/g, ' ').toUpperCase())}</div><h2>${esc(p.name)}</h2></div>
+      <button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body">
+      <div class="gallery ${photos.length < 2 ? 'single' : ''}">${photos.map((i) => photoTag(i, p.name)).join('') || '<img src="img/placeholder.svg" alt="">'}</div>
+      ${p.short ? `<p style="font-weight:700;margin:12px 0 0">${esc(p.short)}</p>` : ''}
+      <dl class="specs">${specs.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
+      ${p.desc?.length ? `<ul class="bullets">${p.desc.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>` : ''}
+      ${(p.docs || []).filter((d) => d.url).map((d) => `<a class="btn btn-ghost btn-block" href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>`).join('')}
+      <p class="small muted">Photos and specs from Ditch Witch (via hddadvisor.com).</p>
+    </div>
+    <div class="sheet-foot">${p.pn ? `<button class="btn btn-ghost" id="cpn">Copy part #</button>` : ''}<button class="btn btn-primary" style="flex:1" ${stacked ? 'id="back"' : 'data-close'}>${stacked ? '‹ Back to list' : 'Close'}</button></div>`, (sh) => {
+    $('#cpn', sh)?.addEventListener('click', async () => { await copyText(p.pn); toast(`Copied ${p.pn}`); });
+    if (stacked) $('#back', sh).addEventListener('click', () => { const sid = compute(rm, buildCfg).find((r) => r.cands.some((o) => o.id === id))?.sec.id; closeSheet(); setTimeout(() => sid && browseSheet(rm, sid), 230); });
+  });
+}
+function saveSheet(cfg) {
+  const ctx = loCtx.for(cfg);
+  if (ctx && ME.member) return loSaveSheet(cfg, ctx);
+  const def = titleOf(cfg).replace(' config', '');
+  openSheet(`<div class="sheet-top"><h2>Save drill string</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body stack"><label class="field"><span>Name it (job, crew or truck)</span><input id="sname" value="${esc(def)}" maxlength="80"></label>
+    <p class="small muted">Saved on this phone only. To share it, use the parts list.</p>
+    <div id="rigsave" class="rigsave"></div></div>
+    <div class="sheet-foot"><button class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" style="flex:1" id="sgo">${ICON.save} Save</button></div>`, (sh) => {
+    $('#sgo', sh).addEventListener('click', () => {
+      const list = getSaved();
+      list.unshift({ id: Date.now().toString(36), name: $('#sname', sh).value.trim() || def, title: titleOf(cfg), ts: Date.now(), cfg: JSON.parse(JSON.stringify(cfg)) });
+      store.set(SAVED_KEY, list.slice(0, 50)); updateSavedBadge(); closeSheet(); toast('Saved to My strings');
+    });
+    saveToRigSection(cfg, sh);
+  });
+}
+
+/* Step 4 – summary */
+function listText(cfg, items, withLink = true) {
+  const lines = [`HDD drill string: ${titleOf(cfg)}`, 'Built with The Better Down Hole Tool (Ditch Witch of Arkansas)', ''];
+  items.forEach((l, i) => lines.push(`${i + 1}. ${l.part.name}: PN ${pnTxt(l.part)}, qty ${l.qty}${l.acc ? ' (add-on)' : ''}`));
+  if (withLink) lines.push('', `Open it: ${shareUrl(cfg)}`);
+  return lines.join('\n');
+}
+async function viewSummary(q) {
+  await loadCatalog();
+  const cfg = cfgFromQuery(q);
+  if (!cfg) return viewNotFound();
+  let rm;
+  try { rm = await loadRoadmap(cfg.r); } catch (e) { app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  buildCfg = cfg;
+  const draw = () => {
+    const rows = compute(rm, cfg), items = lineItems(rm, cfg, rows);
+    const pending = rows.filter((r) => r.status === 'pending' || r.status === 'locked');
+    history.replaceState(null, '', `#/summary?c=${b64e(cfg)}`);
+    setStepper(4, cfg);
+    const m = machine(cfg.m), p = pipeOf(m, cfg.p);
+    app.innerHTML = `
+    <div class="sum-grid"><div class="stack">
+      <div class="sum-head"><small>PARTS LIST · ${cfg.mode === 'Bit' ? 'BIT' : 'BACKREAMER'} CONFIG</small>
+        <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''}</p></div>
+      ${rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this string in Ditch Witch's data.</b> <a href="#/dealer">Ask your dealer</a> for the right tooling.</span></div>` : ''}
+      ${pending.length ? `<div class="note no-print"><span><b>${pending.length} step${pending.length > 1 ? 's' : ''} still open</b> (${esc(pending.map((r) => r.sec.name).join(', '))}). <a href="#/build?c=${b64e(cfg)}">Finish building</a></span></div>` : ''}
+      <div class="card"><ul class="lines">${items.map((l) => `
+        <li class="line ${l.acc ? 'acc-line' : ''}"><div class="thumb">${imgTag(l.part.img, 200, 100, l.part.name)}</div>
+          <div><div class="l-sec">${esc(l.sec)}${l.auto ? ' · auto' : ''}</div><div class="l-name">${esc(l.part.name)}</div>
+            <div class="l-row"><span class="l-pn">${l.part.pn ? '#' + esc(l.part.pn) : '<span class="muted">Part # from dealer</span>'}</span>
+              <span class="qty no-print"><button data-dq="${l.key}" data-d="-1" aria-label="Less">−</button><input inputmode="numeric" data-qk="${l.key}" value="${l.qty}" aria-label="Quantity"><button data-dq="${l.key}" data-d="1" aria-label="More">+</button></span>
+            </div></div></li>`).join('') || '<li class="empty">No parts selected yet.</li>'}</ul></div>
+      <div class="share-grid no-print">
+        <button class="btn btn-ghost" id="sh-share">${ICON.share}Share</button>
+        <a class="btn btn-ghost" id="sh-sms" href="#">${ICON.sms}Text list</a>
+        <a class="btn btn-ghost" id="sh-mail" href="#">${ICON.mail}Email list</a>
+        <button class="btn btn-ghost" id="sh-copy">${ICON.link}Copy link</button>
+        <button class="btn btn-ghost" id="sh-print">${ICON.print}Print / PDF</button>
+        <button class="btn btn-ghost" data-save>${ICON.save}Save</button>
+        <a class="btn btn-ghost" href="#/build?c=${b64e(cfg)}">✎ Edit string</a>
+        <button class="btn btn-ghost" id="sh-mode">⇄ ${cfg.mode === 'Bit' ? 'Backreamer' : 'Bit'} list</button>
+      </div>
+    </div>
+    <aside class="sum-aside stack">
+      <div class="cta"><h2>Get a quote from Ditch Witch of Arkansas</h2>
+        <p>Send this list to the parts counter. They'll confirm fit, stock and price.</p>
+        <div class="stack">
+          <label class="field"><span style="color:#fff">Your name</span><input id="qn" autocomplete="name" value="${esc(store.get('hdda.contact', {}).name || '')}"></label>
+          <label class="field"><span style="color:#fff">Company / phone</span><input id="qc" autocomplete="organization" value="${esc(store.get('hdda.contact', {}).co || '')}"></label>
+          <label class="field"><span style="color:#fff">Store</span><select id="qs">${DEALER.stores.map((s) => `<option>${s.city}</option>`).join('')}</select></label>
+          <a class="btn btn-dark btn-block" id="q-mail" href="#">${ICON.mail} Email quote request</a>
+          <div class="cta-actions" style="grid-template-columns:1fr 1fr">${DEALER.stores.map((s) => `<a class="btn" href="tel:${s.tel}">${ICON.phone} ${s.city}</a>`).join('')}</div>
+        </div></div>
+    </aside></div>`;
+    setActionbar(`<div class="ab-info"><strong>${items.length} parts</strong>${items.reduce((a, l) => a + l.qty, 0)} pcs total</div>
+      <button class="btn btn-ghost btn-sm" id="ab-share" aria-label="Share">${ICON.share}</button>
+      <a class="btn btn-primary" href="#" id="ab-quote">Request quote</a>`);
+    const text = listText(cfg, items);
+    const subj = `Drill string parts list: ${titleOf(cfg)}`;
+    $('#sh-sms').href = `sms:?&body=${encodeURIComponent(text)}`;
+    $('#sh-mail').href = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}`;
+    const quoteHref = () => {
+      const c = { name: $('#qn').value.trim(), co: $('#qc').value.trim() }; store.set('hdda.contact', c);
+      const body = `Hi ${DEALER.name} (${$('#qs').value} store),\n\nPlease quote the parts below and confirm they fit.\n\n${text}\n\nName: ${c.name}\nCompany / phone: ${c.co}\n`;
+      return `mailto:${DEALER.email}?subject=${encodeURIComponent('Quote request: ' + titleOf(cfg))}&body=${encodeURIComponent(body)}`;
+    };
+    $('#q-mail').addEventListener('click', (e) => { e.preventDefault(); location.href = quoteHref(); });
+    $('#ab-quote').addEventListener('click', (e) => {
+      e.preventDefault();
+      if (matchMedia('(min-width:980px)').matches) location.href = quoteHref();
+      else { $('.cta').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#qn').focus({ preventScroll: true }), 500); }
+    });
+    const share = async () => {
+      if (navigator.share) { try { await navigator.share({ title: subj, text: listText(cfg, items, false), url: shareUrl(cfg) }); } catch {} }
+      else { await copyText(text); toast('Parts list copied'); }
+    };
+    $('#sh-share').addEventListener('click', share);
+    $('#ab-share').addEventListener('click', share);
+    $('#sh-copy').addEventListener('click', async () => { await copyText(shareUrl(cfg)); toast('Link copied'); });
+    $('#sh-print').addEventListener('click', () => window.print());
+    $('#sh-mode').addEventListener('click', () => { cfg.mode = cfg.mode === 'Bit' ? 'Backreamer' : 'Bit'; draw(); window.scrollTo({ top: 0 }); });
+    $$('[data-save]').forEach((b) => b.addEventListener('click', () => saveSheet(cfg)));
+    $$('[data-dq]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.dq; cfg.q[k] = Math.max(0, (cfg.q[k] ?? 1) + +b.dataset.d); draw(); }));
+    $$('[data-qk]').forEach((i) => i.addEventListener('change', () => { cfg.q[i.dataset.qk] = Math.max(0, parseInt(i.value, 10) || 0); draw(); }));
+  };
+  draw();
+}
+
+function viewSaved() {
+  setStepper(0); setActionbar('');
+  const list = getSaved();
+  app.innerHTML = `<h1>My saved strings</h1><p class="muted" style="margin:6px 0 14px">Saved on this device.</p>
+    <div class="stack">${list.map((s) => `<div class="choice" style="cursor:default"><div class="pipe-ico">${ICON.pipe}</div>
+      <a class="c-main" href="#/summary?c=${b64e(s.cfg)}" style="text-decoration:none"><div class="c-title">${esc(s.name)}</div><div class="c-sub">${esc(s.title)} · ${new Date(s.ts).toLocaleDateString()}</div></a>
+      <button class="iconbtn" data-del="${s.id}" aria-label="Delete ${esc(s.name)}">${ICON.trash}</button></div>`).join('') ||
+      `<div class="card empty">Nothing saved yet.<br><br><a class="btn btn-primary" href="#/drill">Build a drill string</a></div>`}</div>`;
+  $$('[data-del]').forEach((b) => b.addEventListener('click', () => {
+    if (!confirm('Delete this saved string?')) return;
+    store.set(SAVED_KEY, getSaved().filter((s) => s.id !== b.dataset.del)); updateSavedBadge(); viewSaved();
+  }));
+}
+function viewDealer() {
+  setStepper(0); setActionbar('');
+  app.innerHTML = `<h1>Ditch Witch of Arkansas</h1><p class="muted" style="margin:6px 0 14px">Sales, service, rentals and parts for HDD tooling statewide.</p>
+    ${dealerCard()}<p class="small muted" style="margin-top:12px">More at <a href="${DEALER.site}" target="_blank" rel="noopener">ditchwitchark.com</a></p>`;
+}
+function viewNotFound() {
+  setStepper(0); setActionbar('');
+  app.innerHTML = `<div class="card empty"><h2>That page or link didn't work</h2><p>The link may be old or cut off.</p><a class="btn btn-primary" href="#/drill">Start a new drill string</a></div>`;
+}
+
+/* ---------- accounts, company rigs & "create-a-class" loadouts (Supabase) ---------- */
+// Publishable (anon) key: safe to ship in the browser. Row-level security limits every user to their own company.
+const SB_URL = 'https://rdyhhszmfpomixaoehgy.supabase.co';
+const SB_KEY = 'sb_publishable_3XIxMYWm9FnbzybMqpWXfg_T-TsFqT7';
+const PENDING_KEY = 'bdht.pendingSetup', LO_KEY = 'bdht.loCtx';
+let SB = null;
+const ME = { user: null, member: null, company: null };
+async function sb() {
+  if (!SB) {
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm');
+    SB = createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'bdht.auth', flowType: 'pkce', detectSessionInUrl: true } });
+    SB.auth.onAuthStateChange((ev) => { if (ev === 'PASSWORD_RECOVERY') setTimeout(() => { location.hash = '#/account?m=reset'; }, 0); if (ev === 'SIGNED_OUT') { ME.user = ME.member = ME.company = null; updateAcctNav(); } });
+  }
+  return SB;
+}
+async function refreshMe() {
+  try {
+    const c = await sb();
+    const { data: { session } } = await c.auth.getSession();
+    ME.user = session?.user || null; ME.member = ME.company = null;
+    if (ME.user) {
+      const { data } = await c.from('bdht_members').select('*, company:bdht_companies(*)').eq('user_id', ME.user.id).maybeSingle();
+      if (data) { ME.member = data; ME.company = data.company; }
+    }
+  } catch (e) { console.warn('account service unavailable', e); }
+  updateAcctNav(); return ME;
+}
+let ME_READY = null;
+const meReady = () => (ME_READY ||= refreshMe());
+function updateAcctNav() {
+  const l = $('#acct-label'); if (l) l.textContent = ME.user ? 'My rigs' : 'Sign in';
+}
+const loCtx = {
+  get() { try { return JSON.parse(sessionStorage.getItem(LO_KEY)); } catch { return null; } },
+  set(v) { v ? sessionStorage.setItem(LO_KEY, JSON.stringify(v)) : sessionStorage.removeItem(LO_KEY); },
+  for(cfg) { const c = this.get(); return c && cfg && +c.machine.machine_type_id === +cfg.m ? c : null; },
+};
+const rigName = (mc) => mc.nickname ? mc.nickname : `${mc.brand || ''} ${mc.model}`.trim();
+const rigSub = (mc) => `${mc.brand || ''} ${mc.model}`.trim();
+const errMsg = (e) => (e?.message || String(e)).replace(/^.*?:\s*(?=Invite|You already|Sign in)/, '');
+const ICON_RIG = '<svg viewBox="0 0 24 24"><path d="M12 3 2 8v13h4v-9h12v9h4V8zM8 14h8v2H8zm0 3h8v2H8z"/></svg>';
+const ICON_MORE = '<svg viewBox="0 0 24 24"><path d="M6 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>';
+const ICON_STAR = '<svg viewBox="0 0 24 24"><path d="M12 17.3 18.2 21l-1.6-7L22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2 7.4 14l-1.6 7z"/></svg>';
+function drillOptions(sel) {
+  const by = (b) => CATALOG.machines.filter((m) => m.brand === b && m.pipes.length);
+  return `<option value="">Choose a drill…</option>` + ['Ditch Witch', 'Vermeer'].map((b) => `<optgroup label="${b}">${by(b).map((m) => `<option value="${m.id}" ${+sel === m.id ? 'selected' : ''}>${esc(b)} ${esc(m.model)}</option>`).join('')}</optgroup>`).join('');
+}
+function busy(btn, on, label) { if (!btn) return; if (on) { btn.dataset.l = btn.innerHTML; btn.innerHTML = label || 'Working…'; btn.disabled = true; } else { btn.innerHTML = btn.dataset.l || btn.innerHTML; btn.disabled = false; } }
+
+/* sign up / sign in / finish setup */
+async function viewAccount(q) {
+  await loadCatalog(); await meReady();
+  setStepper(0); setActionbar('');
+  if (q.get('m') === 'reset' && ME.user) {
+    app.innerHTML = `<div class="auth-wrap"><h1>Set a new password</h1>
+      <form class="card pad stack" id="rst" novalidate style="margin-top:14px"><div id="ferr"></div>
+      <label class="field"><span>New password (8+ characters)</span><input id="npw" type="password" autocomplete="new-password" minlength="8" required></label>
+      <button class="btn btn-primary btn-block" id="rgo">Save password</button></form></div>`;
+    $('#rst').addEventListener('submit', async (e) => {
+      e.preventDefault(); const pw = $('#npw').value;
+      if (pw.length < 8) { $('#ferr').innerHTML = '<div class="form-err">Use at least 8 characters.</div>'; return; }
+      const c = await sb(); const { error } = await c.auth.updateUser({ password: pw });
+      if (error) { $('#ferr').innerHTML = `<div class="form-err">${esc(errMsg(error))}</div>`; return; }
+      toast('Password updated'); location.replace(ME.member ? '#/garage' : '#/setup');
+    });
+    return;
+  }
+  if (ME.user && ME.member) { location.replace('#/garage'); return; }
+  if (ME.user) return viewSetup();
+  const mode = q.get('m') === 'signin' ? 'signin' : 'signup';
+  app.innerHTML = `<div class="auth-wrap">
+    <h1>${mode === 'signup' ? 'Set up your crew' : 'Welcome back'}</h1>
+    <p class="muted" style="margin:6px 0 14px">${mode === 'signup' ? 'Save a down hole tool loadout for every rig in your fleet, and share them with your whole company.' : 'Sign in to see your company’s rigs and loadouts.'}</p>
+    <div class="seg" role="tablist" style="margin-bottom:14px">
+      <button aria-pressed="${mode === 'signup'}" data-go="#/account">Sign up</button>
+      <button aria-pressed="${mode === 'signin'}" data-go="#/account?m=signin">Sign in</button></div>
+    ${mode === 'signup' ? onboardForm(true) : `<form class="card pad stack" id="fin" novalidate>
+      <label class="field"><span>Email</span><input id="e" type="email" autocomplete="email" inputmode="email" required></label>
+      <label class="field"><span>Password</span><input id="pw" type="password" autocomplete="current-password" required></label>
+      <div class="form-err" id="err" hidden></div>
+      <button class="btn btn-primary btn-block" id="go">Sign in</button>
+      <button type="button" class="linkbtn" id="forgot" style="align-self:center">Forgot password?</button></form>`}
+    <p class="small muted" style="margin-top:14px;text-align:center">No account needed to build and share a drill string. <a href="#/drill">Keep building as a guest</a></p></div>`;
+  $$('[data-go]').forEach((b) => b.addEventListener('click', () => { location.hash = b.dataset.go; }));
+  if (mode === 'signup') return mountOnboard(true);
+  const err = (m) => { const e = $('#err'); e.textContent = m; e.hidden = !m; };
+  $('#fin').addEventListener('submit', async (ev) => {
+    ev.preventDefault(); err('');
+    const email = $('#e').value.trim(), password = $('#pw').value;
+    if (!email || !password) return err('Enter your email and password.');
+    busy($('#go'), true, 'Signing in…');
+    const c = await sb();
+    const { error } = await c.auth.signInWithPassword({ email, password });
+    if (error) { busy($('#go'), false); return err(error.message === 'Email not confirmed' ? 'Confirm your email first. Check your inbox for the link.' : error.message); }
+    await refreshMe();
+    const pend = store.get(PENDING_KEY, null);
+    if (!ME.member && pend && pend.email?.toLowerCase() === email.toLowerCase()) {
+      try { await runSetup(pend); } catch (e) { busy($('#go'), false); return err(errMsg(e)); }
+    }
+    location.hash = ME.member ? '#/garage' : '#/setup';
+  });
+  $('#forgot').addEventListener('click', async () => {
+    const email = $('#e').value.trim(); if (!email) return err('Type your email above first.');
+    const c = await sb(); const { error } = await c.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname + '#/account?m=signin' });
+    error ? err(error.message) : toast('Check your email for a reset link');
+  });
+}
+async function viewSetup() {
+  await loadCatalog(); await meReady();
+  setStepper(0); setActionbar('');
+  if (!ME.user) { location.replace('#/account'); return; }
+  if (ME.member) { location.replace('#/garage'); return; }
+  app.innerHTML = `<div class="auth-wrap"><h1>Finish setting up</h1><p class="muted" style="margin:6px 0 14px">Signed in as ${esc(ME.user.email)}. Tell us your company and the drills you run.</p>${onboardForm(false)}</div>`;
+  mountOnboard(false);
+}
+function onboardForm(withAuth) {
+  const p = store.get(PENDING_KEY, {}) || {};
+  return `<form class="card pad stack" id="fon" novalidate>
+    <div class="seg" id="cmode"><button type="button" data-cm="new" aria-pressed="true">New company</button><button type="button" data-cm="join" aria-pressed="false">Join my company</button></div>
+    <label class="field" data-show="new"><span>Company name</span><input id="co" autocomplete="organization" maxlength="120" placeholder="e.g. Ozark Boring LLC" value="${esc(p.company || '')}"></label>
+    <label class="field" data-show="join" hidden><span>Company invite code</span><input id="code" autocapitalize="characters" maxlength="12" placeholder="8-character code from your boss" style="text-transform:uppercase;font-family:ui-monospace,Menlo,monospace;letter-spacing:.12em"></label>
+    <label class="field"><span>Your name</span><input id="emp" autocomplete="name" maxlength="120" placeholder="First and last name" value="${esc(p.employee || '')}"></label>
+    ${withAuth ? `<label class="field"><span>Email</span><input id="e" type="email" autocomplete="email" inputmode="email"></label>
+    <label class="field"><span>Password <em class="muted" style="font-style:normal;font-weight:500">(8+ characters)</em></span><input id="pw" type="password" autocomplete="new-password" minlength="8"></label>` : ''}
+    <div><div class="form-sub"><b>Your machines</b><span class="small muted" id="msub">Add every drill your crew runs. Give each a unit name or number.</span></div>
+      <div id="mlist" class="stack" style="margin-top:10px"></div>
+      <button type="button" class="btn btn-ghost btn-block" id="madd" style="margin-top:10px">+ Add another machine</button></div>
+    <div class="form-err" id="err" hidden></div>
+    <button class="btn btn-primary btn-block" id="go">${withAuth ? 'Create account' : 'Save and continue'}</button>
+  </form>`;
+}
+function mountOnboard(withAuth) {
+  let cm = 'new';
+  const rows = (store.get(PENDING_KEY, {}) || {}).machines?.length ? store.get(PENDING_KEY).machines : [{ id: '', nick: '' }];
+  const draw = () => {
+    $('#mlist').innerHTML = rows.map((r, i) => `<div class="mrow">
+      <label class="field"><span>Machine ${i + 1}</span><select data-mi="${i}" data-k="id">${drillOptions(r.id)}</select></label>
+      <label class="field"><span>Unit name / #</span><input data-mi="${i}" data-k="nick" maxlength="60" placeholder="Unit 12" value="${esc(r.nick)}"></label>
+      ${rows.length > 1 ? `<button type="button" class="iconbtn" data-mrm="${i}" aria-label="Remove machine ${i + 1}">${ICON.trash}</button>` : ''}</div>`).join('');
+    $$('[data-mi]').forEach((el) => el.addEventListener('input', () => { rows[+el.dataset.mi][el.dataset.k] = el.value; }));
+    $$('[data-mrm]').forEach((b) => b.addEventListener('click', () => { rows.splice(+b.dataset.mrm, 1); draw(); }));
+  };
+  draw();
+  $('#madd').addEventListener('click', () => { rows.push({ id: '', nick: '' }); draw(); $$('#mlist select').at(-1).focus(); });
+  $$('[data-cm]').forEach((b) => b.addEventListener('click', () => {
+    cm = b.dataset.cm; $$('[data-cm]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    $$('[data-show]').forEach((el) => { el.hidden = el.dataset.show !== cm; });
+    $('#msub').textContent = cm === 'join' ? 'Optional: your company’s rigs show up after you join. Add any that are missing.' : 'Add every drill your crew runs. Give each a unit name or number.';
+  }));
+  const err = (m) => { const e = $('#err'); e.textContent = m; e.hidden = !m; if (m) e.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
+  $('#fon').addEventListener('submit', async (ev) => {
+    ev.preventDefault(); err('');
+    const p = { mode: cm, company: $('#co').value.trim(), code: $('#code').value.trim().toUpperCase(), employee: $('#emp').value.trim(),
+      machines: rows.filter((r) => r.id).map((r) => ({ id: +r.id, nick: r.nick.trim() })) };
+    if (cm === 'new' && !p.company) return err('Enter your company name.');
+    if (cm === 'join' && p.code.length < 6) return err('Enter the invite code from your company’s account owner.');
+    if (!p.employee) return err('Enter your name.');
+    if (cm === 'new' && !p.machines.length) return err('Pick at least one machine.');
+    const go = $('#go'); busy(go, true, withAuth ? 'Creating account…' : 'Saving…');
+    try {
+      if (withAuth) {
+        p.email = $('#e').value.trim(); const password = $('#pw').value;
+        if (!/^\S+@\S+\.\S+$/.test(p.email)) throw new Error('Enter a valid email.');
+        if (password.length < 8) throw new Error('Password needs at least 8 characters.');
+        store.set(PENDING_KEY, p);
+        const c = await sb();
+        const { data, error } = await c.auth.signUp({ email: p.email, password, options: { data: { employee_name: p.employee }, emailRedirectTo: location.origin + location.pathname + '#/account?m=signin' } });
+        if (error) throw error;
+        if (!data.session) { busy(go, false); return viewCheckEmail(p.email); }
+        await refreshMe();
+      }
+      await runSetup(p);
+      toast(`Welcome, ${p.employee.split(' ')[0]}!`); location.hash = '#/garage';
+    } catch (e) { busy(go, false); err(errMsg(e)); }
+  });
+}
+function viewCheckEmail(email) {
+  app.innerHTML = `<div class="auth-wrap"><div class="card pad stack" style="text-align:center">
+    <div style="font-size:44px">✉️</div><h1>Check your email</h1>
+    <p>We sent a confirmation link to <b>${esc(email)}</b>. Tap it, then sign in. Your company and machines will be set up automatically.</p>
+    <a class="btn btn-primary btn-block" href="#/account?m=signin">I confirmed, sign in</a></div></div>`;
+}
+async function runSetup(p) {
+  const c = await sb();
+  const r = p.mode === 'join' ? await c.rpc('bdht_join_company', { p_code: p.code, p_employee: p.employee })
+    : await c.rpc('bdht_create_company', { p_company: p.company, p_employee: p.employee });
+  if (r.error) throw r.error;
+  const cid = r.data;
+  if (p.machines?.length) {
+    const ins = p.machines.map((m) => { const mm = machine(m.id); return { company_id: cid, machine_type_id: m.id, brand: mm?.brand, model: mm?.model || String(m.id), nickname: m.nick || null }; });
+    const { error } = await c.from('bdht_machines').insert(ins); if (error) throw error;
+  }
+  store.set(PENDING_KEY, null); await refreshMe();
+}
+
+/* garage: the company's machines */
+async function fetchFleet() {
+  const c = await sb();
+  const [m, l] = await Promise.all([
+    c.from('bdht_machines').select('*').order('created_at'),
+    c.from('bdht_loadouts').select('id,machine_id,name,is_default,mode,part_count,items,pipe_id,roadmap_id,config,updated_at').order('updated_at', { ascending: false }),
+  ]);
+  if (m.error) throw m.error; if (l.error) throw l.error;
+  return { machines: m.data, loadouts: l.data };
+}
+const loImgs = (lo, n = 6) => (lo?.items || []).filter((i) => i.img).slice(0, n);
+const loKey = (lo) => (lo.items || []).slice().reverse().find((i) => /^(Bit|Backreamer)$/i.test(i.type || '') || /^(Bit|Backreamer)\b/i.test(i.sec || ''));
+function stripHtml(lo, cls = 'lo-strip') {
+  const im = loImgs(lo);
+  return `<div class="${cls}">${im.map((i) => imgTag(i.img, 200, 100, i.name)).join('') || '<span class="small muted">No parts yet</span>'}</div>`;
+}
+function guestUpsell(where) {
+  return `<div class="upsell card pad stack">
+    <div class="upsell-ico">${ICON_RIG}</div>
+    <h2>${where === 'garage' ? 'Your rigs, your loadouts' : 'Save it to your rig'}</h2>
+    <p>Free account for your crew. Add every drill you run, then save named down hole tool loadouts for each one, like “Rock setup” or “Sand pilot”. Everyone in your company sees the same list.</p>
+    <a class="btn btn-primary btn-block" href="#/account">Create free account</a>
+    <a class="btn btn-ghost btn-block" href="#/account?m=signin">I have an account</a></div>`;
+}
+async function viewGarage() {
+  await loadCatalog(); setStepper(0); setActionbar('');
+  app.innerHTML = '<div class="stack"><div class="skeleton"></div><div class="skeleton"></div></div>';
+  await meReady();
+  if (!ME.user) { app.innerHTML = `<h1>My rigs</h1><p class="muted" style="margin:6px 0 14px">Save tooling loadouts for each machine in your fleet.</p>${guestUpsell('garage')}`; return; }
+  if (!ME.member) { location.replace('#/setup'); return; }
+  let fleet; try { fleet = await fetchFleet(); } catch (e) { app.innerHTML = `<div class="card empty">${esc(errMsg(e))}</div>`; return; }
+  const byM = (id) => fleet.loadouts.filter((l) => l.machine_id === id);
+  app.innerHTML = `
+    <div class="garage-head">
+      <div><small>COMPANY</small><h1>${esc(ME.company.name)}</h1>
+        <div class="small" style="color:#bbb">${esc(ME.member.employee_name)} · ${ME.member.role === 'owner' ? 'Owner' : 'Member'}</div></div>
+      <button class="iconbtn dark" id="acct" aria-label="Account and crew">${ICON_MORE}</button></div>
+    <div class="section-head"><h2>Rigs · ${fleet.machines.length}</h2><button class="linkbtn" id="addm">+ Add machine</button></div>
+    <div class="rig-grid">${fleet.machines.map((mc) => {
+      const los = byM(mc.id), def = los.find((l) => l.is_default) || los[0];
+      return `<a class="rig-card" href="#/rig/${mc.id}">
+        <div class="rig-top"><div><div class="t-brand">${esc(mc.brand || '')} ${esc(mc.model)}</div><div class="rig-name">${esc(rigName(mc))}</div></div>
+          <span class="pill ${los.length ? 'pill-orange' : ''}">${los.length} loadout${los.length === 1 ? '' : 's'}</span></div>
+        ${stripHtml(def)}
+        <div class="rig-foot">${def ? `${ICON_STAR}<span><b>${esc(def.name)}</b> · ${def.part_count} parts</span>` : '<span class="muted">No loadouts yet. Tap to build one.</span>'}${ICON.chev}</div></a>`;
+    }).join('') || `<div class="card empty">No machines yet.<br><br><button class="btn btn-primary" id="addm2">+ Add your first machine</button></div>`}</div>`;
+  $('#addm').addEventListener('click', () => addMachineSheet());
+  $('#addm2')?.addEventListener('click', () => addMachineSheet());
+  $('#acct').addEventListener('click', () => accountSheet());
+}
+function addMachineSheet(prefill) {
+  openSheet(`<div class="sheet-top"><h2>Add a machine</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body stack">
+      <label class="field"><span>Drill</span><select id="am">${drillOptions(prefill)}</select></label>
+      <label class="field"><span>Unit name / number (optional)</span><input id="an" maxlength="60" placeholder="Unit 12, Big Red, #4471…"></label>
+      <div class="form-err" id="aerr" hidden></div></div>
+    <div class="sheet-foot"><button class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" style="flex:1" id="ago">Add machine</button></div>`, (sh) => {
+    $('#ago', sh).addEventListener('click', async () => {
+      const id = +$('#am', sh).value; if (!id) { $('#aerr', sh).textContent = 'Pick a drill.'; $('#aerr', sh).hidden = false; return; }
+      const mm = machine(id), c = await sb();
+      busy($('#ago', sh), true, 'Adding…');
+      const { data, error } = await c.from('bdht_machines').insert({ company_id: ME.company.id, machine_type_id: id, brand: mm.brand, model: mm.model, nickname: $('#an', sh).value.trim() || null }).select().single();
+      if (error) { busy($('#ago', sh), false); $('#aerr', sh).textContent = error.message; $('#aerr', sh).hidden = false; return; }
+      closeSheet(); toast('Machine added'); location.hash = `#/rig/${data.id}`;
+    });
+  });
+}
+async function accountSheet() {
+  const c = await sb();
+  const { data: crew } = await c.from('bdht_members').select('employee_name,role,email').order('created_at');
+  openSheet(`<div class="sheet-top"><div><h2>${esc(ME.company.name)}</h2><div class="small muted">${esc(ME.user.email)}</div></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body stack">
+      <div class="invite"><div><small>CREW INVITE CODE</small><code>${esc(ME.company.invite_code)}</code><div class="small muted">Coworkers pick “Join my company” when they sign up and enter this code.</div></div>
+        <button class="btn btn-ghost btn-sm" id="cpy">${ICON.link} Copy</button></div>
+      <div><div class="form-sub"><b>Crew · ${crew?.length || 0}</b></div>
+        <ul class="mini-list">${(crew || []).map((m) => `<li><span>${esc(m.employee_name)}</span><span class="pill ${m.role === 'owner' ? 'pill-dark' : ''}">${m.role === 'owner' ? 'Owner' : 'Member'}</span></li>`).join('')}</ul></div>
+      ${ME.member.role === 'owner' ? `<label class="field"><span>Company name</span><input id="cn" value="${esc(ME.company.name)}" maxlength="120"></label><button class="btn btn-ghost btn-block" id="cnsave">Rename company</button>` : ''}
+    </div>
+    <div class="sheet-foot"><button class="btn btn-outline btn-block" id="out">Sign out</button></div>`, (sh) => {
+    $('#cpy', sh).addEventListener('click', async () => { await copyText(ME.company.invite_code); toast('Invite code copied'); });
+    $('#cnsave', sh)?.addEventListener('click', async () => {
+      const name = $('#cn', sh).value.trim(); if (!name) return;
+      const { error } = await c.from('bdht_companies').update({ name }).eq('id', ME.company.id);
+      if (error) return toast(error.message); ME.company.name = name; closeSheet(); toast('Company renamed'); route();
+    });
+    $('#out', sh).addEventListener('click', async () => { await c.auth.signOut(); ME.user = ME.member = ME.company = null; loCtx.set(null); updateAcctNav(); closeSheet(); toast('Signed out'); location.hash = '#/'; });
+  });
+}
+
+/* one machine: its loadout cards ("create a class") */
+async function viewRig(id) {
+  await loadCatalog(); setStepper(0); setActionbar('');
+  await meReady();
+  if (!ME.member) { location.replace(ME.user ? '#/setup' : '#/account'); return; }
+  app.innerHTML = '<div class="stack"><div class="skeleton"></div><div class="skeleton"></div></div>';
+  const c = await sb();
+  const [mr, lr] = await Promise.all([c.from('bdht_machines').select('*').eq('id', id).maybeSingle(),
+    c.from('bdht_loadouts').select('*').eq('machine_id', id).order('is_default', { ascending: false }).order('updated_at', { ascending: false })]);
+  const mc = mr.data; if (!mc) return viewNotFound();
+  const los = lr.data || [], cat = machine(mc.machine_type_id);
+  app.innerHTML = `
+    <a class="linkbtn" href="#/garage" style="padding-left:0">‹ All rigs</a>
+    <div class="rig-hero">
+      <div style="min-width:0"><div class="t-brand" style="color:#ff9a55">${esc(rigSub(mc))}</div><h1>${esc(rigName(mc))}</h1>
+        <div class="small" style="color:#bbb">${los.length} loadout${los.length === 1 ? '' : 's'} · shared with ${esc(ME.company.name)}</div></div>
+      <button class="iconbtn dark" id="mmenu" aria-label="Machine options">${ICON_MORE}</button></div>
+    <button class="btn btn-primary btn-block" id="newlo" style="margin:14px 0 4px" ${cat?.pipes.length ? '' : 'disabled'}>+ New loadout</button>
+    <div class="section-head"><h2>Loadouts</h2><span class="small muted">Tap ⋯ to rename, copy or set default</span></div>
+    <div class="lo-grid">${los.map((lo) => {
+      const pipe = pipeOf(cat, lo.pipe_id), key = loKey(lo);
+      return `<article class="lo-card ${lo.is_default ? 'is-default' : ''}">
+        <div class="lo-top"><div style="min-width:0"><div class="lo-name">${esc(lo.name)}${lo.is_default ? `<span class="pill pill-dark">${ICON_STAR}Default</span>` : ''}</div>
+          <div class="small muted">${esc(pipe?.name || 'Pipe')} · ${lo.mode === 'Bit' ? 'Bit' : 'Backreamer'} · ${lo.part_count} parts</div></div>
+          <button class="iconbtn" data-lomenu="${lo.id}" aria-label="Options for ${esc(lo.name)}">${ICON_MORE}</button></div>
+        ${stripHtml(lo)}
+        ${key ? `<div class="lo-key"><span>${lo.mode === 'Bit' ? 'Bit' : 'Reamer'}</span><b>${esc(key.name)}</b>${key.pn ? `<code>#${esc(key.pn)}</code>` : ''}</div>` : ''}
+        <div class="lo-actions"><button class="btn btn-outline" data-loedit="${lo.id}">✎ Edit</button><a class="btn btn-primary" href="#/summary?c=${b64e(lo.config)}">Parts &amp; quote</a></div>
+      </article>`;
+    }).join('') || `<div class="card empty">No loadouts for this rig yet.<br>Build one: pick pipe, then tap through tooling from rig to bit.</div>`}</div>`;
+  const ctxFor = (lo) => ({ machine: { id: mc.id, machine_type_id: mc.machine_type_id, model: mc.model, brand: mc.brand, nickname: mc.nickname }, loadout: lo ? { id: lo.id, name: lo.name } : null });
+  $('#newlo').addEventListener('click', () => { loCtx.set(ctxFor(null)); location.hash = `#/pipe/${mc.machine_type_id}`; });
+  $$('[data-loedit]').forEach((b) => b.addEventListener('click', () => { const lo = los.find((x) => x.id === b.dataset.loedit); loCtx.set(ctxFor(lo)); location.hash = `#/build?c=${b64e(lo.config)}`; }));
+  $$('[data-lomenu]').forEach((b) => b.addEventListener('click', () => loMenu(los.find((x) => x.id === b.dataset.lomenu), mc, los)));
+  $('#mmenu').addEventListener('click', () => machineMenu(mc, los.length));
+}
+function loMenu(lo, mc, los) {
+  openSheet(`<div class="sheet-top"><div><div class="small muted">${esc(rigName(mc))}</div><h2>${esc(lo.name)}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body stack">
+      <label class="field"><span>Name</span><input id="lr" value="${esc(lo.name)}" maxlength="60"></label>
+      <button class="btn btn-ghost btn-block" id="lrn">Rename</button>
+      <div class="menu-grid">
+        <button class="btn btn-ghost" id="ldef" ${lo.is_default ? 'disabled' : ''}>${ICON_STAR} ${lo.is_default ? 'Default' : 'Set default'}</button>
+        <button class="btn btn-ghost" id="ldup"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11z"/></svg> Duplicate</button>
+        <button class="btn btn-ghost" id="lshare">${ICON.share} Share</button>
+        <a class="btn btn-ghost" href="#/summary?c=${b64e(lo.config)}">${ICON.mail} Quote</a>
+      </div>
+      <button class="btn btn-ghost btn-block danger" id="ldel">${ICON.trash} Delete loadout</button></div>`, async (sh) => {
+    const c = await sb(), done = (m) => { closeSheet(); toast(m); setTimeout(route, 240); };
+    const fail = (e) => toast(errMsg(e));
+    $('#lrn', sh).addEventListener('click', async () => { const name = $('#lr', sh).value.trim(); if (!name) return; const { error } = await c.from('bdht_loadouts').update({ name, updated_at: new Date().toISOString() }).eq('id', lo.id); error ? fail(error) : done('Renamed'); });
+    $('#ldef', sh).addEventListener('click', async () => { const { error } = await c.rpc('bdht_set_default_loadout', { p_loadout: lo.id }); error ? fail(error) : done(`${lo.name} is now the default`); });
+    $('#ldup', sh).addEventListener('click', async () => {
+      let name = `${lo.name} copy`, n = 2; while (los.some((x) => x.name === name)) name = `${lo.name} copy ${n++}`;
+      const { id, created_at, updated_at, is_default, created_by, ...rest } = lo;
+      const { error } = await c.from('bdht_loadouts').insert({ ...rest, name: name.slice(0, 60), is_default: false }); error ? fail(error) : done('Duplicated');
+    });
+    $('#lshare', sh).addEventListener('click', async () => {
+      const url = shareUrl(lo.config), title = `${lo.name} · ${rigName(mc)}`;
+      if (navigator.share) { try { await navigator.share({ title, text: `${title} drill string (The Better Down Hole Tool)`, url }); } catch {} } else { await copyText(url); toast('Link copied'); }
+    });
+    $('#ldel', sh).addEventListener('click', async () => { if (!confirm(`Delete “${lo.name}”?`)) return; const { error } = await c.from('bdht_loadouts').delete().eq('id', lo.id); error ? fail(error) : done('Deleted'); });
+  });
+}
+function machineMenu(mc, nLo) {
+  openSheet(`<div class="sheet-top"><div><div class="small muted">${esc(rigSub(mc))}</div><h2>${esc(rigName(mc))}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body stack">
+      <label class="field"><span>Unit name / number</span><input id="mn" value="${esc(mc.nickname || '')}" maxlength="60" placeholder="Unit 12"></label>
+      <button class="btn btn-ghost btn-block" id="mns">Save name</button>
+      <button class="btn btn-ghost btn-block danger" id="mdel">${ICON.trash} Remove machine${nLo ? ` and its ${nLo} loadout${nLo > 1 ? 's' : ''}` : ''}</button></div>`, async (sh) => {
+    const c = await sb();
+    $('#mns', sh).addEventListener('click', async () => { const { error } = await c.from('bdht_machines').update({ nickname: $('#mn', sh).value.trim() || null }).eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Saved'); setTimeout(route, 240); });
+    $('#mdel', sh).addEventListener('click', async () => { if (!confirm(`Remove ${rigName(mc)}${nLo ? ' and its loadouts' : ''}?`)) return; const { error } = await c.from('bdht_machines').delete().eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Machine removed'); if (!error) location.hash = '#/garage'; });
+  });
+}
+
+/* loadout editor hooks used by the pipe + build steps */
+function loBanner(ctx, label) {
+  return `<div class="lo-banner"><div style="min-width:0"><small>${label}</small><b>${esc(ctx.loadout?.name || 'New loadout')}</b><span> · ${esc(rigName(ctx.machine))}</span></div>
+    <button class="iconbtn dark" id="loexit" aria-label="Stop editing loadout">✕</button></div>`;
+}
+function mountLoBanner() {
+  $('#loexit')?.addEventListener('click', () => { const c = loCtx.get(); loCtx.set(null); toast('Left loadout editor'); location.hash = c ? `#/rig/${c.machine.id}` : '#/garage'; });
+}
+function loSaveSheet(cfg, ctx) {
+  const def = ctx.loadout?.name || (cfg.mode === 'Bit' ? 'Pilot setup' : 'Backream setup');
+  openSheet(`<div class="sheet-top"><div><div class="small muted">${esc(rigName(ctx.machine))}</div><h2>${ctx.loadout ? 'Save loadout' : 'Save new loadout'}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body stack"><label class="field"><span>Loadout name</span><input id="lname" value="${esc(def)}" maxlength="60" placeholder="Rock setup, Sand pilot, Backream 12in…"></label>
+      <div class="chips">${['Rock setup', 'Sand pilot', 'Clay pilot', 'Backream 12in'].map((s) => `<button class="chip" data-sug="${s}">${s}</button>`).join('')}</div>
+      ${ctx.loadout ? `<label class="check"><input type="checkbox" id="lcopy"> Save as a new copy instead</label>` : ''}
+      <p class="small muted">Everyone at ${esc(ME.company?.name || 'your company')} will see it on this rig.</p></div>
+    <div class="sheet-foot"><button class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" style="flex:1" id="lgo">${ICON.save} Save loadout</button></div>`, (sh) => {
+    $$('[data-sug]', sh).forEach((b) => b.addEventListener('click', () => { $('#lname', sh).value = b.dataset.sug; }));
+    $('#lgo', sh).addEventListener('click', async () => {
+      const name = $('#lname', sh).value.trim() || def, asCopy = $('#lcopy', sh)?.checked;
+      busy($('#lgo', sh), true, 'Saving…');
+      try {
+        const saved = await saveLoadout(cfg, ctx.machine.id, asCopy ? null : ctx.loadout?.id, name);
+        loCtx.set(null); closeSheet(); toast(`Saved “${saved.name}”`); location.hash = `#/rig/${ctx.machine.id}`;
+      } catch (e) { busy($('#lgo', sh), false); toast(errMsg(e)); }
+    });
+  });
+}
+async function saveLoadout(cfg, machineId, id, name) {
+  const rm = await loadRoadmap(cfg.r), items = lineItems(rm, cfg, compute(rm, cfg)), c = await sb();
+  const payload = { company_id: ME.company.id, machine_id: machineId, name: name.slice(0, 60), pipe_id: cfg.p, roadmap_id: cfg.r, mode: cfg.mode,
+    config: JSON.parse(JSON.stringify(cfg)), part_count: items.length, updated_at: new Date().toISOString(),
+    items: items.map((l) => ({ sec: l.sec, type: l.part.type || null, name: l.part.name, pn: l.part.pn || null, img: l.part.img || null, qty: l.qty, acc: !!l.acc })) };
+  if (!id) { const { count } = await c.from('bdht_loadouts').select('id', { count: 'exact', head: true }).eq('machine_id', machineId); payload.is_default = !count; }
+  const { data, error } = await (id ? c.from('bdht_loadouts').update(payload).eq('id', id) : c.from('bdht_loadouts').insert(payload)).select().single();
+  if (error) throw error; return data;
+}
+async function saveToRigSection(cfg, sh) {
+  const box = $('#rigsave', sh); if (!box) return;
+  await meReady();
+  if (!ME.user || !ME.member) { box.innerHTML = guestUpsell('save'); return; }
+  const c = await sb(); const { data } = await c.from('bdht_machines').select('*').eq('machine_type_id', cfg.m).order('created_at');
+  const mm = machine(cfg.m);
+  box.innerHTML = `<div class="form-sub"><b>Save as a loadout on a rig</b><span class="small muted">Shared with ${esc(ME.company.name)}</span></div>
+    <div class="stack" style="margin-top:8px">${(data || []).map((mc) => `<button class="choice" data-rig="${mc.id}"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div>${ICON.chev}</button>`).join('') ||
+      `<p class="small muted">No ${esc(mm?.model || '')} in your rigs yet.</p><button class="btn btn-ghost btn-block" id="addthis">+ Add a ${esc(mm?.model || 'machine')} to my rigs</button>`}</div>`;
+  $$('[data-rig]', box).forEach((b) => b.addEventListener('click', () => {
+    const mc = data.find((x) => x.id === b.dataset.rig);
+    closeSheet(); setTimeout(() => loSaveSheet(cfg, { machine: mc, loadout: null }), 230);
+  }));
+  $('#addthis', box)?.addEventListener('click', () => { closeSheet(); setTimeout(() => addMachineSheet(cfg.m), 230); });
+}
+
+/* ---------- router ---------- */
+async function route() {
+  const h = location.hash.slice(1) || '/';
+  const [path, qs] = h.split('?');
+  const q = new URLSearchParams(qs || '');
+  const parts = path.split('/').filter(Boolean);
+  const navKey = ['rig', 'account', 'setup'].includes(parts[0]) ? 'garage' : parts[0];
+  $$('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === navKey));
+  if (!$('#sheet').hidden) closeSheet();
+  try {
+    switch (parts[0]) {
+      case undefined: viewHome(); break;
+      case 'drill': await viewDrill(); break;
+      case 'pipe': await viewPipe(parts[1]); break;
+      case 'build': await viewBuild(q); break;
+      case 'summary': await viewSummary(q); break;
+      case 'saved': viewSaved(); break;
+      case 'dealer': viewDealer(); break;
+      case 'account': await viewAccount(q); break;
+      case 'setup': await viewSetup(); break;
+      case 'garage': await viewGarage(); break;
+      case 'rig': await viewRig(parts[1]); break;
+      default: viewNotFound();
+    }
+  } catch (e) {
+    console.error(e);
+    app.innerHTML = `<div class="card empty"><h2>Something went wrong</h2><p>${esc(e.message)}</p><a class="btn btn-primary" href="#/">Home</a></div>`;
+  }
+}
+let lastPath = '';
+window.addEventListener('hashchange', () => {
+  const p = location.hash.split('?')[0];
+  if (p !== lastPath) window.scrollTo({ top: 0 });
+  lastPath = p; route();
+});
+updateSavedBadge();
+loadCatalog().catch(() => {});
+lastPath = location.hash.split('?')[0];
+route();
+// account state loads in the background; guests never wait on it
+meReady().then(() => { const h = location.hash.split('?')[0]; if (h === '' || h === '#/' || h === '#') viewHome(); });

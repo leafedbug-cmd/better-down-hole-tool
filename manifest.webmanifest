@@ -1,0 +1,18 @@
+{
+  "name": "The Better Down Hole Tool",
+  "short_name": "Down Hole Tool",
+  "description": "Build a compatible HDD drill string and send the Ditch Witch parts list to Ditch Witch of Arkansas.",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "img/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

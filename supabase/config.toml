@@ -1,0 +1,9 @@
+# Gateway JWT check. The webhook authenticates with the Stripe signature instead.
+[functions.bdht-create-checkout]
+verify_jwt = true
+
+[functions.bdht-create-portal]
+verify_jwt = true
+
+[functions.bdht-stripe-webhook]
+verify_jwt = false

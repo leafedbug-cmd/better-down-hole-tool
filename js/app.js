@@ -1,6 +1,7 @@
 /* The Better Down Hole Tool – mobile-first HDD drill-string builder.
    Data: data/catalog.json + data/roadmaps/<id>.json, generated from public manufacturer catalog APIs
    by tools/build_data.py. Compatibility rules mirror the source configurator. */
+import { FREE_MACHINE_LIMIT, canAddMachine } from './billing.mjs';
 
 const IMG_HOST = 'https://www.hddadvisor.com';
 
@@ -842,12 +843,12 @@ const SB_URL = 'https://rdyhhszmfpomixaoehgy.supabase.co';
 const SB_KEY = 'sb_publishable_3XIxMYWm9FnbzybMqpWXfg_T-TsFqT7';
 const PENDING_KEY = 'bdht.pendingSetup', LO_KEY = 'bdht.loCtx';
 let SB = null;
-const ME = { user: null, member: null, company: null };
+const ME = { user: null, member: null, company: null, billing: null };
 async function sb() {
   if (!SB) {
     const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm');
     SB = createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'bdht.auth', flowType: 'pkce', detectSessionInUrl: true } });
-    SB.auth.onAuthStateChange((ev) => { if (ev === 'PASSWORD_RECOVERY') setTimeout(() => { location.hash = '#/account?m=reset'; }, 0); if (ev === 'SIGNED_OUT') { ME.user = ME.member = ME.company = null; updateAcctNav(); } });
+    SB.auth.onAuthStateChange((ev) => { if (ev === 'PASSWORD_RECOVERY') setTimeout(() => { location.hash = '#/account?m=reset'; }, 0); if (ev === 'SIGNED_OUT') { ME.user = ME.member = ME.company = ME.billing = null; updateAcctNav(); } });
   }
   return SB;
 }
@@ -855,10 +856,15 @@ async function refreshMe() {
   try {
     const c = await sb();
     const { data: { session } } = await c.auth.getSession();
-    ME.user = session?.user || null; ME.member = ME.company = null;
+    ME.user = session?.user || null; ME.member = ME.company = ME.billing = null;
     if (ME.user) {
       const { data } = await c.from('bdht_members').select('*, company:bdht_companies(*)').eq('user_id', ME.user.id).maybeSingle();
-      if (data) { ME.member = data; ME.company = data.company; }
+      if (data) {
+        ME.member = data;
+        ME.company = data.company;
+        const { data: billing, error: billingError } = await c.from('bdht_billing').select('*').eq('company_id', data.company_id).maybeSingle();
+        ME.billing = billingError ? null : billing;
+      }
     }
   } catch (e) { console.warn('account service unavailable', e); }
   updateAcctNav(); return ME;
@@ -959,7 +965,7 @@ function onboardForm(withAuth) {
     <label class="field"><span>Your name</span><input id="emp" autocomplete="name" maxlength="120" placeholder="First and last name" value="${esc(p.employee || '')}"></label>
     ${withAuth ? `<label class="field"><span>Email</span><input id="e" type="email" autocomplete="email" inputmode="email"></label>
     <label class="field"><span>Password <em class="muted" style="font-style:normal;font-weight:500">(8+ characters)</em></span><input id="pw" type="password" autocomplete="new-password" minlength="8"></label>` : ''}
-    <div><div class="form-sub"><b>Your operators</b><span class="small muted" id="msub">Add every drill your crew runs. Give each a unit name or number.</span></div>
+    <div><div class="form-sub"><b>Your operators</b><span class="small muted" id="msub">Free plan: up to ${FREE_MACHINE_LIMIT} drills. Upgrade later for unlimited at $2.99/month.</span></div>
       <div id="mlist" class="stack" style="margin-top:10px"></div>
       <button type="button" class="btn btn-ghost btn-block" id="madd" style="margin-top:10px">+ Add another operator</button></div>
     <div class="form-err" id="err" hidden></div>
@@ -978,11 +984,19 @@ function mountOnboard(withAuth) {
     $$('[data-mrm]').forEach((b) => b.addEventListener('click', () => { rows.splice(+b.dataset.mrm, 1); draw(); }));
   };
   draw();
-  $('#madd').addEventListener('click', () => { rows.push({ id: '', nick: '' }); draw(); $$('#mlist select').at(-1).focus(); });
+  $('#madd').addEventListener('click', () => {
+    if (cm === 'new' && rows.length >= FREE_MACHINE_LIMIT) {
+      err(`Free crews can add ${FREE_MACHINE_LIMIT} operators at signup. Upgrade in the garage for unlimited.`);
+      return;
+    }
+    rows.push({ id: '', nick: '' }); draw(); $$('#mlist select').at(-1).focus();
+  });
   $$('[data-cm]').forEach((b) => b.addEventListener('click', () => {
     cm = b.dataset.cm; $$('[data-cm]').forEach((x) => x.setAttribute('aria-pressed', x === b));
     $$('[data-show]').forEach((el) => { el.hidden = el.dataset.show !== cm; });
-    $('#msub').textContent = cm === 'join' ? 'Optional: your company’s operators show up after you join. Add any that are missing.' : 'Add every drill your crew runs. Give each a unit name or number.';
+    $('#msub').textContent = cm === 'join'
+      ? 'Optional. A free company stops at 3 operators. A paid company can add more after you join.'
+      : `Free plan: up to ${FREE_MACHINE_LIMIT} drills. Upgrade later for unlimited at $2.99/month.`;
   }));
   const err = (m) => { const e = $('#err'); e.textContent = m; e.hidden = !m; if (m) e.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
   $('#fon').addEventListener('submit', async (ev) => {
@@ -993,6 +1007,7 @@ function mountOnboard(withAuth) {
     if (cm === 'join' && p.code.length < 6) return err('Enter the invite code from your company’s account owner.');
     if (!p.employee) return err('Enter your name.');
     if (cm === 'new' && !p.machines.length) return err('Pick at least one drill.');
+    if (cm === 'new' && p.machines.length > FREE_MACHINE_LIMIT) return err(`Free crews can add ${FREE_MACHINE_LIMIT} operators. Upgrade after signup for unlimited.`);
     const go = $('#go'); busy(go, true, withAuth ? 'Creating account…' : 'Saving…');
     try {
       if (withAuth) {
@@ -1023,11 +1038,17 @@ async function runSetup(p) {
     : await c.rpc('bdht_create_company', { p_company: p.company, p_employee: p.employee });
   if (r.error) throw r.error;
   const cid = r.data;
-  if (p.machines?.length) {
-    const ins = p.machines.map((m) => { const mm = machine(m.id); return { company_id: cid, machine_type_id: m.id, brand: mm?.brand, model: mm?.model || String(m.id), nickname: m.nick || null }; });
-    const { error } = await c.from('bdht_machines').insert(ins); if (error) throw error;
+  let stoppedAtLimit = false;
+  for (const m of p.machines || []) {
+    const mm = machine(m.id);
+    const { error } = await c.from('bdht_machines').insert({ company_id: cid, machine_type_id: m.id, brand: mm?.brand, model: mm?.model || String(m.id), nickname: m.nick || null });
+    if (error) {
+      if (/Free plan includes 3/.test(error.message || '')) { stoppedAtLimit = true; break; }
+      throw error;
+    }
   }
   store.set(PENDING_KEY, null); await refreshMe();
+  if (stoppedAtLimit) toast('Free plan stops at 3 operators. Upgrade in the garage for unlimited.');
 }
 
 /* garage: the company's machines */
@@ -1050,9 +1071,113 @@ function guestUpsell(where) {
   return `<div class="upsell card pad stack">
     <div class="upsell-ico">${ICON_RIG}</div>
     <h2>${where === 'garage' ? 'Operators and loadouts' : 'Save it on an operator'}</h2>
-    <p>Free crew account. Each drill is an operator. Each saved setup is a named loadout, like “Rock setup” or “Sand pilot”. Everyone in the company sees the same classes.</p>
+    <p>Free crew account, up to ${FREE_MACHINE_LIMIT} operators. Each drill is an operator, and each saved setup is a named loadout. Unlimited operators are $2.99/month.</p>
     <a class="btn btn-primary btn-block" href="#/account">Create free account</a>
     <a class="btn btn-ghost btn-block" href="#/account?m=signin">I have an account</a></div>`;
+}
+const isEntitled = () => ME.billing?.entitled === true;
+function billingDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function planCopy(count) {
+  const b = ME.billing || {};
+  if (b.entitled) {
+    const when = billingDate(b.current_period_end);
+    const detail = b.cancel_at_period_end
+      ? `Cancels ${when || 'at period end'}. Unlimited until then.`
+      : (when ? `Renews ${when}.` : '$2.99/month.');
+    return { title: 'Unlimited · $2.99/mo', detail, paid: true };
+  }
+  const title = count > FREE_MACHINE_LIMIT
+    ? `Free · ${count} operators saved`
+    : `Free · ${count} of ${FREE_MACHINE_LIMIT} operators`;
+  let detail = 'Unlimited operators are $2.99/month.';
+  if (count >= FREE_MACHINE_LIMIT) detail = 'This crew is at the free limit. Upgrade for unlimited operators, $2.99/month.';
+  if (b.subscription_status === 'past_due' || b.payment_failed_at) {
+    detail = 'The last invoice failed. New operators stay capped at 3 until billing is active. Existing operators stay.';
+  }
+  return { title, detail, paid: false };
+}
+function billingAlerts() {
+  const b = ME.billing;
+  if (!b) return '';
+  const notes = [];
+  if (b.open_dispute_id) notes.push('A charge on this subscription was disputed. The owner can review it in Manage billing.');
+  if (b.fraud_warning_id) notes.push('The card network flagged a charge for possible fraud. Review the warning in the Stripe Dashboard.');
+  if (b.last_refunded_at) notes.push(`A charge was refunded${b.last_refund_amount ? ` ($${(b.last_refund_amount / 100).toFixed(2)})` : ''}. Operator access still follows the subscription status.`);
+  return notes.map((text) => `<div class="note note-warn"><span>${esc(text)}</span></div>`).join('');
+}
+function planBanner(count) {
+  const plan = planCopy(count);
+  const owner = ME.member?.role === 'owner';
+  const actions = owner
+    ? `${plan.paid ? '' : '<button class="btn btn-primary" id="upgrade">Upgrade · $2.99/mo</button>'}${ME.billing?.stripe_customer_id ? '<button class="btn btn-ghost" id="portal">Manage billing</button>' : ''}`
+    : (plan.paid ? '' : '<p class="small muted">The company owner upgrades the plan.</p>');
+  return `<section class="plan-banner ${plan.paid ? 'is-paid' : ''}" aria-label="Plan">
+    <div><small>Plan</small><b>${esc(plan.title)}</b><p>${esc(plan.detail)}</p></div>
+    <div class="plan-actions">${actions}</div></section>`;
+}
+function consumeBillingReturn() {
+  const billing = new URLSearchParams(location.search).get('billing');
+  if (!billing) return null;
+  history.replaceState(null, '', location.pathname + location.hash);
+  return billing;
+}
+async function functionError(error) {
+  let message = error?.message || 'Billing request failed';
+  try {
+    const body = await error?.context?.json?.();
+    if (body?.error) message = body.error;
+  } catch { /* body already consumed */ }
+  return new Error(message);
+}
+async function startCheckout(btn) {
+  if (ME.member?.role !== 'owner') return toast('The company owner upgrades the plan.');
+  busy(btn, true, 'Opening checkout…');
+  try {
+    const c = await sb();
+    const { data, error } = await c.functions.invoke('bdht-create-checkout', { body: {} });
+    if (error) throw await functionError(error);
+    if (!data?.url) throw new Error('Checkout did not return a link.');
+    location.href = data.url;
+  } catch (e) {
+    busy(btn, false);
+    const msg = errMsg(e);
+    if (/Manage billing|update the card/i.test(msg)) { toast(msg); return startPortal(); }
+    toast(msg);
+  }
+}
+async function startPortal(btn) {
+  if (ME.member?.role !== 'owner') return toast('The company owner manages billing.');
+  busy(btn, true, 'Opening billing…');
+  try {
+    const c = await sb();
+    const { data, error } = await c.functions.invoke('bdht-create-portal', { body: {} });
+    if (error) throw await functionError(error);
+    if (!data?.url) throw new Error('Billing portal did not return a link.');
+    location.href = data.url;
+  } catch (e) { busy(btn, false); toast(errMsg(e)); }
+}
+function wirePlanActions(root = document) {
+  $('#upgrade', root)?.addEventListener('click', (ev) => startCheckout(ev.currentTarget));
+  $('#portal', root)?.addEventListener('click', (ev) => startPortal(ev.currentTarget));
+}
+function upgradeSheet() {
+  const owner = ME.member?.role === 'owner';
+  openSheet(`<div class="sheet-top"><div><div class="small muted">Unlimited operators</div><h2>$2.99/month</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body stack">
+      <p>Free crews save up to ${FREE_MACHINE_LIMIT} operators. Unlimited removes that cap for the whole company. Checkout is on Stripe. This page does not unlock the plan by itself.</p>
+      ${owner ? '' : '<p class="small muted">Ask the company owner to upgrade. Members can keep using the operators already saved.</p>'}
+    </div>
+    <div class="sheet-foot">${owner ? '<button class="btn btn-primary" style="flex:1" id="upgrade">Continue to checkout</button>' : '<button class="btn btn-ghost" data-close>Close</button>'}</div>`, (sh) => {
+    wirePlanActions(sh);
+  });
+}
+function requestAddOperator(count, prefill) {
+  if (!canAddMachine(count, isEntitled())) return upgradeSheet();
+  return addMachineSheet(prefill);
 }
 async function viewGarage() {
   await loadCatalog(); setStepper(0); setActionbar('');
@@ -1061,6 +1186,7 @@ async function viewGarage() {
   const phone = getSaved();
   const unsaved = store.get(LAST_KEY, null);
   const unsavedOpen = unsaved?.cfg?.r && needsGarageSave(unsaved.cfg);
+  const billingFlag = consumeBillingReturn();
   if (!ME.user) {
     app.innerHTML = `${pageHead('Class select', 'My rigs', 'Each drill is an operator. Each saved setup is a named loadout. Sign in to keep the class on that drill.')}
       ${unsavedOpen ? `<div class="note" style="margin-bottom:12px"><span><b>${esc(unsaved.title || 'This loadout')} is not in My rigs yet.</b> Sign in and it is saved on the drill. <button class="linkbtn" id="stash-in" type="button">Sign in and save</button></span></div>` : ''}
@@ -1079,14 +1205,27 @@ async function viewGarage() {
   if (!ME.member) { location.replace('#/setup'); return; }
   let finish = null;
   try { finish = await consumePendingSave(); } catch (e) { toast(errMsg(e)); }
+  if (billingFlag === 'success' && !isEntitled()) {
+    toast('Checkout finished. Unlimited operators turn on when Stripe confirms the subscription.');
+    for (let i = 0; i < 3 && !isEntitled(); i++) {
+      await new Promise((r) => setTimeout(r, 2000));
+      await refreshMe();
+    }
+    if (isEntitled()) toast('Unlimited operators are on.');
+  } else if (billingFlag === 'cancel') toast('Checkout canceled. This crew is still on the free plan.');
+  else if (billingFlag === 'portal') toast('Back from billing. Pull to refresh if the plan looks stale.');
   let fleet; try { fleet = await fetchFleet(); } catch (e) { app.innerHTML = `<div class="card empty">${esc(errMsg(e))}</div>`; return; }
+  const count = fleet.machines.length;
+  const atLimit = !canAddMachine(count, isEntitled());
   const byM = (id) => fleet.loadouts.filter((l) => l.machine_id === id);
   app.innerHTML = `
     <div class="garage-head">
       <div><small>Class select</small><h1>${esc(ME.company.name)}</h1>
         <div class="small muted">${esc(ME.member.employee_name)} · ${ME.member.role === 'owner' ? 'Owner' : 'Member'}</div></div>
       <button class="iconbtn dark" id="acct" aria-label="Account and crew">${ICON_MORE}</button></div>
-    <div class="section-head"><h2>Operators · ${fleet.machines.length}</h2><button class="linkbtn" id="addm">+ Add operator</button></div>
+    ${planBanner(count)}
+    ${billingAlerts()}
+    <div class="section-head"><h2>Operators · ${count}</h2><button class="linkbtn" id="addm">${atLimit ? 'Upgrade for unlimited' : '+ Add operator'}</button></div>
     <div class="rig-grid">${fleet.machines.map((mc) => {
       const los = byM(mc.id), def = los.find((l) => l.is_default) || los[0];
       return `<a class="rig-card" href="#/rig/${mc.id}">
@@ -1098,7 +1237,8 @@ async function viewGarage() {
     }).join('') || `<div class="card empty"><h2>No operators yet</h2><p>Add a drill to start a class.</p><button class="btn btn-primary" id="addm2">+ Add operator</button></div>`}</div>
     ${finish?.pending ? `<div class="note" style="margin-top:12px"><span><b>Finish saving “${esc(finish.pending.name)}”.</b> Pick the operator.
       <span class="chips" style="margin-top:8px">${finish.machines.map((mc) => `<button type="button" class="chip" data-finish="${mc.id}">${esc(rigName(mc))}</button>`).join('')}</span></span></div>` : ''}`;
-  $('#addm').addEventListener('click', () => addMachineSheet());
+  const openAdd = () => requestAddOperator(count);
+  $('#addm').addEventListener('click', openAdd);
   $$('[data-finish]').forEach((b) => b.addEventListener('click', async () => {
     try {
       const saved = await saveLoadout(finish.pending.cfg, b.dataset.finish, null, finish.pending.name);
@@ -1108,8 +1248,9 @@ async function viewGarage() {
       route();
     } catch (e) { toast(errMsg(e)); }
   }));
-  $('#addm2')?.addEventListener('click', () => addMachineSheet());
-  $('#acct').addEventListener('click', () => accountSheet());
+  $('#addm2')?.addEventListener('click', openAdd);
+  $('#acct').addEventListener('click', () => accountSheet(count));
+  wirePlanActions();
 }
 function addMachineSheet(prefill) {
   openSheet(`<div class="sheet-top"><h2>Add an operator</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
@@ -1123,16 +1264,22 @@ function addMachineSheet(prefill) {
       const mm = machine(id), c = await sb();
       busy($('#ago', sh), true, 'Adding…');
       const { data, error } = await c.from('bdht_machines').insert({ company_id: ME.company.id, machine_type_id: id, brand: mm.brand, model: mm.model, nickname: $('#an', sh).value.trim() || null }).select().single();
-      if (error) { busy($('#ago', sh), false); $('#aerr', sh).textContent = error.message; $('#aerr', sh).hidden = false; return; }
+      if (error) {
+        busy($('#ago', sh), false);
+        if (/Free plan includes 3/.test(error.message || '')) { closeSheet(); setTimeout(upgradeSheet, 220); return; }
+        $('#aerr', sh).textContent = errMsg(error); $('#aerr', sh).hidden = false; return;
+      }
       closeSheet(); toast('Operator added'); location.hash = `#/rig/${data.id}`;
     });
   });
 }
-async function accountSheet() {
+async function accountSheet(machineCount) {
   const c = await sb();
   const { data: crew } = await c.from('bdht_members').select('employee_name,role,email').order('created_at');
+  const count = Number.isFinite(machineCount) ? machineCount : null;
   openSheet(`<div class="sheet-top"><div><h2>${esc(ME.company.name)}</h2><div class="small muted">${esc(ME.user.email)}</div></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body stack">
+      ${count == null ? '' : planBanner(count)}
       <div class="invite"><div><small>CREW INVITE CODE</small><code>${esc(ME.company.invite_code)}</code><div class="small muted">Coworkers pick “Join my company” when they sign up and enter this code.</div></div>
         <button class="btn btn-ghost btn-sm" id="cpy">${ICON.link} Copy</button></div>
       <div><div class="form-sub"><b>Crew · ${crew?.length || 0}</b></div>
@@ -1140,13 +1287,14 @@ async function accountSheet() {
       ${ME.member.role === 'owner' ? `<label class="field"><span>Company name</span><input id="cn" value="${esc(ME.company.name)}" maxlength="120"></label><button class="btn btn-ghost btn-block" id="cnsave">Rename company</button>` : ''}
     </div>
     <div class="sheet-foot"><button class="btn btn-outline btn-block" id="out">Sign out</button></div>`, (sh) => {
+    wirePlanActions(sh);
     $('#cpy', sh).addEventListener('click', async () => { await copyText(ME.company.invite_code); toast('Invite code copied'); });
     $('#cnsave', sh)?.addEventListener('click', async () => {
       const name = $('#cn', sh).value.trim(); if (!name) return;
       const { error } = await c.from('bdht_companies').update({ name }).eq('id', ME.company.id);
       if (error) return toast(error.message); ME.company.name = name; closeSheet(); toast('Company renamed'); route();
     });
-    $('#out', sh).addEventListener('click', async () => { await c.auth.signOut(); ME.user = ME.member = ME.company = null; loCtx.set(null); sessionStorage.removeItem(GARAGE_FP_KEY); updateAcctNav(); closeSheet(); toast('Signed out'); goHash('#/'); });
+    $('#out', sh).addEventListener('click', async () => { await c.auth.signOut(); ME.user = ME.member = ME.company = ME.billing = null; loCtx.set(null); sessionStorage.removeItem(GARAGE_FP_KEY); updateAcctNav(); closeSheet(); toast('Signed out'); goHash('#/'); });
   });
 }
 
@@ -1272,16 +1420,22 @@ async function saveToRigSection(cfg, sh) {
   const box = $('#rigsave', sh); if (!box) return;
   await meReady();
   if (!ME.user || !ME.member) { box.innerHTML = guestUpsell('save'); return; }
-  const c = await sb(); const { data } = await c.from('bdht_machines').select('*').eq('machine_type_id', cfg.m).order('created_at');
+  const c = await sb();
+  const [{ data }, counted] = await Promise.all([
+    c.from('bdht_machines').select('*').eq('machine_type_id', cfg.m).order('created_at'),
+    c.from('bdht_machines').select('id', { count: 'exact', head: true }),
+  ]);
   const mm = machine(cfg.m);
+  const atLimit = !canAddMachine(counted.count || 0, isEntitled());
+  const addLabel = atLimit ? 'Upgrade for another operator' : `+ Add a ${mm?.model || 'drill'}`;
   box.innerHTML = `<div class="form-sub"><b>Save on an operator</b><span class="small muted">Shared with ${esc(ME.company.name)}</span></div>
     <div class="stack" style="margin-top:8px">${(data || []).map((mc) => `<button class="choice" data-rig="${mc.id}"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div>${ICON.chev}</button>`).join('') ||
-      `<p class="small muted">No ${esc(mm?.model || '')} in your operators yet.</p><button class="btn btn-ghost btn-block" id="addthis">+ Add a ${esc(mm?.model || 'drill')}</button>`}</div>`;
+      `<p class="small muted">No ${esc(mm?.model || '')} in your operators yet.</p><button class="btn ${atLimit ? 'btn-primary' : 'btn-ghost'} btn-block" id="addthis">${esc(addLabel)}</button>`}</div>`;
   $$('[data-rig]', box).forEach((b) => b.addEventListener('click', () => {
     const mc = data.find((x) => x.id === b.dataset.rig);
     closeSheet(); setTimeout(() => loSaveSheet(cfg, { machine: mc, loadout: null }), 230);
   }));
-  $('#addthis', box)?.addEventListener('click', () => { closeSheet(); setTimeout(() => addMachineSheet(cfg.m), 230); });
+  $('#addthis', box)?.addEventListener('click', () => { closeSheet(); setTimeout(() => requestAddOperator(counted.count || 0, cfg.m), 230); });
 }
 
 /* ---------- router ---------- */

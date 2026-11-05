@@ -1,7 +1,7 @@
 {
   "name": "The Better Down Hole Tool",
   "short_name": "Down Hole Tool",
-  "description": "Build a compatible HDD drill string and send the Ditch Witch parts list to Ditch Witch of Arkansas.",
+  "description": "Build a compatible HDD drill string and share or export the parts list.",
   "start_url": "./",
   "scope": "./",
   "id": "./",

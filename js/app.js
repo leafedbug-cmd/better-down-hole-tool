@@ -14,6 +14,11 @@ const imgTag = (id, w, h, alt = '', cls = '') => !id ? `<img src="img/placeholde
   `<img ${cls ? `class="${cls}"` : ''} src="img/parts/${id}.png" data-remote="${img(id, w, h)}" alt="${esc(alt)}" loading="lazy" decoding="async" onerror="imgFallback(this)">`;
 const photoTag = (id, alt = '') =>
   `<img src="${img(id, 800, 800)}" alt="${esc(alt)}" decoding="async" onerror="this.onerror=null;this.src='img/parts/${id}.png'">`;
+// List cards and the string rail use the mirrored catalog file in img/parts/, not a shared glyph.
+function catalogPhoto(id, alt) {
+  const inner = id ? imgTag(id, 360, 140, alt) : `<img src="img/placeholder.svg" alt="">`;
+  return `<div class="c-photo">${inner}</div>`;
+}
 window.imgFallback = (el) => {
   if (el.dataset.remote) { const r = el.dataset.remote; delete el.dataset.remote; el.src = r; }
   else { el.onerror = null; el.src = 'img/placeholder.svg'; }
@@ -334,10 +339,11 @@ async function viewPipe(mid) {
     ${pageHead('Step 02 · Pipe', `${esc(m.brand)} ${esc(m.model)}`, `Lock the pipe for this drill. Only pipe that fits the ${esc(m.model)} can be equipped.`)}
     <div class="stack">${m.pipes.map((p) => p.roadmap ? `
       <a class="choice" href="#/build?c=${b64e(newCfg(m.id, p.id, p.roadmap))}">
-        <div class="pipe-ico">${ICON.pipe}</div>
+        ${catalogPhoto(p.img, p.name)}
         <div class="c-main"><div class="c-title">${esc(p.name)}</div>
           <div class="c-sub">${p.pn ? `Part # <b class="pn">${esc(p.pn)}</b>` : ''}</div></div>${ICON.chev}</a>` : `
-      <div class="choice" aria-disabled="true"><div class="pipe-ico">${ICON.pipe}</div>
+      <div class="choice" aria-disabled="true">
+        ${catalogPhoto(p.img, p.name)}
         <div class="c-main"><div class="c-title">${esc(p.name)}</div><div class="c-sub">${p.pn ? `Part # ${esc(p.pn)} · ` : ''}Tooling data not loaded yet</div></div></div>`).join('') ||
       `<div class="empty">No pipe is listed for this drill.</div>`}
     </div>

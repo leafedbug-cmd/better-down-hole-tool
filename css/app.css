@@ -205,6 +205,7 @@ h3{font-size:16px;font-weight:800}
 .tile.vermeer{border-left-color:var(--cyan)}
 .tile.vermeer .t-brand{color:var(--cyan)}
 .note{display:flex;gap:10px;align-items:flex-start;background:#132028;border:1px solid #245e58;border-left:4px solid var(--cyan);padding:12px 14px;border-radius:12px;font-size:14px;color:var(--ink-2)}
+.note-warn{background:#2a2112;border-color:#7a5a16;border-left-color:var(--warn)}
 .note svg{width:20px;height:20px;fill:var(--cyan);flex:none}
 .note a{color:var(--cyan);font-weight:800}
 .empty{padding:28px 16px;text-align:center;color:var(--mute)}
@@ -525,6 +526,23 @@ label.check input{width:22px;height:22px;accent-color:var(--amber)}
 .invite{display:flex;gap:12px;align-items:center;justify-content:space-between;background:#1a1408;border:1px solid var(--amber);border-radius:12px;padding:12px 14px}
 .invite small{font-size:11px;font-weight:900;letter-spacing:.14em;color:var(--amber-2)}
 .invite code{display:block;font-family:var(--mono);font-size:26px;font-weight:800;letter-spacing:.18em;margin:2px 0;color:var(--ink)}
+.plan-banner{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  background:#1a1408;border:1px solid var(--amber);border-radius:14px;
+  padding:12px 14px;margin:12px 0;
+}
+.plan-banner.is-paid{background:#132028;border-color:#245e58}
+.plan-banner small{display:block;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--amber-2)}
+.plan-banner.is-paid small{color:var(--cyan)}
+.plan-banner b{display:block;font-size:16px}
+.plan-banner p{margin:2px 0 0;color:var(--ink-2);font-size:13px}
+.plan-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.plan-actions .btn{flex:none}
+@media(max-width:560px){
+  .plan-banner{flex-direction:column;align-items:stretch}
+  .plan-actions{justify-content:stretch}
+  .plan-actions .btn{flex:1}
+}
 
 @media print{
   html{color-scheme:light}

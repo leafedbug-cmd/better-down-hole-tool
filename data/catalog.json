@@ -12,19 +12,22 @@
      "id": 6180,
      "name": "POWER PIPE AT 3.95 X 4.38 3.36DS 20FT",
      "pn": "355-1368",
-     "roadmap": 7015
+     "roadmap": 7015,
+     "img": 10495
     },
     {
      "id": 6280,
      "name": "POWER PIPE ATG3 3.95 X 4.38 3.36DS 20'",
      "pn": "355-10100",
-     "roadmap": 7063
+     "roadmap": 7063,
+     "img": 10573
     },
     {
      "id": 6201,
      "name": "POWER PIPE UL 3.95 X 4.38 3.36DS 20'",
      "pn": "355-1367",
-     "roadmap": 7016
+     "roadmap": 7016,
+     "img": 10484
     }
    ]
   },
@@ -38,13 +41,15 @@
      "id": 1520,
      "name": "Forged HIWS1 #1000",
      "pn": "355-1134",
-     "roadmap": 7017
+     "roadmap": 7017,
+     "img": 8040
     },
     {
      "id": 6201,
      "name": "POWER PIPE UL 3.95 X 4.38 3.36DS 20'",
      "pn": "355-1367",
-     "roadmap": 6827
+     "roadmap": 6827,
+     "img": 10484
     }
    ]
   },
@@ -58,7 +63,8 @@
      "id": 1538,
      "name": "Power Pipe® HD Unlined 1.1",
      "pn": "355-1038",
-     "roadmap": 7038
+     "roadmap": 7038,
+     "img": 1829
     }
    ]
   },
@@ -72,13 +78,15 @@
      "id": 1537,
      "name": "Power Pipe® HD Unlined 1.21",
      "pn": "355-1052",
-     "roadmap": 6608
+     "roadmap": 6608,
+     "img": 1825
     },
     {
      "id": 6061,
      "name": "Power Pipe® Unlined 1.10",
      "pn": "355-1066",
-     "roadmap": 6671
+     "roadmap": 6671,
+     "img": 10199
     }
    ]
   },
@@ -92,37 +100,43 @@
      "id": 6117,
      "name": "Ditch Witch® Forged HD 1.30",
      "pn": "355-1301",
-     "roadmap": 6723
+     "roadmap": 6723,
+     "img": 10317
     },
     {
      "id": 6139,
      "name": "HDX Drill Pipe 1.63 X 1.88 #200 6'",
      "pn": "355-1349",
-     "roadmap": 6725
+     "roadmap": 6725,
+     "img": 10360
     },
     {
      "id": 1060,
      "name": "Power Pipe® HD Fluid Miser® II 1.30",
      "pn": "355-1150",
-     "roadmap": 6617
+     "roadmap": 6617,
+     "img": 420
     },
     {
      "id": 1529,
      "name": "Power Pipe® HD Fluid Miser® II 1.41",
      "pn": "355-1229",
-     "roadmap": 6618
+     "roadmap": 6618,
+     "img": 1793
     },
     {
      "id": 1542,
      "name": "Power Pipe® HD Unlined 1.30",
      "pn": "355-1149",
-     "roadmap": 6722
+     "roadmap": 6722,
+     "img": 1845
     },
     {
      "id": 1541,
      "name": "Power Pipe® HD Unlined 1.41",
      "pn": "355-1228",
-     "roadmap": 6724
+     "roadmap": 6724,
+     "img": 1841
     }
    ]
   },
@@ -136,25 +150,29 @@
      "id": 6117,
      "name": "Ditch Witch® Forged HD 1.30",
      "pn": "355-1301",
-     "roadmap": 6959
+     "roadmap": 6959,
+     "img": 10317
     },
     {
      "id": 6139,
      "name": "HDX Drill Pipe 1.63 X 1.88 #200 6'",
      "pn": "355-1349",
-     "roadmap": 6957
+     "roadmap": 6957,
+     "img": 10360
     },
     {
      "id": 1060,
      "name": "Power Pipe® HD Fluid Miser® II 1.30",
      "pn": "355-1150",
-     "roadmap": 6960
+     "roadmap": 6960,
+     "img": 420
     },
     {
      "id": 1542,
      "name": "Power Pipe® HD Unlined 1.30",
      "pn": "355-1149",
-     "roadmap": 6958
+     "roadmap": 6958,
+     "img": 1845
     }
    ]
   },
@@ -168,25 +186,29 @@
      "id": 6117,
      "name": "Ditch Witch® Forged HD 1.30",
      "pn": "355-1301",
-     "roadmap": 6962
+     "roadmap": 6962,
+     "img": 10317
     },
     {
      "id": 6139,
      "name": "HDX Drill Pipe 1.63 X 1.88 #200 6'",
      "pn": "355-1349",
-     "roadmap": 6963
+     "roadmap": 6963,
+     "img": 10360
     },
     {
      "id": 1060,
      "name": "Power Pipe® HD Fluid Miser® II 1.30",
      "pn": "355-1150",
-     "roadmap": 6961
+     "roadmap": 6961,
+     "img": 420
     },
     {
      "id": 1542,
      "name": "Power Pipe® HD Unlined 1.30",
      "pn": "355-1149",
-     "roadmap": 6964
+     "roadmap": 6964,
+     "img": 1845
     }
    ]
   },
@@ -200,25 +222,29 @@
      "id": 5974,
      "name": "Ditch Witch® Forged HD 1.94 Pipe",
      "pn": "355-1246",
-     "roadmap": 6912
+     "roadmap": 6912,
+     "img": 10109
     },
     {
      "id": 6138,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M (PIN UP)",
      "pn": "355-1350-PU",
-     "roadmap": 6915
+     "roadmap": 6915,
+     "img": 10357
     },
     {
      "id": 1532,
      "name": "Power Pipe® HD Fluid Miser® II 1.94",
      "pn": "355-1107",
-     "roadmap": 6914
+     "roadmap": 6914,
+     "img": 1805
     },
     {
      "id": 1545,
      "name": "Power Pipe® HD Unlined 1.94",
      "pn": "355-1106",
-     "roadmap": 6913
+     "roadmap": 6913,
+     "img": 1857
     }
    ]
   },
@@ -232,19 +258,22 @@
      "id": 1046,
      "name": "DW Forged #400 (Pin Up)",
      "pn": "355-1317 PU",
-     "roadmap": 6911
+     "roadmap": 6911,
+     "img": 8073
     },
     {
      "id": 1530,
      "name": "Power Pipe® Fluid Miser® II 1.47",
      "pn": "401-239",
-     "roadmap": 6910
+     "roadmap": 6910,
+     "img": 1797
     },
     {
      "id": 1543,
      "name": "Power Pipe® Unlined 1.47",
      "pn": "355-1005",
-     "roadmap": 6909
+     "roadmap": 6909,
+     "img": 1849
     }
    ]
   },
@@ -258,25 +287,29 @@
      "id": 5974,
      "name": "Ditch Witch® Forged HD 1.94 Pipe",
      "pn": "355-1246",
-     "roadmap": 6968
+     "roadmap": 6968,
+     "img": 10109
     },
     {
      "id": 6138,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M (PIN UP)",
      "pn": "355-1350-PU",
-     "roadmap": 6966
+     "roadmap": 6966,
+     "img": 10357
     },
     {
      "id": 1532,
      "name": "Power Pipe® HD Fluid Miser® II 1.94",
      "pn": "355-1107",
-     "roadmap": 6967
+     "roadmap": 6967,
+     "img": 1805
     },
     {
      "id": 1545,
      "name": "Power Pipe® HD Unlined 1.94",
      "pn": "355-1106",
-     "roadmap": 6965
+     "roadmap": 6965,
+     "img": 1857
     }
    ]
   },
@@ -290,25 +323,29 @@
      "id": 5974,
      "name": "Ditch Witch® Forged HD 1.94 Pipe",
      "pn": "355-1246",
-     "roadmap": 6969
+     "roadmap": 6969,
+     "img": 10109
     },
     {
      "id": 6138,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M (PIN UP)",
      "pn": "355-1350-PU",
-     "roadmap": 6970
+     "roadmap": 6970,
+     "img": 10357
     },
     {
      "id": 1532,
      "name": "Power Pipe® HD Fluid Miser® II 1.94",
      "pn": "355-1107",
-     "roadmap": 6971
+     "roadmap": 6971,
+     "img": 1805
     },
     {
      "id": 1545,
      "name": "Power Pipe® HD Unlined 1.94",
      "pn": "355-1106",
-     "roadmap": 6972
+     "roadmap": 6972,
+     "img": 1857
     }
    ]
   },
@@ -322,31 +359,36 @@
      "id": 6170,
      "name": "DW FORGED HD 2.38 X 2.63 1.76-4 10'",
      "pn": "355-1233",
-     "roadmap": 6975
+     "roadmap": 6975,
+     "img": 10414
     },
     {
      "id": 6140,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M",
      "pn": "355-1350",
-     "roadmap": 6709
+     "roadmap": 6709,
+     "img": 10574
     },
     {
      "id": 6138,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M (PIN UP)",
      "pn": "355-1350-PU",
-     "roadmap": 6977
+     "roadmap": 6977,
+     "img": 10357
     },
     {
      "id": 6132,
      "name": "Power Pipe® HD FM 2.25 X 2.63 1.76-4 10'",
      "pn": "355-1313",
-     "roadmap": 6976
+     "roadmap": 6976,
+     "img": 10335
     },
     {
      "id": 6130,
      "name": "Power Pipe® HD UL 2.25 X 2.63 1.76-4 10'",
      "pn": "355-1312",
-     "roadmap": 6974
+     "roadmap": 6974,
+     "img": 10332
     }
    ]
   },
@@ -360,31 +402,36 @@
      "id": 6030,
      "name": "Ditch Witch® Forged HD 2.11",
      "pn": "355-1244",
-     "roadmap": 6979
+     "roadmap": 6979,
+     "img": 10497
     },
     {
      "id": 6140,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M",
      "pn": "355-1350",
-     "roadmap": 6982
+     "roadmap": 6982,
+     "img": 10574
     },
     {
      "id": 6138,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M (PIN UP)",
      "pn": "355-1350-PU",
-     "roadmap": 6978
+     "roadmap": 6978,
+     "img": 10357
     },
     {
      "id": 1533,
      "name": "Power Pipe® HD Fluid Miser® II 2.11",
      "pn": "355-1111",
-     "roadmap": 6980
+     "roadmap": 6980,
+     "img": 1809
     },
     {
      "id": 1061,
      "name": "Power Pipe® HD Unlined 2.11",
      "pn": "355-1094",
-     "roadmap": 6981
+     "roadmap": 6981,
+     "img": 424
     }
    ]
   },
@@ -398,13 +445,15 @@
      "id": 1533,
      "name": "Power Pipe® HD Fluid Miser® II 2.11",
      "pn": "355-1111",
-     "roadmap": 6932
+     "roadmap": 6932,
+     "img": 1809
     },
     {
      "id": 1061,
      "name": "Power Pipe® HD Unlined 2.11",
      "pn": "355-1094",
-     "roadmap": 6931
+     "roadmap": 6931,
+     "img": 424
     }
    ]
   },
@@ -418,43 +467,50 @@
      "id": 6031,
      "name": "All Terrain Flush Pipe 2.77",
      "pn": "355-1225",
-     "roadmap": 6691
+     "roadmap": 6691,
+     "img": 10111
     },
     {
      "id": 1804,
      "name": "All Terrain Pipe (Dirt Tooling) 2.77",
      "pn": "355-1351 D",
-     "roadmap": 6935
+     "roadmap": 6935,
+     "img": 1192
     },
     {
      "id": 1803,
      "name": "All Terrain Pipe (Rock Tooling) 2.77",
      "pn": "355-1351 R",
-     "roadmap": 6934
+     "roadmap": 6934,
+     "img": 1192
     },
     {
      "id": 1805,
      "name": "All Terrain Power Pipe® Cobble (Dirt Tooling) 2.77",
      "pn": "400-1492 D",
-     "roadmap": 6690
+     "roadmap": 6690,
+     "img": 5823
     },
     {
      "id": 1806,
      "name": "All Terrain Power Pipe® Cobble (Rock Tooling) 2.77",
      "pn": "400-1492 R",
-     "roadmap": 6933
+     "roadmap": 6933,
+     "img": 5827
     },
     {
      "id": 1533,
      "name": "Power Pipe® HD Fluid Miser® II 2.11",
      "pn": "355-1111",
-     "roadmap": 6936
+     "roadmap": 6936,
+     "img": 1809
     },
     {
      "id": 1061,
      "name": "Power Pipe® HD Unlined 2.11",
      "pn": "355-1094",
-     "roadmap": 5856
+     "roadmap": 5856,
+     "img": 424
     }
    ]
   },
@@ -468,31 +524,36 @@
      "id": 6030,
      "name": "Ditch Witch® Forged HD 2.11",
      "pn": "355-1244",
-     "roadmap": 6987
+     "roadmap": 6987,
+     "img": 10497
     },
     {
      "id": 6140,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M",
      "pn": "355-1350",
-     "roadmap": 6985
+     "roadmap": 6985,
+     "img": 10574
     },
     {
      "id": 6138,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M (PIN UP)",
      "pn": "355-1350-PU",
-     "roadmap": 6986
+     "roadmap": 6986,
+     "img": 10357
     },
     {
      "id": 1533,
      "name": "Power Pipe® HD Fluid Miser® II 2.11",
      "pn": "355-1111",
-     "roadmap": 6983
+     "roadmap": 6983,
+     "img": 1809
     },
     {
      "id": 1061,
      "name": "Power Pipe® HD Unlined 2.11",
      "pn": "355-1094",
-     "roadmap": 6984
+     "roadmap": 6984,
+     "img": 424
     }
    ]
   },
@@ -506,19 +567,22 @@
      "id": 1791,
      "name": "Forged HIWS1 #600 (Pin Up)",
      "pn": "355-1118-PU",
-     "roadmap": 6944
+     "roadmap": 6944,
+     "img": 8081
     },
     {
      "id": 1533,
      "name": "Power Pipe® HD Fluid Miser® II 2.11",
      "pn": "355-1111",
-     "roadmap": 6943
+     "roadmap": 6943,
+     "img": 1809
     },
     {
      "id": 1061,
      "name": "Power Pipe® HD Unlined 2.11",
      "pn": "355-1094",
-     "roadmap": 6942
+     "roadmap": 6942,
+     "img": 424
     }
    ]
   },
@@ -532,31 +596,36 @@
      "id": 6030,
      "name": "Ditch Witch® Forged HD 2.11",
      "pn": "355-1244",
-     "roadmap": 7049
+     "roadmap": 7049,
+     "img": 10497
     },
     {
      "id": 6140,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M",
      "pn": "355-1350",
-     "roadmap": 7050
+     "roadmap": 7050,
+     "img": 10574
     },
     {
      "id": 6138,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M (PIN UP)",
      "pn": "355-1350-PU",
-     "roadmap": 7053
+     "roadmap": 7053,
+     "img": 10357
     },
     {
      "id": 1533,
      "name": "Power Pipe® HD Fluid Miser® II 2.11",
      "pn": "355-1111",
-     "roadmap": 7048
+     "roadmap": 7048,
+     "img": 1809
     },
     {
      "id": 1061,
      "name": "Power Pipe® HD Unlined 2.11",
      "pn": "355-1094",
-     "roadmap": 7051
+     "roadmap": 7051,
+     "img": 424
     }
    ]
   },
@@ -570,13 +639,15 @@
      "id": 6152,
      "name": "All Terrain Pipe 2.36",
      "pn": "355-1403",
-     "roadmap": 7054
+     "roadmap": 7054,
+     "img": 10494
     },
     {
      "id": 1061,
      "name": "Power Pipe® HD Unlined 2.11",
      "pn": "355-1094",
-     "roadmap": 7055
+     "roadmap": 7055,
+     "img": 424
     }
    ]
   },
@@ -590,25 +661,29 @@
      "id": 6030,
      "name": "Ditch Witch® Forged HD 2.11",
      "pn": "355-1244",
-     "roadmap": 6990
+     "roadmap": 6990,
+     "img": 10497
     },
     {
      "id": 6138,
      "name": "HDX Drill Pipe 2.38 X 2.63 #600 3M (PIN UP)",
      "pn": "355-1350-PU",
-     "roadmap": 6989
+     "roadmap": 6989,
+     "img": 10357
     },
     {
      "id": 1533,
      "name": "Power Pipe® HD Fluid Miser® II 2.11",
      "pn": "355-1111",
-     "roadmap": 6991
+     "roadmap": 6991,
+     "img": 1809
     },
     {
      "id": 1061,
      "name": "Power Pipe® HD Unlined 2.11",
      "pn": "355-1094",
-     "roadmap": 6988
+     "roadmap": 6988,
+     "img": 424
     }
    ]
   },
@@ -622,49 +697,57 @@
      "id": 6031,
      "name": "All Terrain Flush Pipe 2.77",
      "pn": "355-1225",
-     "roadmap": 7021
+     "roadmap": 7021,
+     "img": 10111
     },
     {
      "id": 1804,
      "name": "All Terrain Pipe (Dirt Tooling) 2.77",
      "pn": "355-1351 D",
-     "roadmap": 7019
+     "roadmap": 7019,
+     "img": 1192
     },
     {
      "id": 1803,
      "name": "All Terrain Pipe (Rock Tooling) 2.77",
      "pn": "355-1351 R",
-     "roadmap": 6688
+     "roadmap": 6688,
+     "img": 1192
     },
     {
      "id": 1805,
      "name": "All Terrain Power Pipe® Cobble (Dirt Tooling) 2.77",
      "pn": "400-1492 D",
-     "roadmap": 7020
+     "roadmap": 7020,
+     "img": 5823
     },
     {
      "id": 1806,
      "name": "All Terrain Power Pipe® Cobble (Rock Tooling) 2.77",
      "pn": "400-1492 R",
-     "roadmap": 6689
+     "roadmap": 6689,
+     "img": 5827
     },
     {
      "id": 1047,
      "name": "Forged HIWS1 (Pin Up) #600",
      "pn": "355-1118 PU",
-     "roadmap": 6683
+     "roadmap": 6683,
+     "img": 8137
     },
     {
      "id": 1533,
      "name": "Power Pipe® HD Fluid Miser® II 2.11",
      "pn": "355-1111",
-     "roadmap": 7018
+     "roadmap": 7018,
+     "img": 1809
     },
     {
      "id": 1061,
      "name": "Power Pipe® HD Unlined 2.11",
      "pn": "355-1094",
-     "roadmap": 6998
+     "roadmap": 6998,
+     "img": 424
     }
    ]
   },
@@ -678,13 +761,15 @@
      "id": 6174,
      "name": "DW FORGED HD 2.75 X 3.13 2.10-4 15'",
      "pn": "355-1303",
-     "roadmap": 7005
+     "roadmap": 7005,
+     "img": 10420
     },
     {
      "id": 1518,
      "name": "Forged HDX #700 / 15'",
      "pn": "355-1352",
-     "roadmap": 6895
+     "roadmap": 6895,
+     "img": 8105
     },
     {
      "id": 6055,
@@ -716,7 +801,8 @@
      "id": 6107,
      "name": "All Terrain Pipe 2.95",
      "pn": "355-1195",
-     "roadmap": 7040
+     "roadmap": 7040,
+     "img": 10566
     },
     {
      "id": 6119,
@@ -728,13 +814,15 @@
      "id": 6174,
      "name": "DW FORGED HD 2.75 X 3.13 2.10-4 15'",
      "pn": "355-1303",
-     "roadmap": 7059
+     "roadmap": 7059,
+     "img": 10420
     },
     {
      "id": 1518,
      "name": "Forged HDX #700 / 15'",
      "pn": "355-1352",
-     "roadmap": 7028
+     "roadmap": 7028,
+     "img": 8105
     },
     {
      "id": 6055,
@@ -766,13 +854,15 @@
      "id": 1534,
      "name": "Power Pipe® Fluid Miser® II 2.59",
      "pn": "369-804",
-     "roadmap": 6775
+     "roadmap": 6775,
+     "img": 1813
     },
     {
      "id": 1546,
      "name": "Power Pipe® Unlined 2.59",
      "pn": "400-847",
-     "roadmap": 5884
+     "roadmap": 5884,
+     "img": 1861
     }
    ]
   },
@@ -786,25 +876,29 @@
      "id": 1799,
      "name": "All Terrain Pipe (Dirt Tooling) 3.25",
      "pn": "355-1258 D",
-     "roadmap": 6779
+     "roadmap": 6779,
+     "img": 404
     },
     {
      "id": 1798,
      "name": "All Terrain Pipe (Rock Tooling) 3.25",
      "pn": "355-1258 R",
-     "roadmap": 6088
+     "roadmap": 6088,
+     "img": 404
     },
     {
      "id": 1534,
      "name": "Power Pipe® Fluid Miser® II 2.59",
      "pn": "369-804",
-     "roadmap": 6776
+     "roadmap": 6776,
+     "img": 1813
     },
     {
      "id": 1546,
      "name": "Power Pipe® Unlined 2.59",
      "pn": "400-847",
-     "roadmap": 6777
+     "roadmap": 6777,
+     "img": 1861
     }
    ]
   },
@@ -818,19 +912,22 @@
      "id": 1048,
      "name": "Forged HIWS1 (Pin Up) #900",
      "pn": "355-1132 (PU)",
-     "roadmap": 7011
+     "roadmap": 7011,
+     "img": 8145
     },
     {
      "id": 1535,
      "name": "Power Pipe® HD Fluid Miser II® 2.46",
      "pn": "355-1100",
-     "roadmap": 7013
+     "roadmap": 7013,
+     "img": 1817
     },
     {
      "id": 1536,
      "name": "Power Pipe® HD Unlined 2.46",
      "pn": "355-1079",
-     "roadmap": 7012
+     "roadmap": 7012,
+     "img": 1821
     }
    ]
   },
@@ -844,25 +941,29 @@
      "id": 1052,
      "name": "All Terrain Pipe 3.25SS",
      "pn": "355-1258",
-     "roadmap": 7008
+     "roadmap": 7008,
+     "img": 404
     },
     {
      "id": 1050,
      "name": "Power Pipe® Forged",
      "pn": "355-1132",
-     "roadmap": 7009
+     "roadmap": 7009,
+     "img": 8145
     },
     {
      "id": 1535,
      "name": "Power Pipe® HD Fluid Miser II® 2.46",
      "pn": "355-1100",
-     "roadmap": 7010
+     "roadmap": 7010,
+     "img": 1817
     },
     {
      "id": 1536,
      "name": "Power Pipe® HD Unlined 2.46",
      "pn": "355-1079",
-     "roadmap": 6831
+     "roadmap": 6831,
+     "img": 1821
     }
    ]
   },
@@ -876,7 +977,8 @@
      "id": 1547,
      "name": "Power Pipe® HD Unlined 3.27",
      "pn": "355-1200",
-     "roadmap": 6814
+     "roadmap": 6814,
+     "img": 1865
     }
    ]
   },
@@ -890,7 +992,8 @@
      "id": 1547,
      "name": "Power Pipe® HD Unlined 3.27",
      "pn": "355-1200",
-     "roadmap": 6828
+     "roadmap": 6828,
+     "img": 1865
     }
    ]
   },
@@ -904,7 +1007,8 @@
      "id": 1796,
      "name": "All Terrain Pipe 3.44",
      "pn": "355-1254",
-     "roadmap": 7014
+     "roadmap": 7014,
+     "img": 8186
     }
    ]
   },
@@ -918,7 +1022,8 @@
      "id": 1037,
      "name": "Forged HIWS1 #200",
      "pn": "355-1121 PD",
-     "roadmap": 6732
+     "roadmap": 6732,
+     "img": 8044
     }
    ]
   },
@@ -932,7 +1037,8 @@
      "id": 1037,
      "name": "Forged HIWS1 #200",
      "pn": "355-1121 PD",
-     "roadmap": 6842
+     "roadmap": 6842,
+     "img": 8044
     }
    ]
   },
@@ -946,7 +1052,8 @@
      "id": 1037,
      "name": "Forged HIWS1 #200",
      "pn": "355-1121 PD",
-     "roadmap": 6749
+     "roadmap": 6749,
+     "img": 8044
     }
    ]
   },
@@ -960,7 +1067,8 @@
      "id": 1513,
      "name": "Forged HIWS1 #200 10'",
      "pn": "355-1122",
-     "roadmap": 6174
+     "roadmap": 6174,
+     "img": 8056
     }
    ]
   },
@@ -974,7 +1082,8 @@
      "id": 1038,
      "name": "Forged HIWS1 #250",
      "pn": "355-1123",
-     "roadmap": 6750
+     "roadmap": 6750,
+     "img": 8060
     }
    ]
   },
@@ -988,7 +1097,8 @@
      "id": 1038,
      "name": "Forged HIWS1 #250",
      "pn": "355-1123",
-     "roadmap": 6751
+     "roadmap": 6751,
+     "img": 8060
     }
    ]
   },
@@ -1002,7 +1112,8 @@
      "id": 1039,
      "name": "DW Forged #400",
      "pn": "355-1317",
-     "roadmap": 6752
+     "roadmap": 6752,
+     "img": 8069
     }
    ]
   },
@@ -1016,13 +1127,15 @@
      "id": 1039,
      "name": "DW Forged #400",
      "pn": "355-1317",
-     "roadmap": 5818
+     "roadmap": 5818,
+     "img": 8069
     },
     {
      "id": 1040,
      "name": "Forged HIWS1 (Pin Down) #600",
      "pn": "355-1118",
-     "roadmap": 5940
+     "roadmap": 5940,
+     "img": 8126
     }
    ]
   },
@@ -1036,7 +1149,8 @@
      "id": 1039,
      "name": "DW Forged #400",
      "pn": "355-1317",
-     "roadmap": 5609
+     "roadmap": 5609,
+     "img": 8069
     }
    ]
   },
@@ -1050,7 +1164,8 @@
      "id": 1040,
      "name": "Forged HIWS1 (Pin Down) #600",
      "pn": "355-1118",
-     "roadmap": 6780
+     "roadmap": 6780,
+     "img": 8126
     }
    ]
   },
@@ -1064,19 +1179,22 @@
      "id": 1518,
      "name": "Forged HDX #700 / 15'",
      "pn": "355-1352",
-     "roadmap": 6805
+     "roadmap": 6805,
+     "img": 8105
     },
     {
      "id": 1515,
      "name": "Forged HIWS1 #650 / 10'",
      "pn": "355-1127",
-     "roadmap": 6803
+     "roadmap": 6803,
+     "img": 8091
     },
     {
      "id": 1516,
      "name": "Forged HIWS1 #650 / 15'",
      "pn": "355-1128",
-     "roadmap": 6804
+     "roadmap": 6804,
+     "img": 8095
     }
    ]
   },
@@ -1090,25 +1208,29 @@
      "id": 1518,
      "name": "Forged HDX #700 / 15'",
      "pn": "355-1352",
-     "roadmap": 6809
+     "roadmap": 6809,
+     "img": 8105
     },
     {
      "id": 1515,
      "name": "Forged HIWS1 #650 / 10'",
      "pn": "355-1127",
-     "roadmap": 6806
+     "roadmap": 6806,
+     "img": 8091
     },
     {
      "id": 1516,
      "name": "Forged HIWS1 #650 / 15'",
      "pn": "355-1128",
-     "roadmap": 6807
+     "roadmap": 6807,
+     "img": 8095
     },
     {
      "id": 1517,
      "name": "Forged HIWS1 #700 / 10'",
      "pn": "355-1129",
-     "roadmap": 6808
+     "roadmap": 6808,
+     "img": 8100
     }
    ]
   },
@@ -1122,7 +1244,8 @@
      "id": 1514,
      "name": "Forged HIWS1 #600",
      "pn": "355-1126",
-     "roadmap": 5621
+     "roadmap": 5621,
+     "img": 8077
     }
    ]
   },
@@ -1136,13 +1259,15 @@
      "id": 1042,
      "name": "Forged HIWS1 #800 / 15'",
      "pn": "355-1133",
-     "roadmap": 6818
+     "roadmap": 6818,
+     "img": 8109
     },
     {
      "id": 1041,
      "name": "Forged HIWS1 #900 / 15'",
      "pn": "355-1132 (PD)",
-     "roadmap": 6817
+     "roadmap": 6817,
+     "img": 8118
     }
    ]
   },
@@ -1156,7 +1281,8 @@
      "id": 1519,
      "name": "Forged HIWS1 #900 / 10'",
      "pn": "355-1131",
-     "roadmap": 5427
+     "roadmap": 5427,
+     "img": 8113
     }
    ]
   },
@@ -1170,13 +1296,15 @@
      "id": 1042,
      "name": "Forged HIWS1 #800 / 15'",
      "pn": "355-1133",
-     "roadmap": 6819
+     "roadmap": 6819,
+     "img": 8109
     },
     {
      "id": 1041,
      "name": "Forged HIWS1 #900 / 15'",
      "pn": "355-1132 (PD)",
-     "roadmap": 6820
+     "roadmap": 6820,
+     "img": 8118
     }
    ]
   },
@@ -1190,7 +1318,8 @@
      "id": 1520,
      "name": "Forged HIWS1 #1000",
      "pn": "355-1134",
-     "roadmap": 6821
+     "roadmap": 6821,
+     "img": 8040
     }
    ]
   }

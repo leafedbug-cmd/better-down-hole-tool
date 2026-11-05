@@ -1,13 +1,13 @@
 {
   "name": "The Better Down Hole Tool",
   "short_name": "Down Hole Tool",
-  "description": "Build a compatible HDD drill string and share or export the parts list.",
+  "description": "Create an HDD loadout for a Ditch Witch or Vermeer drill and share the parts list.",
   "start_url": "./",
   "scope": "./",
   "id": "./",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#111111",
+  "background_color": "#07090d",
+  "theme_color": "#07090d",
   "icons": [
     {
       "src": "img/favicon.svg",

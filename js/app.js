@@ -371,6 +371,7 @@ function persistBuild(replace = true) {
   const url = `#/build?c=${b64e(buildCfg)}`;
   if (replace) history.replaceState(null, '', url);
   store.set(LAST_KEY, { cfg: buildCfg, title: titleOf(buildCfg) });
+  rememberBuilder();
   setStepper(3, buildCfg);
 }
 function partRow(p, { selected, multi, sel = true, compact } = {}) {
@@ -579,16 +580,158 @@ function saveSheet(cfg) {
   const def = titleOf(cfg).replace(' config', '');
   openSheet(`<div class="sheet-top"><h2>Save loadout</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body stack"><label class="field"><span>Name this preset</span><input id="sname" value="${esc(def)}" maxlength="80"></label>
-    <p class="small muted">Saved on this phone only. To share it, open the loadout brief.</p>
+    <p class="small muted">Saved on this phone only. To put it in My rigs, use Save loadout on the brief.</p>
     <div id="rigsave" class="rigsave"></div></div>
     <div class="sheet-foot"><button class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" style="flex:1" id="sgo">${ICON.save} Save</button></div>`, (sh) => {
     $('#sgo', sh).addEventListener('click', () => {
-      const list = getSaved();
-      list.unshift({ id: Date.now().toString(36), name: $('#sname', sh).value.trim() || def, title: titleOf(cfg), ts: Date.now(), cfg: JSON.parse(JSON.stringify(cfg)) });
-      store.set(SAVED_KEY, list.slice(0, 50)); updateSavedBadge(); closeSheet(); toast('Saved on this phone');
+      keepPhoneDraft(cfg, $('#sname', sh).value.trim() || def);
+      closeSheet(); toast('Saved on this phone');
     });
     saveToRigSection(cfg, sh);
   });
+}
+
+/* Unsaved loadout: never leave the builder for My rigs without a choice. */
+const PENDING_SAVE_KEY = 'bdht.pendingLoadout';
+const GARAGE_FP_KEY = 'bdht.garageFp';
+let skipLeaveGuard = false;
+let builderHref = '';
+function cfgFp(cfg) {
+  if (!cfg?.r) return '';
+  return b64e({ m: cfg.m, p: cfg.p, r: cfg.r, mode: cfg.mode, sel: cfg.sel || {}, acc: cfg.acc || {}, q: cfg.q || {} });
+}
+function onBuilder(hash = location.hash) {
+  return /^#\/(build|summary)(\?|$)/.test(hash);
+}
+function needsGarageSave(cfg = buildCfg) {
+  return !!(cfg?.r && sessionStorage.getItem(GARAGE_FP_KEY) !== cfgFp(cfg));
+}
+function markGarageSaved(cfg) {
+  if (cfg?.r) sessionStorage.setItem(GARAGE_FP_KEY, cfgFp(cfg));
+}
+function rememberBuilder() {
+  if (onBuilder()) builderHref = location.hash;
+}
+function keepPhoneDraft(cfg, name) {
+  if (!cfg?.r) return;
+  const fp = cfgFp(cfg);
+  const list = getSaved();
+  if (list.some((s) => cfgFp(s.cfg) === fp)) return;
+  const title = titleOf(cfg);
+  list.unshift({ id: Date.now().toString(36), name: (name || title).replace(' config', '').slice(0, 80), title, ts: Date.now(), cfg: JSON.parse(JSON.stringify(cfg)) });
+  store.set(SAVED_KEY, list.slice(0, 50));
+  updateSavedBadge();
+}
+function stashPendingSave(cfg, name) {
+  store.set(PENDING_SAVE_KEY, { cfg: JSON.parse(JSON.stringify(cfg)), name: (name || titleOf(cfg)).replace(' config', '').slice(0, 60), ts: Date.now() });
+}
+function goHash(href) {
+  skipLeaveGuard = true;
+  location.hash = href;
+}
+function confirmLeave(href) {
+  const cfg = buildCfg;
+  if (!cfg?.r) { goHash(href); return; }
+  openSheet(`<div class="sheet-top"><div><h2>Save this loadout?</h2><p class="small muted">My rigs does not have it yet.</p></div><button class="iconbtn" data-close aria-label="Keep editing">✕</button></div>
+    <div class="sheet-body"><p>Save it onto the drill, or keep a draft on this phone.</p></div>
+    <div class="sheet-foot sheet-actions">
+      <button class="btn btn-primary btn-block" id="save-go">Save loadout</button>
+      <button class="btn btn-ghost btn-block" id="discard-go">Keep a draft on this phone</button>
+      <button class="btn btn-ghost btn-block" data-close>Keep editing</button>
+    </div>`, (sh) => {
+    $('#save-go', sh).addEventListener('click', () => { closeSheet(); setTimeout(() => openDoneSheet(cfg), 240); });
+    $('#discard-go', sh).addEventListener('click', () => {
+      keepPhoneDraft(cfg);
+      closeSheet();
+      toast('Draft kept on this phone. My rigs does not have it yet.');
+      goHash(href);
+    });
+  });
+}
+async function openDoneSheet(cfg) {
+  await meReady();
+  await loadCatalog();
+  const ctx = loCtx.for(cfg);
+  const def = ctx?.loadout?.name || titleOf(cfg).replace(' config', '');
+  if (!ME.member) {
+    openSheet(`<div class="sheet-top"><div><h2>Save loadout</h2><p class="small muted">My rigs needs a crew account</p></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+      <div class="sheet-body stack">
+        <label class="field"><span>Loadout name</span><input id="lname" value="${esc(def)}" maxlength="60"></label>
+        <p>Sign in and this loadout is saved on the drill. It stays here until the account is ready. Nothing is discarded.</p>
+        <button class="btn btn-primary btn-block" id="gosignup">Create account and save</button>
+        <button class="btn btn-ghost btn-block" id="gosign">Sign in and save</button>
+        <button class="btn btn-ghost btn-block" id="gophone">Save on this phone only</button>
+      </div>`, (sh) => {
+      const nameOf = () => $('#lname', sh).value.trim() || def;
+      $('#gophone', sh).addEventListener('click', () => { keepPhoneDraft(cfg, nameOf()); closeSheet(); toast('Saved on this phone. Sign in when you want it in My rigs.'); });
+      const stash = (hash) => { stashPendingSave(cfg, nameOf()); closeSheet(); goHash(hash); };
+      $('#gosign', sh).addEventListener('click', () => stash('#/account?m=signin'));
+      $('#gosignup', sh).addEventListener('click', () => stash('#/account'));
+    });
+    return;
+  }
+  const c = await sb();
+  const { data: machines, error } = await c.from('bdht_machines').select('*').eq('machine_type_id', cfg.m).order('created_at');
+  if (error) return toast(error.message);
+  const list = machines || [];
+  const pre = (ctx && list.some((mc) => mc.id === ctx.machine.id) && ctx.machine.id) || list[0]?.id || '';
+  openSheet(`<div class="sheet-top"><div><h2>Save loadout</h2><p class="small muted">${esc(machine(cfg.m)?.model || 'Drill')}</p></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body stack">
+      <label class="field"><span>Loadout name</span><input id="lname" value="${esc(def)}" maxlength="60"></label>
+      <div class="chips">${['Rock setup', 'Sand pilot', 'Clay pilot', 'Backream 12in'].map((s) => `<button type="button" class="chip" data-sug="${s}">${s}</button>`).join('')}</div>
+      ${list.length ? `<div class="form-sub"><b>Operator</b><span class="small muted">Where it shows in My rigs</span></div>
+        <div class="stack">${list.map((mc) => `<button type="button" class="choice" data-mc="${mc.id}" aria-pressed="${mc.id === pre}"><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div></button>`).join('')}</div>`
+        : `<p>This drill is not in My rigs yet. Saving adds it as an operator.</p>
+           <label class="field"><span>Unit name (optional)</span><input id="an" maxlength="60" placeholder="Unit 12"></label>`}
+      <p class="small muted">Everyone at ${esc(ME.company.name)} will see it.</p>
+      <div class="form-err" id="lerr" hidden></div>
+    </div>
+    <div class="sheet-foot"><button class="btn btn-primary btn-block" id="lgo">${ICON.save} Save and open My rigs</button></div>`, (sh) => {
+    $$('[data-sug]', sh).forEach((b) => b.addEventListener('click', () => { $('#lname', sh).value = b.dataset.sug; }));
+    $$('[data-mc]', sh).forEach((b) => b.addEventListener('click', () => { $$('[data-mc]', sh).forEach((x) => x.setAttribute('aria-pressed', x === b)); }));
+    $('#lgo', sh).addEventListener('click', async () => {
+      const name = $('#lname', sh).value.trim() || def;
+      const picked = sh.querySelector('[data-mc][aria-pressed="true"]')?.dataset.mc || pre;
+      busy($('#lgo', sh), true, 'Saving…');
+      try {
+        let mc = list.find((m) => m.id === picked);
+        if (!mc) {
+          const mm = machine(cfg.m);
+          const ins = await c.from('bdht_machines').insert({ company_id: ME.company.id, machine_type_id: +cfg.m, brand: mm?.brand, model: mm?.model || String(cfg.m), nickname: $('#an', sh)?.value.trim() || null }).select().single();
+          if (ins.error) throw ins.error;
+          mc = ins.data;
+        }
+        const existing = ctx && ctx.machine.id === mc.id ? ctx.loadout?.id : null;
+        const saved = await saveLoadout(cfg, mc.id, existing, name);
+        markGarageSaved(cfg);
+        loCtx.set(null);
+        closeSheet();
+        toast(`Saved “${saved.name}”`);
+        goHash('#/garage');
+      } catch (e) { busy($('#lgo', sh), false); const err = $('#lerr', sh); err.textContent = errMsg(e); err.hidden = false; }
+    });
+  });
+}
+async function consumePendingSave() {
+  const p = store.get(PENDING_SAVE_KEY, null);
+  if (!p?.cfg?.r || !ME.member) return null;
+  const c = await sb();
+  const { data, error } = await c.from('bdht_machines').select('*').eq('machine_type_id', p.cfg.m).order('created_at');
+  if (error) throw error;
+  const list = data || [];
+  if (list.length > 1) return { pending: p, machines: list };
+  let mc = list[0];
+  if (!mc) {
+    const mm = machine(p.cfg.m);
+    const ins = await c.from('bdht_machines').insert({ company_id: ME.company.id, machine_type_id: +p.cfg.m, brand: mm?.brand, model: mm?.model || String(p.cfg.m), nickname: null }).select().single();
+    if (ins.error) throw ins.error;
+    mc = ins.data;
+  }
+  const saved = await saveLoadout(p.cfg, mc.id, null, p.name || titleOf(p.cfg));
+  store.set(PENDING_SAVE_KEY, null);
+  markGarageSaved(p.cfg);
+  toast(`Saved “${saved.name}” to My rigs`);
+  return { saved };
 }
 
 /* Step 4 – summary */
@@ -609,12 +752,15 @@ async function viewSummary(q) {
     const rows = compute(rm, cfg), items = lineItems(rm, cfg, rows);
     const pending = rows.filter((r) => r.status === 'pending' || r.status === 'locked');
     history.replaceState(null, '', `#/summary?c=${b64e(cfg)}`);
+    rememberBuilder();
     setStepper(4, cfg);
     const m = machine(cfg.m), p = pipeOf(m, cfg.p);
     app.innerHTML = `
     <div class="sum-grid"><div class="stack">
       <div class="sum-head"><small>LOADOUT BRIEF · ${cfg.mode === 'Bit' ? 'PILOT' : 'PULLBACK'}</small>
-        <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config</p></div>
+        <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config</p>
+        <button class="btn btn-primary" data-done style="margin-top:14px">${ICON.save} Save loadout</button>
+        <p class="small" style="margin:8px 0 0;color:#d5deea">${needsGarageSave(cfg) ? 'Not in My rigs yet. Saving puts it on this drill.' : 'Saved to My rigs.'}</p></div>
       ${rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
       ${pending.length ? `<div class="note no-print"><span><b>${pending.length} slot${pending.length > 1 ? 's' : ''} still open</b> (${esc(pending.map((r) => r.sec.name).join(', '))}). <a href="#/build?c=${b64e(cfg)}">Finish equipping</a></span></div>` : ''}
       <div class="card"><ul class="lines">${items.map((l) => `
@@ -629,24 +775,25 @@ async function viewSummary(q) {
         <a class="btn btn-ghost" id="sh-mail" href="#">${ICON.mail}Email list</a>
         <button class="btn btn-ghost" id="sh-copy">${ICON.link}Copy link</button>
         <button class="btn btn-ghost" id="sh-print">${ICON.print}Print / PDF</button>
-        <button class="btn btn-ghost" data-save>${ICON.save}Save</button>
+        <button class="btn btn-ghost" data-done>${ICON.save}Save loadout</button>
         <a class="btn btn-ghost" href="#/build?c=${b64e(cfg)}">✎ Edit loadout</a>
         <button class="btn btn-ghost" id="sh-mode">⇄ ${cfg.mode === 'Bit' ? 'Pullback' : 'Pilot'} brief</button>
       </div>
     </div>
     <aside class="sum-aside stack">
-      <div class="cta"><h2>Send this loadout</h2>
-        <p>Copy, text, email, or print the list. Confirm part numbers and fit before you order.</p>
+      <div class="cta"><h2>Save this loadout</h2>
+        <p>Confirm the class and put it in My rigs. You can still copy, text, email, or print the list.</p>
         <div class="stack">
+          <button class="btn btn-primary btn-block" data-done>${ICON.save} Save loadout</button>
           <button class="btn btn-dark btn-block" id="q-share">${ICON.share} Share list</button>
           <button class="btn btn-block" id="q-copy">${ICON.link} Copy list</button>
           <a class="btn btn-block" id="q-mail" href="#">${ICON.mail} Email list</a>
           <button class="btn btn-block" id="q-print">${ICON.print} Print / PDF</button>
         </div></div>
     </aside></div>`;
-    setActionbar(`<div class="ab-info"><strong>${items.length} equipped</strong><span class="ab-line">${items.reduce((a, l) => a + l.qty, 0)} pcs${pending.length ? ` · ${pending.length} open` : ' · class ready'}</span></div>
-      <button class="btn btn-ghost btn-sm" id="ab-share" aria-label="Share">${ICON.share}</button>
-      <button class="btn btn-primary" id="ab-copy">Copy list</button>`);
+    setActionbar(`<div class="ab-info"><strong>${needsGarageSave(cfg) ? 'Not saved' : 'Saved'}</strong><span class="ab-line">${items.length} equipped${pending.length ? ` · ${pending.length} open` : ' · class ready'}</span></div>
+      <button class="btn btn-ghost btn-sm" id="ab-copy">Copy</button>
+      <button class="btn btn-primary" data-done>${ICON.save} Save loadout</button>`);
     const text = listText(cfg, items);
     const subj = `HDD loadout: ${titleOf(cfg)}`;
     const mailHref = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}`;
@@ -658,7 +805,6 @@ async function viewSummary(q) {
       else { await copyText(text); toast('Parts list copied'); }
     };
     $('#sh-share').addEventListener('click', share);
-    $('#ab-share').addEventListener('click', share);
     $('#q-share').addEventListener('click', share);
     const copyList = async () => { await copyText(text); toast('Parts list copied'); };
     $('#sh-copy').addEventListener('click', async () => { await copyText(shareUrl(cfg)); toast('Link copied'); });
@@ -667,7 +813,7 @@ async function viewSummary(q) {
     $('#sh-print').addEventListener('click', () => window.print());
     $('#q-print').addEventListener('click', () => window.print());
     $('#sh-mode').addEventListener('click', () => { cfg.mode = cfg.mode === 'Bit' ? 'Backreamer' : 'Bit'; draw(); window.scrollTo({ top: 0 }); });
-    $$('[data-save]').forEach((b) => b.addEventListener('click', () => saveSheet(cfg)));
+    $$('[data-done]').forEach((b) => b.addEventListener('click', () => openDoneSheet(cfg)));
     $$('[data-dq]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.dq; cfg.q[k] = Math.max(0, (cfg.q[k] ?? 1) + +b.dataset.d); draw(); }));
     $$('[data-qk]').forEach((i) => i.addEventListener('change', () => { cfg.q[i.dataset.qk] = Math.max(0, parseInt(i.value, 10) || 0); draw(); }));
   };
@@ -912,17 +1058,27 @@ async function viewGarage() {
   await loadCatalog(); setStepper(0); setActionbar('');
   app.innerHTML = '<div class="stack"><div class="skeleton"></div><div class="skeleton"></div></div>';
   await meReady();
+  const phone = getSaved();
+  const unsaved = store.get(LAST_KEY, null);
+  const unsavedOpen = unsaved?.cfg?.r && needsGarageSave(unsaved.cfg);
   if (!ME.user) {
-    app.innerHTML = `${pageHead('Class select', 'My rigs', 'Each drill is an operator. Each saved setup is a named loadout. Sign in to open your crew’s classes.')}
-      <div class="rig-grid"><a class="rig-card rig-locked" href="#/account">
+    app.innerHTML = `${pageHead('Class select', 'My rigs', 'Each drill is an operator. Each saved setup is a named loadout. Sign in to keep the class on that drill.')}
+      ${unsavedOpen ? `<div class="note" style="margin-bottom:12px"><span><b>${esc(unsaved.title || 'This loadout')} is not in My rigs yet.</b> Sign in and it is saved on the drill. <button class="linkbtn" id="stash-in" type="button">Sign in and save</button></span></div>` : ''}
+      ${phone.length ? `<div class="section-head"><h2>On this phone</h2><a class="linkbtn" href="#/saved">See all</a></div><div class="lo-grid">${phone.slice(0, 4).map((s) => savedRow(s)).join('')}</div>` : ''}
+      <div class="rig-grid" style="margin-top:12px"><a class="rig-card rig-locked" href="#/account">
         <div class="rig-top"><div><div class="t-brand">Operator</div><div class="rig-name">Your drills</div></div><span class="pill">Locked</span></div>
-        <p class="small muted" style="margin:0">Slots stay empty until a crew account is on this phone.</p>
-        <div class="rig-foot"><span>Sign in to equip classes</span>${ICON.chev}</div>
+        <p class="small muted" style="margin:0">Crew loadouts show up here after you sign in.</p>
+        <div class="rig-foot"><span>Sign in to open My rigs</span>${ICON.chev}</div>
       </a></div>
       ${guestUpsell('garage')}`;
+    const stashAccount = () => { if (unsavedOpen && unsaved?.cfg) stashPendingSave(unsaved.cfg, unsaved.title); };
+    $('#stash-in')?.addEventListener('click', () => { stashAccount(); goHash('#/account?m=signin'); });
+    $$('a[href="#/account"], a[href="#/account?m=signin"]').forEach((a) => a.addEventListener('click', stashAccount));
     return;
   }
   if (!ME.member) { location.replace('#/setup'); return; }
+  let finish = null;
+  try { finish = await consumePendingSave(); } catch (e) { toast(errMsg(e)); }
   let fleet; try { fleet = await fetchFleet(); } catch (e) { app.innerHTML = `<div class="card empty">${esc(errMsg(e))}</div>`; return; }
   const byM = (id) => fleet.loadouts.filter((l) => l.machine_id === id);
   app.innerHTML = `
@@ -937,9 +1093,21 @@ async function viewGarage() {
         <div class="rig-top"><div><div class="t-brand">Operator · ${esc(mc.brand || '')} ${esc(mc.model)}</div><div class="rig-name">${esc(rigName(mc))}</div></div>
           <span class="pill ${los.length ? 'pill-orange' : ''}">${los.length} loadout${los.length === 1 ? '' : 's'}</span></div>
         ${stripHtml(def)}
-        <div class="rig-foot">${def ? `${ICON_STAR}<span><b>${esc(def.name)}</b> · ${def.part_count} equipped</span>` : '<span class="muted">No loadouts yet. Tap to build a class.</span>'}${ICON.chev}</div></a>`;
-    }).join('') || `<div class="card empty"><h2>No operators yet</h2><p>Add a drill to start a class.</p><button class="btn btn-primary" id="addm2">+ Add operator</button></div>`}</div>`;
+        <ul class="lo-name-list">${los.map((lo) => `<li><b>${lo.is_default ? '★ ' : ''}${esc(lo.name)}</b><span>${lo.mode === 'Bit' ? 'Pilot' : 'Pullback'} · ${lo.part_count}</span></li>`).join('') || '<li class="muted">No loadouts yet</li>'}</ul>
+        <div class="rig-foot">${def ? `<span><b>${los.length} loadout${los.length === 1 ? '' : 's'}</b></span>` : '<span class="muted">No loadouts yet. Tap to build a class.</span>'}${ICON.chev}</div></a>`;
+    }).join('') || `<div class="card empty"><h2>No operators yet</h2><p>Add a drill to start a class.</p><button class="btn btn-primary" id="addm2">+ Add operator</button></div>`}</div>
+    ${finish?.pending ? `<div class="note" style="margin-top:12px"><span><b>Finish saving “${esc(finish.pending.name)}”.</b> Pick the operator.
+      <span class="chips" style="margin-top:8px">${finish.machines.map((mc) => `<button type="button" class="chip" data-finish="${mc.id}">${esc(rigName(mc))}</button>`).join('')}</span></span></div>` : ''}`;
   $('#addm').addEventListener('click', () => addMachineSheet());
+  $$('[data-finish]').forEach((b) => b.addEventListener('click', async () => {
+    try {
+      const saved = await saveLoadout(finish.pending.cfg, b.dataset.finish, null, finish.pending.name);
+      store.set(PENDING_SAVE_KEY, null);
+      markGarageSaved(finish.pending.cfg);
+      toast(`Saved “${saved.name}”`);
+      route();
+    } catch (e) { toast(errMsg(e)); }
+  }));
   $('#addm2')?.addEventListener('click', () => addMachineSheet());
   $('#acct').addEventListener('click', () => accountSheet());
 }
@@ -978,7 +1146,7 @@ async function accountSheet() {
       const { error } = await c.from('bdht_companies').update({ name }).eq('id', ME.company.id);
       if (error) return toast(error.message); ME.company.name = name; closeSheet(); toast('Company renamed'); route();
     });
-    $('#out', sh).addEventListener('click', async () => { await c.auth.signOut(); ME.user = ME.member = ME.company = null; loCtx.set(null); updateAcctNav(); closeSheet(); toast('Signed out'); location.hash = '#/'; });
+    $('#out', sh).addEventListener('click', async () => { await c.auth.signOut(); ME.user = ME.member = ME.company = null; loCtx.set(null); sessionStorage.removeItem(GARAGE_FP_KEY); updateAcctNav(); closeSheet(); toast('Signed out'); goHash('#/'); });
   });
 }
 
@@ -1064,7 +1232,12 @@ function loBanner(ctx, label) {
     <button class="iconbtn dark" id="loexit" aria-label="Stop editing loadout">✕</button></div>`;
 }
 function mountLoBanner() {
-  $('#loexit')?.addEventListener('click', () => { const c = loCtx.get(); loCtx.set(null); toast('Left loadout editor'); location.hash = c ? `#/rig/${c.machine.id}` : '#/garage'; });
+  $('#loexit')?.addEventListener('click', () => {
+    const c = loCtx.get();
+    const dest = c ? `#/rig/${c.machine.id}` : '#/garage';
+    if (needsGarageSave(buildCfg)) confirmLeave(dest);
+    else { loCtx.set(null); goHash(dest); }
+  });
 }
 function loSaveSheet(cfg, ctx) {
   const def = ctx.loadout?.name || (cfg.mode === 'Bit' ? 'Pilot setup' : 'Backream setup');
@@ -1080,7 +1253,8 @@ function loSaveSheet(cfg, ctx) {
       busy($('#lgo', sh), true, 'Saving…');
       try {
         const saved = await saveLoadout(cfg, ctx.machine.id, asCopy ? null : ctx.loadout?.id, name);
-        loCtx.set(null); closeSheet(); toast(`Saved “${saved.name}”`); location.hash = `#/rig/${ctx.machine.id}`;
+        markGarageSaved(cfg);
+        loCtx.set(null); closeSheet(); toast(`Saved “${saved.name}”`); goHash('#/garage');
       } catch (e) { busy($('#lgo', sh), false); toast(errMsg(e)); }
     });
   });
@@ -1140,8 +1314,40 @@ async function route() {
   }
 }
 let lastPath = '';
+let currentHash = location.hash;
+function leaveGuard(destHash, fromHash) {
+  if (skipLeaveGuard) return false;
+  if (!onBuilder(fromHash)) return false;
+  if (!needsGarageSave(buildCfg)) return false;
+  if (onBuilder(destHash)) return false;
+  return true;
+}
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === '_blank') return;
+  const href = a.getAttribute('href');
+  if (!leaveGuard(href, location.hash)) return;
+  e.preventDefault();
+  confirmLeave(href);
+});
+window.addEventListener('beforeunload', (e) => {
+  if (onBuilder() && needsGarageSave(buildCfg)) { e.preventDefault(); e.returnValue = ''; }
+});
 window.addEventListener('hashchange', () => {
-  const p = location.hash.split('?')[0];
+  const now = location.hash;
+  const from = currentHash;
+  if (skipLeaveGuard) skipLeaveGuard = false;
+  else if (leaveGuard(now, from)) {
+    const dest = now;
+    skipLeaveGuard = true;
+    currentHash = from;
+    location.hash = from;
+    confirmLeave(dest);
+    return;
+  }
+  currentHash = now;
+  if (onBuilder(now)) builderHref = now;
+  const p = now.split('?')[0];
   if (p !== lastPath) window.scrollTo({ top: 0 });
   lastPath = p; route();
 });

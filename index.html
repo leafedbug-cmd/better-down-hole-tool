@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#111111">
+<meta name="theme-color" content="#07090d">
 <title>The Better Down Hole Tool</title>
 <meta name="application-name" content="The Better Down Hole Tool">
 <meta name="apple-mobile-web-app-title" content="Down Hole Tool">
 <meta property="og:title" content="The Better Down Hole Tool">
 <meta property="og:site_name" content="The Better Down Hole Tool">
-<meta property="og:description" content="Build a compatible HDD drill string for a Ditch Witch or Vermeer drill, then share or export the parts list.">
+<meta property="og:description" content="Create an HDD loadout for a Ditch Witch or Vermeer drill. Equip the string slot by slot, then share or export the list.">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="description" content="Build a compatible HDD drill string for your Ditch Witch or Vermeer drill in a few taps, then share or export the parts list.">
+<meta name="description" content="Create an HDD loadout for your Ditch Witch or Vermeer drill. Pick the drill, lock the pipe, equip each slot, then share or export the list.">
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://www.hddadvisor.com">
 <link rel="preconnect" href="https://rdyhhszmfpomixaoehgy.supabase.co">
@@ -19,14 +19,15 @@
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
+<a class="skip" href="#app">Skip to content</a>
 <header class="topbar">
   <a class="brand" href="#/" aria-label="The Better Down Hole Tool home">
-    <img src="img/favicon.svg" alt="" width="24" height="24">
-    <span class="brand-name"><b>The Better Down Hole Tool</b></span>
+    <img src="img/favicon.svg" alt="" width="28" height="28">
+    <span class="brand-name"><small>Loadout</small><b>The Better Down Hole Tool</b></span>
   </a>
-  <nav class="topnav">
+  <nav class="topnav" aria-label="Primary">
     <a href="#/garage" class="topnav-link" data-nav="garage"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 8v13h4v-9h12v9h4V8zM8 14h8v2H8zm0 3h8v2H8z"/></svg><span id="acct-label">Sign in</span></a>
-    <a href="#/saved" class="topnav-link" data-nav="saved"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>My strings</span><b class="badge" id="saved-count" hidden></b></a>
+    <a href="#/saved" class="topnav-link" data-nav="saved"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span>Saved</span><b class="badge" id="saved-count" hidden></b></a>
   </nav>
 </header>
 <div class="stepper" id="stepper" hidden></div>
@@ -36,7 +37,7 @@
 <section class="sheet" id="sheet" role="dialog" aria-modal="true" hidden></section>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <footer class="sitefoot" id="sitefoot">
-  <p class="fineprint">Independent drill-string builder. Tooling data is compiled from public manufacturer references, last refreshed <span id="data-date"></span>. Confirm part numbers and compatibility before ordering. Ditch Witch® and Vermeer® are trademarks of their respective owners.</p>
+  <p class="fineprint">Independent loadout builder. Tooling data is compiled from public manufacturer references, last refreshed <span id="data-date"></span>. Confirm part numbers and compatibility before ordering. Ditch Witch® and Vermeer® are trademarks of their respective owners.</p>
 </footer>
 <script src="js/app.js" type="module"></script>
 </body>

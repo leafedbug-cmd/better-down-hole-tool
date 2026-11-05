@@ -30,7 +30,7 @@ const ICON = {
   print: '<svg viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zm-3 11H8v-5h8zm3-7a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM18 3H6v4h12z"/></svg>',
   save: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
   trash: '<svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg>',
-  pipe: '<svg viewBox="0 0 40 40"><rect x="2" y="15" width="7" height="10" rx="1.5" fill="#FF6600"/><rect x="9" y="17" width="22" height="6" fill="#bbb"/><rect x="31" y="15" width="7" height="10" rx="1.5" fill="#FF6600"/></svg>',
+  pipe: '<svg viewBox="0 0 40 40"><rect x="2" y="15" width="7" height="10" rx="1.5" fill="currentColor"/><rect x="9" y="17" width="22" height="6" fill="currentColor" opacity=".45"/><rect x="31" y="15" width="7" height="10" rx="1.5" fill="currentColor"/></svg>',
 };
 
 /* ---------- storage ---------- */
@@ -173,8 +173,8 @@ function setStepper(step, cfg) {
   const steps = [
     ['Drill', m ? m.model : '', '#/drill'],
     ['Pipe', p ? p.name : '', m ? `#/pipe/${m.id}` : null],
-    ['Build', cfg?.r ? cfg.mode : '', cfg?.r ? `#/build?c=${b64e(cfg)}` : null],
-    ['Parts list', '', cfg?.r ? `#/summary?c=${b64e(cfg)}` : null],
+    ['Equip', cfg?.r ? cfg.mode : '', cfg?.r ? `#/build?c=${b64e(cfg)}` : null],
+    ['Confirm', '', cfg?.r ? `#/summary?c=${b64e(cfg)}` : null],
   ];
   el.innerHTML = `<ol>${steps.map(([t, sub, href], i) => {
     const cls = i + 1 < step ? 'done' : i + 1 === step ? 'cur' : '';
@@ -210,51 +210,76 @@ function closeSheet() {
 $('#sheet-backdrop').addEventListener('click', closeSheet);
 document.addEventListener('keydown', (e) => e.key === 'Escape' && !$('#sheet').hidden && closeSheet());
 async function copyText(t) {
-  try { await navigator.clipboard.writeText(t); return true; }
-  catch {
-    const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
-    const ok = document.execCommand('copy'); ta.remove(); return ok;
-  }
+  const fallback = () => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = t; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      const ok = document.execCommand('copy'); ta.remove(); return ok;
+    } catch { return false; }
+  };
+  try {
+    if (!navigator.clipboard?.writeText) return fallback();
+    await Promise.race([
+      navigator.clipboard.writeText(t),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('clipboard-timeout')), 700)),
+    ]);
+    return true;
+  } catch { return fallback(); }
 }
 
 /* ---------- views ---------- */
+function pageHead(kicker, title, sub) {
+  return `<header class="page-head"><p class="kicker">${kicker}</p><h1>${title}</h1>${sub ? `<p class="lede">${sub}</p>` : ''}</header>`;
+}
 function viewHome() {
   setStepper(0); setActionbar('');
   const last = store.get(LAST_KEY, null), saved = getSaved().slice(0, 3);
   let lastHtml = '';
   if (last?.cfg) {
     lastHtml = `<a class="choice" href="#/build?c=${b64e(last.cfg)}"><div class="pipe-ico">${ICON.pipe}</div>
-      <div class="c-main"><div class="small muted">Pick up where you left off</div><div class="c-title">${esc(last.title)}</div></div>${ICON.chev}</a>`;
+      <div class="c-main"><div class="small muted">Resume loadout</div><div class="c-title">${esc(last.title)}</div></div>${ICON.chev}</a>`;
   }
   app.innerHTML = `
-  <section class="hero">
+  <section class="hero frame">
     <img src="img/hero-wide.jpg" alt="" fetchpriority="high">
     <div class="hero-body">
-      <h1>Build the right drill string. <em>From your phone.</em></h1>
-      <p><b>The Better Down Hole Tool.</b> Pick your drill and pipe, tap through the tooling from rig to bit, and share or export the parts list.</p>
-      <a class="btn btn-primary btn-block" href="#/drill" style="max-width:360px">Start: pick your drill ${ICON.chev.replace('class="chev"', 'style="fill:#fff"')}</a>
+      <p class="kicker">Create a class</p>
+      <h1>Build the loadout. <em>Equip every slot.</em></h1>
+      <p>Pick a Ditch Witch® or Vermeer® drill, lock the pipe, then fill the string from the rig out to the bit. Share the loadout when the class is ready.</p>
+      <a class="btn btn-primary btn-block" href="#/drill">Start a loadout ${ICON.chev}</a>
     </div>
   </section>
-  ${ME.member ? `<a class="choice rig-cta" href="#/garage"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="small muted">${esc(ME.company.name)}</div><div class="c-title">My rigs &amp; loadouts</div></div>${ICON.chev}</a>` :
-    `<a class="choice rig-cta" href="#/account"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">Save loadouts for every rig</div><div class="c-sub">Free crew account. Optional: guests can build and share.</div></div>${ICON.chev}</a>`}
+  ${ME.member ? `<a class="choice rig-cta" href="#/garage"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="small muted">${esc(ME.company.name)}</div><div class="c-title">Operators and loadouts</div></div>${ICON.chev}</a>` :
+    `<a class="choice rig-cta" href="#/account"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">Save a class for every rig</div><div class="c-sub">Free crew account. Guests can still build and share a loadout.</div></div>${ICON.chev}</a>`}
   ${lastHtml ? `<div class="section-head"><h2>Continue</h2></div>${lastHtml}` : ''}
-  ${saved.length ? `<div class="section-head"><h2>My saved strings</h2><a class="linkbtn" href="#/saved">See all</a></div>
-    <div class="stack">${saved.map(savedRow).join('')}</div>` : ''}
-  <div class="section-head"><h2>How it works</h2></div>
+  ${saved.length ? `<div class="section-head"><h2>Saved loadouts</h2><a class="linkbtn" href="#/saved">See all</a></div>
+    <div class="lo-grid">${saved.map((s) => savedRow(s)).join('')}</div>` : ''}
+  <div class="section-head"><h2>How a class is built</h2></div>
   <div class="howto"><ol style="display:contents">
-    <li><span class="num">1</span><div><h3>Pick your drill</h3><p>All current Ditch Witch® and Vermeer® models.</p></div></li>
-    <li><span class="num">2</span><div><h3>Pick your pipe</h3><p>Only pipe that fits your drill is shown.</p></div></li>
-    <li><span class="num">3</span><div><h3>Build the string</h3><p>Threads are matched for you, and adapters are added automatically.</p></div></li>
-    <li><span class="num">4</span><div><h3>Send it</h3><p>Text, email, copy, or print the parts list.</p></div></li>
+    <li><span class="num">1</span><div><h3>Choose the drill</h3><p>Current Ditch Witch® and Vermeer® models. This is the operator.</p></div></li>
+    <li><span class="num">2</span><div><h3>Lock the pipe</h3><p>Only pipe that fits that drill can be equipped.</p></div></li>
+    <li><span class="num">3</span><div><h3>Equip the slots</h3><p>Fill the string from housing to bit. Threads and adapters match as you go.</p></div></li>
+    <li><span class="num">4</span><div><h3>Confirm and send</h3><p>Text, email, copy, or print the loadout.</p></div></li>
   </ol></div>`;
 }
-function savedRow(s) {
-  return `<div class="choice" style="cursor:default">
-    <div class="pipe-ico">${ICON.pipe}</div>
-    <a class="c-main" href="#/summary?c=${b64e(s.cfg)}" style="text-decoration:none">
-      <div class="c-title">${esc(s.name)}</div>
-      <div class="c-sub">${esc(s.title)} · ${new Date(s.ts).toLocaleDateString()}</div></a>
-    <a class="iconbtn" href="#/build?c=${b64e(s.cfg)}" aria-label="Edit">${ICON.chev}</a></div>`;
+function savedRow(s, { del = false } = {}) {
+  const c = b64e(s.cfg);
+  return `<article class="lo-card">
+    <div class="lo-top"><div style="min-width:0">
+      <div class="lo-name">${esc(s.name)}</div>
+      <div class="small muted">${esc(s.title)} · ${new Date(s.ts).toLocaleDateString()}</div>
+    </div>
+    ${del
+      ? `<button class="iconbtn" data-del="${s.id}" aria-label="Delete ${esc(s.name)}">${ICON.trash}</button>`
+      : `<a class="iconbtn" href="#/build?c=${c}" aria-label="Edit ${esc(s.name)}">${ICON.chev}</a>`}
+    </div>
+    <div class="lo-actions">
+      <a class="btn btn-outline" href="#/build?c=${c}">Edit</a>
+      <a class="btn btn-primary" href="#/summary?c=${c}">Open brief</a>
+    </div>
+  </article>`;
 }
 /* Step 1 – drill */
 let drillFilter = { brand: 'all', q: '' };
@@ -262,8 +287,7 @@ async function viewDrill() {
   await loadCatalog();
   setStepper(1, null); setActionbar('');
   app.innerHTML = `
-    <h1>Which drill are you running?</h1>
-    <p class="muted" style="margin:6px 0 14px">Tap your model. You can search too, like “JT25” or “D24”.</p>
+    ${pageHead('Step 01 · Drill class', 'Choose your drill', 'This is the operator you are building for. Tap a Ditch Witch® or Vermeer® model, or search “JT25” or “D24”.')}
     <div class="stack">
       <div class="searchbox">${ICON.search}<input id="q" type="search" inputmode="search" autocomplete="off" placeholder="Search drill model" value="${esc(drillFilter.q)}" aria-label="Search drill model"><button class="clear" id="clear" aria-label="Clear" ${drillFilter.q ? '' : 'hidden'}>×</button></div>
       <div class="seg" role="group" aria-label="Brand">
@@ -282,9 +306,10 @@ async function viewDrill() {
           const n = m.pipes.length;
           return `<a class="tile ${m.brand === 'Vermeer' ? 'vermeer' : ''}" href="#/pipe/${m.id}">
             <div><div class="t-brand">${esc(m.brand)}</div><div class="t-model">${esc(m.model)}</div></div>
-            <div class="t-meta">${n ? `${n} pipe option${n === 1 ? '' : 's'}` : 'No pipe listed'}</div></a>`;
+            <div class="t-meta">${n ? `${n} pipe option${n === 1 ? '' : 's'}` : 'No pipe listed'}</div>
+            <div class="t-act">Select</div></a>`;
         }).join('')}</div>`).join('') +
-      (drillFilter.brand !== 'Ditch Witch' ? `<div class="note" style="margin-top:16px">${ICON.info.replace('<svg', '<svg width="20" height="20" style="flex:none;fill:#e05500"')}<span>Running a Vermeer®? Ditch Witch drill pipe HIWS1® and HXT® is compatible with all Vermeer® Firestick® threads.</span></div>` : '');
+      (drillFilter.brand !== 'Ditch Witch' ? `<div class="note" style="margin-top:16px">${ICON.info}<span>Running a Vermeer®? Ditch Witch drill pipe HIWS1® and HXT® is compatible with all Vermeer® Firestick® threads.</span></div>` : '');
   };
   draw();
   const q = $('#q');
@@ -304,16 +329,15 @@ async function viewPipe(mid) {
   setStepper(2, { m: m.id }); setActionbar('');
   const ctx = loCtx.for({ m: m.id });
   app.innerHTML = `
-    ${ctx ? loBanner(ctx, 'NEW LOADOUT · STEP 1 OF 2: PIPE') : ''}
+    ${ctx ? loBanner(ctx, 'NEW LOADOUT · LOCK PIPE') : ''}
     ${ctx ? `<a class="linkbtn" href="#/rig/${ctx.machine.id}">‹ Back to ${esc(rigName(ctx.machine))}</a>` : '<a class="linkbtn" href="#/drill">‹ Change drill</a>'}
-    <h1>${esc(m.brand)} ${esc(m.model)}: pick your drill pipe</h1>
-    <p class="muted" style="margin:6px 0 14px">Only pipe that works with the ${esc(m.model)} is listed.</p>
+    ${pageHead('Step 02 · Pipe', `${esc(m.brand)} ${esc(m.model)}`, `Lock the pipe for this drill. Only pipe that fits the ${esc(m.model)} can be equipped.`)}
     <div class="stack">${m.pipes.map((p) => p.roadmap ? `
       <a class="choice" href="#/build?c=${b64e(newCfg(m.id, p.id, p.roadmap))}">
         <div class="pipe-ico">${ICON.pipe}</div>
         <div class="c-main"><div class="c-title">${esc(p.name)}</div>
-          <div class="c-sub">${p.pn ? `Part # <b style="font-family:ui-monospace,Menlo,monospace;color:#e05500">${esc(p.pn)}</b>` : ''}</div></div>${ICON.chev}</a>` : `
-      <div class="choice" aria-disabled="true" style="opacity:.55;cursor:not-allowed"><div class="pipe-ico">${ICON.pipe}</div>
+          <div class="c-sub">${p.pn ? `Part # <b class="pn">${esc(p.pn)}</b>` : ''}</div></div>${ICON.chev}</a>` : `
+      <div class="choice" aria-disabled="true"><div class="pipe-ico">${ICON.pipe}</div>
         <div class="c-main"><div class="c-title">${esc(p.name)}</div><div class="c-sub">${p.pn ? `Part # ${esc(p.pn)} · ` : ''}Tooling data not loaded yet</div></div></div>`).join('') ||
       `<div class="empty">No pipe is listed for this drill.</div>`}
     </div>
@@ -344,6 +368,7 @@ function persistBuild(replace = true) {
   setStepper(3, buildCfg);
 }
 function partRow(p, { selected, multi, sel = true, compact } = {}) {
+  const stamp = selected || !sel ? 'Equipped' : 'Equip';
   return `<div class="part ${selected ? 'sel' : ''} ${multi ? 'multi' : ''}" ${sel ? `role="button" tabindex="0" data-pick="${p.id}" aria-pressed="${!!selected}"` : ''}>
     <div class="thumb">${imgTag(p.img, 240, 120, p.name)}</div>
     <div class="p-main"><div class="p-name">${esc(p.name)}</div>
@@ -352,8 +377,30 @@ function partRow(p, { selected, multi, sel = true, compact } = {}) {
       ${!compact && p.short ? `<div class="p-short">${esc(p.short)}</div>` : ''}</div>
     <div class="p-act">
       <button class="iconbtn" data-info="${p.id}" aria-label="Details for ${esc(p.name)}">${ICON.info}</button>
-      ${sel ? `<span class="check">${selected ? ICON.check : ''}</span>` : ''}
+      <span class="equip-stamp">${stamp}</span>
+      ${sel ? `<span class="check" aria-hidden="true">${selected ? ICON.check : ''}</span>` : ''}
     </div></div>`;
+}
+function slotCell(r, i, P) {
+  const n = String(i + 1).padStart(2, '0');
+  const name = esc(r.sec.name);
+  let state = 'locked', tag = 'Locked', plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">·</span></span>`;
+  if (r.sel.length) {
+    const pp = P[r.sel[0]];
+    state = 'filled'; tag = 'Equipped';
+    const count = r.sel.length > 1 ? `<span class="slot-count">×${r.sel.length}</span>` : '';
+    const addon = r.acc[r.sel[0]] ? `<span class="slot-addon">+add</span>` : '';
+    plate = `<span class="slot-plate">${imgTag(pp.img, 340, 100, pp.name)}${count}${addon}<span class="visually-hidden">${esc(pp.name)}</span></span>`;
+  } else if (r.status === 'pending') {
+    state = 'open'; tag = 'Open';
+    plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">+</span></span>`;
+  } else if (r.status === 'skip') {
+    state = 'skip'; tag = 'Skipped';
+    plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">–</span></span>`;
+  }
+  return `<button type="button" class="slot slot-${state}" data-jump="${r.sec.id}">
+    <span class="slot-idx" aria-hidden="true">${n}</span>${plate}
+    <span class="slot-name">${name}</span><span class="slot-tag">${tag}</span></button>`;
 }
 function renderBuild(rm, focusNext) {
   const cfg = buildCfg, P = rm.parts, m = machine(cfg.m), p = pipeOf(m, cfg.p);
@@ -361,11 +408,7 @@ function renderBuild(rm, focusNext) {
   const items = lineItems(rm, cfg, rows);
   const pending = rows.find((r) => r.status === 'pending');
   persistBuild();
-  const strip = rows.filter((r) => r.sel.length).map((r) => {
-    const id = r.sel[0], pp = P[id], a = r.acc[id];
-    return `<button class="seg-img" data-jump="${r.sec.id}" title="${esc(pp.name)}">${imgTag(pp.img, 340, 100, pp.name)}<span>${esc(r.sec.name)}</span></button>` +
-      (a ? `<button class="seg-img" data-jump="${r.sec.id}">${imgTag(P[a.id].img, 200, 100, P[a.id].name)}<span>Add-on</span></button>` : '');
-  }).join('') + (pending ? `<div class="gap" title="Next: ${esc(pending.sec.name)}"></div>` : '');
+  const strip = rows.map((r, i) => slotCell(r, i, P)).join('');
 
   let n = 0;
   const secHtml = rows.map((r) => {
@@ -373,19 +416,19 @@ function renderBuild(rm, focusNext) {
     const multi = s.multi;
     let body = '', chip = '';
     if (r.status === 'skip') {
-      chip = '<span class="pill">Not needed</span>';
-      body = `<p class="sec-note">Nothing in this step fits your selections, so it's skipped.</p>`;
+      chip = '<span class="pill">Skipped</span>';
+      body = `<p class="sec-note">Nothing fits the slot before this one, so this slot stays empty.</p>`;
     } else if (r.status === 'locked') {
-      chip = '<span class="pill">Waiting</span>';
-      body = `<p class="sec-note">Choose ${esc(pending?.sec.name || 'the step above')} first.</p>`;
+      chip = '<span class="pill">Locked</span>';
+      body = `<p class="sec-note">Equip ${esc(pending?.sec.name || 'the open slot')} first.</p>`;
     } else if (r.status === 'pending') {
-      chip = `<span class="pill pill-orange">Choose ${multi ? 'one or more' : 'one'}</span>`;
+      chip = `<span class="pill pill-orange">${multi ? 'Equip one or more' : 'Open slot'}</span>`;
       const shown = r.cands.slice(0, 5);
-      body = `<p class="sec-note">${r.cands.length} option${r.cands.length > 1 ? 's' : ''} fit the part before it${r.hidden ? ` (${r.hidden} more hidden because nothing downstream fits them)` : ''}.</p>
+      body = `<p class="sec-note">${r.cands.length} option${r.cands.length > 1 ? 's' : ''} fit the slot before this one${r.hidden ? ` (${r.hidden} more hidden because nothing downstream fits them)` : ''}.</p>
         ${shown.map((o) => partRow(P[o.id], { multi })).join('')}
-        ${r.cands.length > shown.length ? `<button class="btn btn-outline btn-block more" data-browse="${s.id}">See all ${r.cands.length} ${esc(s.name.toLowerCase())} options</button>` : ''}`;
+        ${r.cands.length > shown.length ? `<button class="btn btn-outline btn-block more" data-browse="${s.id}">See all ${r.cands.length} options</button>` : ''}`;
     } else {
-      chip = r.status === 'auto' ? '<span class="pill pill-ok">Auto-matched</span>' : `<span class="pill pill-dark">Selected${r.sel.length > 1 ? ` · ${r.sel.length}` : ''}</span>`;
+      chip = r.status === 'auto' ? '<span class="pill pill-ok">Auto-matched</span>' : `<span class="pill pill-dark">Equipped${r.sel.length > 1 ? ` · ${r.sel.length}` : ''}</span>`;
       body = r.sel.map((id) => {
         const opt = s.opts.find((o) => o.id === id), accs = (opt.acc || []), a = r.acc[id];
         const accHtml = accs.length ? `<div class="acc"><div class="acc-title"><span>Add-on / adapter</span>${a?.auto ? '<span class="pill pill-ok">Auto-added to fit</span>' : ''}</div>
@@ -394,41 +437,46 @@ function renderBuild(rm, focusNext) {
             ${accs.map((aid) => `<button class="chip" data-acc="${s.id}.${id}" data-accid="${aid}" aria-pressed="${a?.id === aid}">${esc(P[aid].name)}${P[aid].pn ? `<small>#${esc(P[aid].pn)}</small>` : ''}</button>`).join('')}
           </div></div>` : '';
         return partRow(P[id], { selected: true, multi, sel: false }) + accHtml;
-      }).join('') + (r.cands.length > 1 ? `<button class="linkbtn" data-browse="${s.id}">${multi ? 'Add or remove options' : `Change (${r.cands.length} options fit)`}</button>` : '');
+      }).join('') + (r.cands.length > 1 ? `<button class="linkbtn" data-browse="${s.id}">${multi ? 'Add or remove' : `Swap (${r.cands.length} fit this slot)`}</button>` : '');
     }
     const dot = r.status === 'done' || r.status === 'auto' ? '✓' : n;
     const cls = { done: 'done', auto: 'done', pending: 'pending', skip: 'skip', locked: 'locked' }[r.status];
-    return `<div class="sec ${cls}" id="sec-${s.id}"><span class="sec-dot">${dot}</span><div class="sec-body">
-      <div class="sec-head"><h3>${esc(s.name)}</h3>${chip}</div>${body}</div></div>`;
+    return `<div class="sec ${cls}" id="sec-${s.id}"><span class="sec-dot" aria-hidden="true">${dot}</span><div class="sec-body">
+      <div class="sec-head"><div><p class="sec-kicker">Slot ${String(n).padStart(2, '0')}</p><h3>${esc(s.name)}</h3></div>${chip}</div>${body}</div></div>`;
   }).join('');
 
   const donePct = rows.filter((r) => ['done', 'auto', 'skip'].includes(r.status)).length;
+  const pct = rows.length ? Math.round((donePct / rows.length) * 100) : 0;
   const ctx = loCtx.for(cfg);
+  const endLabel = cfg.mode === 'Bit' ? 'Bit end' : 'Reamer end';
   app.innerHTML = `
-    ${ctx ? loBanner(ctx, ctx.loadout ? 'EDITING LOADOUT' : 'NEW LOADOUT') : ''}
+    ${ctx ? loBanner(ctx, ctx.loadout ? 'EDITING LOADOUT' : 'NEW LOADOUT · EQUIP SLOTS') : ''}
     <div class="build-grid"><div>
       <div class="build-title"><div><a class="linkbtn" href="#/pipe/${cfg.m}" style="padding-left:0">‹ Change pipe</a>
-        <h1>${esc(m?.model || '')} drill string</h1><div class="small muted">${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''}</div></div></div>
+        ${pageHead('Step 03 · Equip', esc(m?.model || 'Drill string'), `${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''}`)}</div></div>
       <div class="seg" role="group" aria-label="Configuration type" style="margin:14px 0">
-        <button data-mode="Bit" aria-pressed="${cfg.mode === 'Bit'}">Bit config<small>pilot bore</small></button>
-        <button data-mode="Backreamer" aria-pressed="${cfg.mode === 'Backreamer'}">Backreamer config<small>pullback</small></button>
+        <button data-mode="Bit" aria-pressed="${cfg.mode === 'Bit'}">Pilot<small>Bit config</small></button>
+        <button data-mode="Backreamer" aria-pressed="${cfg.mode === 'Backreamer'}">Pullback<small>Backreamer config</small></button>
       </div>
-      <div class="preview"><div class="preview-head"><span>RIG</span><span>${cfg.mode === 'Bit' ? 'BIT' : 'REAMER'} END →</span></div>
-        <div class="strip"><span class="rig">${esc(m?.model || 'RIG')}</span>${strip || '<span class="small muted">Your string appears here</span>'}</div></div>
+      <div class="preview"><div class="preview-head"><span>Slot rail</span><span>${endLabel} →</span></div>
+        <div class="meter" role="img" aria-label="${donePct} of ${rows.length} slots settled"><span style="width:${pct}%"></span></div>
+        <div class="strip"><span class="rig">${esc(m?.model || 'RIG')}</span>${strip || '<span class="small muted">Slots appear here</span>'}</div></div>
       <div class="timeline" style="margin-top:18px">${secHtml}</div>
-      ${!pending && rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note" style="margin-top:14px">${ICON.info.replace('<svg', '<svg width="20" height="20" style="flex:none;fill:#e05500"')}<span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} in the catalog fits this string.</b> Try a different choice in an earlier step.</span></div>` : ''}
+      ${!pending && rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note" style="margin-top:14px">${ICON.info}<span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
     </div>
     <aside class="build-aside">
-      <div class="aside-card"><h3>Parts so far</h3>
-        <ul class="mini-list">${items.map((l) => `<li><span>${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">Nothing yet</li>'}</ul>
-        <a class="btn btn-primary btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">Review parts list</a>
-        <button class="btn btn-ghost btn-block" style="margin-top:8px" data-save>${ICON.save} ${ctx ? 'Save loadout' : 'Save this string'}</button>
+      <div class="aside-card"><h3>Equipped</h3>
+        <ul class="mini-list">${items.map((l) => `<li><span>${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}</ul>
+        <a class="btn btn-primary btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">${pending ? 'Review loadout' : 'Confirm class'}</a>
+        <button class="btn btn-ghost btn-block" style="margin-top:8px" data-save>${ICON.save} Save loadout</button>
       </div>
     </aside></div>`;
 
-  setActionbar(`<div class="ab-info"><strong>${items.length} part${items.length === 1 ? '' : 's'}</strong>${pending ? `Next: ${esc(pending.sec.name)}` : `${donePct}/${rows.length} steps done`}</div>
-    ${ctx ? `<button class="btn ${pending ? 'btn-ghost' : 'btn-primary'}" data-save>${ICON.save} Save loadout</button>` : `<button class="btn btn-ghost btn-sm" data-save aria-label="Save">${ICON.save}</button>`}
-    ${ctx && !pending ? '' : `<a class="btn btn-primary" href="#/summary?c=${b64e(cfg)}">${pending ? 'Parts list' : 'Done: parts list'}</a>`}`);
+  const confirmHref = `#/summary?c=${b64e(cfg)}`;
+  setActionbar(`<div class="ab-info"><strong>${items.length} equipped</strong><span class="ab-line">${pending ? `Open · ${esc(pending.sec.name)}` : `Class ready · ${donePct}/${rows.length}`}</span>${pending ? `<a class="ab-review" href="${confirmHref}">Review</a>` : ''}</div>
+    ${ctx && !pending
+      ? `<button class="btn btn-primary" data-save>${ICON.save} Save</button><a class="btn btn-ghost" href="${confirmHref}">Confirm</a>`
+      : `<button class="btn btn-ghost btn-sm" data-save aria-label="Save loadout">${ICON.save}</button>${pending ? `<button class="btn btn-primary" type="button" data-equip-next>Equip</button>` : `<a class="btn btn-primary" href="${confirmHref}">Confirm</a>`}`}`);
   mountLoBanner();
 
   // events
@@ -457,11 +505,15 @@ function renderBuild(rm, focusNext) {
   $$('[data-acc]').forEach((b) => b.addEventListener('click', () => { cfg.acc[b.dataset.acc] = +b.dataset.accid; renderBuild(rm); }));
   $$('[data-jump]').forEach((b) => b.addEventListener('click', () => $(`#sec-${b.dataset.jump}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })));
   $$('[data-save]').forEach((b) => b.addEventListener('click', () => saveSheet(cfg)));
+  $$('[data-equip-next]').forEach((b) => b.addEventListener('click', () => {
+    const el = pending && $(`#sec-${pending.sec.id}`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
   if (focusNext) {
     const nxt = compute(rm, cfg).find((r) => r.status === 'pending');
     const el = nxt && $(`#sec-${nxt.sec.id}`);
     if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-    else if (!nxt) toast('Drill string complete ✓');
+    else if (!nxt) toast('Loadout complete');
   }
 }
 function browseSheet(rm, sid) {
@@ -470,7 +522,7 @@ function browseSheet(rm, sid) {
   const s = row.sec, multi = s.multi;
   const soils = [...new Set(row.cands.flatMap((o) => (P[o.id].soil || '').split(',').map((x) => x.trim()).filter(Boolean)))];
   let q = '', soil = '', chosen = new Set(row.sel);
-  openSheet(`<div class="sheet-top"><div><h2>${esc(s.name)}</h2><div class="small muted">${row.cands.length} options fit your string${multi ? ' · pick one or more' : ''}</div></div>
+  openSheet(`<div class="sheet-top"><div><h2>${esc(s.name)}</h2><div class="small muted">${row.cands.length} options fit this slot${multi ? ' · equip one or more' : ''}</div></div>
       <button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body">
       ${row.cands.length > 6 ? `<div class="searchbox" style="margin-bottom:8px">${ICON.search}<input id="bq" type="search" placeholder="Search name, size or part #" aria-label="Search options"></div>` : ''}
@@ -508,7 +560,7 @@ function showPart(rm, id, stacked) {
       <dl class="specs">${specs.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
       ${p.desc?.length ? `<ul class="bullets">${p.desc.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>` : ''}
       ${(p.docs || []).filter((d) => d.url).map((d) => `<a class="btn btn-ghost btn-block" href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>`).join('')}
-      <p class="small muted">Photos and specs from the public manufacturer catalog.</p>
+      <p class="small muted">Photos and specs from public manufacturer references.</p>
     </div>
     <div class="sheet-foot">${p.pn ? `<button class="btn btn-ghost" id="cpn">Copy part #</button>` : ''}<button class="btn btn-primary" style="flex:1" ${stacked ? 'id="back"' : 'data-close'}>${stacked ? '‹ Back to list' : 'Close'}</button></div>`, (sh) => {
     $('#cpn', sh)?.addEventListener('click', async () => { await copyText(p.pn); toast(`Copied ${p.pn}`); });
@@ -519,15 +571,15 @@ function saveSheet(cfg) {
   const ctx = loCtx.for(cfg);
   if (ctx && ME.member) return loSaveSheet(cfg, ctx);
   const def = titleOf(cfg).replace(' config', '');
-  openSheet(`<div class="sheet-top"><h2>Save drill string</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
-    <div class="sheet-body stack"><label class="field"><span>Name it (job, crew or truck)</span><input id="sname" value="${esc(def)}" maxlength="80"></label>
-    <p class="small muted">Saved on this phone only. To share it, use the parts list.</p>
+  openSheet(`<div class="sheet-top"><h2>Save loadout</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body stack"><label class="field"><span>Name this preset</span><input id="sname" value="${esc(def)}" maxlength="80"></label>
+    <p class="small muted">Saved on this phone only. To share it, open the loadout brief.</p>
     <div id="rigsave" class="rigsave"></div></div>
     <div class="sheet-foot"><button class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" style="flex:1" id="sgo">${ICON.save} Save</button></div>`, (sh) => {
     $('#sgo', sh).addEventListener('click', () => {
       const list = getSaved();
       list.unshift({ id: Date.now().toString(36), name: $('#sname', sh).value.trim() || def, title: titleOf(cfg), ts: Date.now(), cfg: JSON.parse(JSON.stringify(cfg)) });
-      store.set(SAVED_KEY, list.slice(0, 50)); updateSavedBadge(); closeSheet(); toast('Saved to My strings');
+      store.set(SAVED_KEY, list.slice(0, 50)); updateSavedBadge(); closeSheet(); toast('Saved on this phone');
     });
     saveToRigSection(cfg, sh);
   });
@@ -535,7 +587,7 @@ function saveSheet(cfg) {
 
 /* Step 4 – summary */
 function listText(cfg, items, withLink = true) {
-  const lines = [`HDD drill string: ${titleOf(cfg)}`, 'Built with The Better Down Hole Tool', ''];
+  const lines = [`HDD loadout: ${titleOf(cfg)}`, 'Built with The Better Down Hole Tool', ''];
   items.forEach((l, i) => lines.push(`${i + 1}. ${l.part.name}: PN ${pnTxt(l.part)}, qty ${l.qty}${l.acc ? ' (add-on)' : ''}`));
   if (withLink) lines.push('', `Open it: ${shareUrl(cfg)}`);
   return lines.join('\n');
@@ -555,10 +607,10 @@ async function viewSummary(q) {
     const m = machine(cfg.m), p = pipeOf(m, cfg.p);
     app.innerHTML = `
     <div class="sum-grid"><div class="stack">
-      <div class="sum-head"><small>PARTS LIST · ${cfg.mode === 'Bit' ? 'BIT' : 'BACKREAMER'} CONFIG</small>
-        <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''}</p></div>
-      ${rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} in the catalog fits this string.</b> Try a different choice in an earlier step.</span></div>` : ''}
-      ${pending.length ? `<div class="note no-print"><span><b>${pending.length} step${pending.length > 1 ? 's' : ''} still open</b> (${esc(pending.map((r) => r.sec.name).join(', '))}). <a href="#/build?c=${b64e(cfg)}">Finish building</a></span></div>` : ''}
+      <div class="sum-head"><small>LOADOUT BRIEF · ${cfg.mode === 'Bit' ? 'PILOT' : 'PULLBACK'}</small>
+        <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config</p></div>
+      ${rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
+      ${pending.length ? `<div class="note no-print"><span><b>${pending.length} slot${pending.length > 1 ? 's' : ''} still open</b> (${esc(pending.map((r) => r.sec.name).join(', '))}). <a href="#/build?c=${b64e(cfg)}">Finish equipping</a></span></div>` : ''}
       <div class="card"><ul class="lines">${items.map((l) => `
         <li class="line ${l.acc ? 'acc-line' : ''}"><div class="thumb">${imgTag(l.part.img, 200, 100, l.part.name)}</div>
           <div><div class="l-sec">${esc(l.sec)}${l.auto ? ' · auto' : ''}</div><div class="l-name">${esc(l.part.name)}</div>
@@ -572,25 +624,25 @@ async function viewSummary(q) {
         <button class="btn btn-ghost" id="sh-copy">${ICON.link}Copy link</button>
         <button class="btn btn-ghost" id="sh-print">${ICON.print}Print / PDF</button>
         <button class="btn btn-ghost" data-save>${ICON.save}Save</button>
-        <a class="btn btn-ghost" href="#/build?c=${b64e(cfg)}">✎ Edit string</a>
-        <button class="btn btn-ghost" id="sh-mode">⇄ ${cfg.mode === 'Bit' ? 'Backreamer' : 'Bit'} list</button>
+        <a class="btn btn-ghost" href="#/build?c=${b64e(cfg)}">✎ Edit loadout</a>
+        <button class="btn btn-ghost" id="sh-mode">⇄ ${cfg.mode === 'Bit' ? 'Pullback' : 'Pilot'} brief</button>
       </div>
     </div>
     <aside class="sum-aside stack">
-      <div class="cta"><h2>Share or export this parts list</h2>
+      <div class="cta"><h2>Send this loadout</h2>
         <p>Copy, text, email, or print the list. Confirm part numbers and fit before you order.</p>
         <div class="stack">
           <button class="btn btn-dark btn-block" id="q-share">${ICON.share} Share list</button>
-          <button class="btn btn-block" id="q-copy">${ICON.link} Copy parts list</button>
+          <button class="btn btn-block" id="q-copy">${ICON.link} Copy list</button>
           <a class="btn btn-block" id="q-mail" href="#">${ICON.mail} Email list</a>
           <button class="btn btn-block" id="q-print">${ICON.print} Print / PDF</button>
         </div></div>
     </aside></div>`;
-    setActionbar(`<div class="ab-info"><strong>${items.length} parts</strong>${items.reduce((a, l) => a + l.qty, 0)} pcs total</div>
+    setActionbar(`<div class="ab-info"><strong>${items.length} equipped</strong><span class="ab-line">${items.reduce((a, l) => a + l.qty, 0)} pcs${pending.length ? ` · ${pending.length} open` : ' · class ready'}</span></div>
       <button class="btn btn-ghost btn-sm" id="ab-share" aria-label="Share">${ICON.share}</button>
       <button class="btn btn-primary" id="ab-copy">Copy list</button>`);
     const text = listText(cfg, items);
-    const subj = `Drill string parts list: ${titleOf(cfg)}`;
+    const subj = `HDD loadout: ${titleOf(cfg)}`;
     const mailHref = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}`;
     $('#sh-sms').href = `sms:?&body=${encodeURIComponent(text)}`;
     $('#sh-mail').href = mailHref;
@@ -619,19 +671,17 @@ async function viewSummary(q) {
 function viewSaved() {
   setStepper(0); setActionbar('');
   const list = getSaved();
-  app.innerHTML = `<h1>My saved strings</h1><p class="muted" style="margin:6px 0 14px">Saved on this device.</p>
-    <div class="stack">${list.map((s) => `<div class="choice" style="cursor:default"><div class="pipe-ico">${ICON.pipe}</div>
-      <a class="c-main" href="#/summary?c=${b64e(s.cfg)}" style="text-decoration:none"><div class="c-title">${esc(s.name)}</div><div class="c-sub">${esc(s.title)} · ${new Date(s.ts).toLocaleDateString()}</div></a>
-      <button class="iconbtn" data-del="${s.id}" aria-label="Delete ${esc(s.name)}">${ICON.trash}</button></div>`).join('') ||
-      `<div class="card empty">Nothing saved yet.<br><br><a class="btn btn-primary" href="#/drill">Build a drill string</a></div>`}</div>`;
+  app.innerHTML = `${pageHead('On this phone', 'Saved loadouts', 'These presets stay on this device. Crew accounts keep loadouts on each operator.')}
+    <div class="lo-grid">${list.map((s) => savedRow(s, { del: true })).join('') ||
+      `<div class="card empty"><h2>No loadouts on this phone</h2><p>Build one, then save it.</p><a class="btn btn-primary" href="#/drill">Start a loadout</a></div>`}</div>`;
   $$('[data-del]').forEach((b) => b.addEventListener('click', () => {
-    if (!confirm('Delete this saved string?')) return;
+    if (!confirm('Delete this saved loadout?')) return;
     store.set(SAVED_KEY, getSaved().filter((s) => s.id !== b.dataset.del)); updateSavedBadge(); viewSaved();
   }));
 }
 function viewNotFound() {
   setStepper(0); setActionbar('');
-  app.innerHTML = `<div class="card empty"><h2>That page or link didn't work</h2><p>The link may be old or cut off.</p><a class="btn btn-primary" href="#/drill">Start a new drill string</a></div>`;
+  app.innerHTML = `<div class="card empty"><h2>That page or link didn't work</h2><p>The link may be old or cut off.</p><a class="btn btn-primary" href="#/drill">Start a new loadout</a></div>`;
 }
 
 /* ---------- accounts, company rigs & "create-a-class" loadouts (Supabase) ---------- */
@@ -705,8 +755,7 @@ async function viewAccount(q) {
   if (ME.user) return viewSetup();
   const mode = q.get('m') === 'signin' ? 'signin' : 'signup';
   app.innerHTML = `<div class="auth-wrap">
-    <h1>${mode === 'signup' ? 'Set up your crew' : 'Welcome back'}</h1>
-    <p class="muted" style="margin:6px 0 14px">${mode === 'signup' ? 'Save a down hole tool loadout for every rig in your fleet, and share them with your whole company.' : 'Sign in to see your company’s rigs and loadouts.'}</p>
+    ${pageHead(mode === 'signup' ? 'New crew' : 'Returning crew', mode === 'signup' ? 'Set up your crew' : 'Welcome back', mode === 'signup' ? 'Save a named loadout for every drill your crew runs, and share those classes with the company.' : 'Sign in to open your operators and loadouts.')}
     <div class="seg" role="tablist" style="margin-bottom:14px">
       <button aria-pressed="${mode === 'signup'}" data-go="#/account">Sign up</button>
       <button aria-pressed="${mode === 'signin'}" data-go="#/account?m=signin">Sign in</button></div>
@@ -716,7 +765,7 @@ async function viewAccount(q) {
       <div class="form-err" id="err" hidden></div>
       <button class="btn btn-primary btn-block" id="go">Sign in</button>
       <button type="button" class="linkbtn" id="forgot" style="align-self:center">Forgot password?</button></form>`}
-    <p class="small muted" style="margin-top:14px;text-align:center">No account needed to build and share a drill string. <a href="#/drill">Keep building as a guest</a></p></div>`;
+    <p class="small muted" style="margin-top:14px;text-align:center">No account needed to build and share a loadout. <a href="#/drill">Keep building as a guest</a></p></div>`;
   $$('[data-go]').forEach((b) => b.addEventListener('click', () => { location.hash = b.dataset.go; }));
   if (mode === 'signup') return mountOnboard(true);
   const err = (m) => { const e = $('#err'); e.textContent = m; e.hidden = !m; };
@@ -746,7 +795,7 @@ async function viewSetup() {
   setStepper(0); setActionbar('');
   if (!ME.user) { location.replace('#/account'); return; }
   if (ME.member) { location.replace('#/garage'); return; }
-  app.innerHTML = `<div class="auth-wrap"><h1>Finish setting up</h1><p class="muted" style="margin:6px 0 14px">Signed in as ${esc(ME.user.email)}. Tell us your company and the drills you run.</p>${onboardForm(false)}</div>`;
+  app.innerHTML = `<div class="auth-wrap">${pageHead('Crew', 'Finish setting up', `Signed in as ${esc(ME.user.email)}. Add your company and the drills you run.`)}${onboardForm(false)}</div>`;
   mountOnboard(false);
 }
 function onboardForm(withAuth) {
@@ -758,9 +807,9 @@ function onboardForm(withAuth) {
     <label class="field"><span>Your name</span><input id="emp" autocomplete="name" maxlength="120" placeholder="First and last name" value="${esc(p.employee || '')}"></label>
     ${withAuth ? `<label class="field"><span>Email</span><input id="e" type="email" autocomplete="email" inputmode="email"></label>
     <label class="field"><span>Password <em class="muted" style="font-style:normal;font-weight:500">(8+ characters)</em></span><input id="pw" type="password" autocomplete="new-password" minlength="8"></label>` : ''}
-    <div><div class="form-sub"><b>Your machines</b><span class="small muted" id="msub">Add every drill your crew runs. Give each a unit name or number.</span></div>
+    <div><div class="form-sub"><b>Your operators</b><span class="small muted" id="msub">Add every drill your crew runs. Give each a unit name or number.</span></div>
       <div id="mlist" class="stack" style="margin-top:10px"></div>
-      <button type="button" class="btn btn-ghost btn-block" id="madd" style="margin-top:10px">+ Add another machine</button></div>
+      <button type="button" class="btn btn-ghost btn-block" id="madd" style="margin-top:10px">+ Add another operator</button></div>
     <div class="form-err" id="err" hidden></div>
     <button class="btn btn-primary btn-block" id="go">${withAuth ? 'Create account' : 'Save and continue'}</button>
   </form>`;
@@ -770,9 +819,9 @@ function mountOnboard(withAuth) {
   const rows = (store.get(PENDING_KEY, {}) || {}).machines?.length ? store.get(PENDING_KEY).machines : [{ id: '', nick: '' }];
   const draw = () => {
     $('#mlist').innerHTML = rows.map((r, i) => `<div class="mrow">
-      <label class="field"><span>Machine ${i + 1}</span><select data-mi="${i}" data-k="id">${drillOptions(r.id)}</select></label>
+      <label class="field"><span>Drill ${i + 1}</span><select data-mi="${i}" data-k="id">${drillOptions(r.id)}</select></label>
       <label class="field"><span>Unit name / #</span><input data-mi="${i}" data-k="nick" maxlength="60" placeholder="Unit 12" value="${esc(r.nick)}"></label>
-      ${rows.length > 1 ? `<button type="button" class="iconbtn" data-mrm="${i}" aria-label="Remove machine ${i + 1}">${ICON.trash}</button>` : ''}</div>`).join('');
+      ${rows.length > 1 ? `<button type="button" class="iconbtn" data-mrm="${i}" aria-label="Remove drill ${i + 1}">${ICON.trash}</button>` : ''}</div>`).join('');
     $$('[data-mi]').forEach((el) => el.addEventListener('input', () => { rows[+el.dataset.mi][el.dataset.k] = el.value; }));
     $$('[data-mrm]').forEach((b) => b.addEventListener('click', () => { rows.splice(+b.dataset.mrm, 1); draw(); }));
   };
@@ -781,7 +830,7 @@ function mountOnboard(withAuth) {
   $$('[data-cm]').forEach((b) => b.addEventListener('click', () => {
     cm = b.dataset.cm; $$('[data-cm]').forEach((x) => x.setAttribute('aria-pressed', x === b));
     $$('[data-show]').forEach((el) => { el.hidden = el.dataset.show !== cm; });
-    $('#msub').textContent = cm === 'join' ? 'Optional: your company’s rigs show up after you join. Add any that are missing.' : 'Add every drill your crew runs. Give each a unit name or number.';
+    $('#msub').textContent = cm === 'join' ? 'Optional: your company’s operators show up after you join. Add any that are missing.' : 'Add every drill your crew runs. Give each a unit name or number.';
   }));
   const err = (m) => { const e = $('#err'); e.textContent = m; e.hidden = !m; if (m) e.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
   $('#fon').addEventListener('submit', async (ev) => {
@@ -791,7 +840,7 @@ function mountOnboard(withAuth) {
     if (cm === 'new' && !p.company) return err('Enter your company name.');
     if (cm === 'join' && p.code.length < 6) return err('Enter the invite code from your company’s account owner.');
     if (!p.employee) return err('Enter your name.');
-    if (cm === 'new' && !p.machines.length) return err('Pick at least one machine.');
+    if (cm === 'new' && !p.machines.length) return err('Pick at least one drill.');
     const go = $('#go'); busy(go, true, withAuth ? 'Creating account…' : 'Saving…');
     try {
       if (withAuth) {
@@ -813,7 +862,7 @@ function mountOnboard(withAuth) {
 function viewCheckEmail(email) {
   app.innerHTML = `<div class="auth-wrap"><div class="card pad stack" style="text-align:center">
     <div style="font-size:44px">✉️</div><h1>Check your email</h1>
-    <p>We sent a confirmation link to <b>${esc(email)}</b>. Tap it, then sign in. Your company and machines will be set up automatically.</p>
+    <p>We sent a confirmation link to <b>${esc(email)}</b>. Tap it, then sign in. Your company and drills will be set up automatically.</p>
     <a class="btn btn-primary btn-block" href="#/account?m=signin">I confirmed, sign in</a></div></div>`;
 }
 async function runSetup(p) {
@@ -848,8 +897,8 @@ function stripHtml(lo, cls = 'lo-strip') {
 function guestUpsell(where) {
   return `<div class="upsell card pad stack">
     <div class="upsell-ico">${ICON_RIG}</div>
-    <h2>${where === 'garage' ? 'Your rigs, your loadouts' : 'Save it to your rig'}</h2>
-    <p>Free account for your crew. Add every drill you run, then save named down hole tool loadouts for each one, like “Rock setup” or “Sand pilot”. Everyone in your company sees the same list.</p>
+    <h2>${where === 'garage' ? 'Operators and loadouts' : 'Save it on an operator'}</h2>
+    <p>Free crew account. Each drill is an operator. Each saved setup is a named loadout, like “Rock setup” or “Sand pilot”. Everyone in the company sees the same classes.</p>
     <a class="btn btn-primary btn-block" href="#/account">Create free account</a>
     <a class="btn btn-ghost btn-block" href="#/account?m=signin">I have an account</a></div>`;
 }
@@ -857,42 +906,51 @@ async function viewGarage() {
   await loadCatalog(); setStepper(0); setActionbar('');
   app.innerHTML = '<div class="stack"><div class="skeleton"></div><div class="skeleton"></div></div>';
   await meReady();
-  if (!ME.user) { app.innerHTML = `<h1>My rigs</h1><p class="muted" style="margin:6px 0 14px">Save tooling loadouts for each machine in your fleet.</p>${guestUpsell('garage')}`; return; }
+  if (!ME.user) {
+    app.innerHTML = `${pageHead('Class select', 'My rigs', 'Each drill is an operator. Each saved setup is a named loadout. Sign in to open your crew’s classes.')}
+      <div class="rig-grid"><a class="rig-card rig-locked" href="#/account">
+        <div class="rig-top"><div><div class="t-brand">Operator</div><div class="rig-name">Your drills</div></div><span class="pill">Locked</span></div>
+        <p class="small muted" style="margin:0">Slots stay empty until a crew account is on this phone.</p>
+        <div class="rig-foot"><span>Sign in to equip classes</span>${ICON.chev}</div>
+      </a></div>
+      ${guestUpsell('garage')}`;
+    return;
+  }
   if (!ME.member) { location.replace('#/setup'); return; }
   let fleet; try { fleet = await fetchFleet(); } catch (e) { app.innerHTML = `<div class="card empty">${esc(errMsg(e))}</div>`; return; }
   const byM = (id) => fleet.loadouts.filter((l) => l.machine_id === id);
   app.innerHTML = `
     <div class="garage-head">
-      <div><small>COMPANY</small><h1>${esc(ME.company.name)}</h1>
-        <div class="small" style="color:#bbb">${esc(ME.member.employee_name)} · ${ME.member.role === 'owner' ? 'Owner' : 'Member'}</div></div>
+      <div><small>Class select</small><h1>${esc(ME.company.name)}</h1>
+        <div class="small muted">${esc(ME.member.employee_name)} · ${ME.member.role === 'owner' ? 'Owner' : 'Member'}</div></div>
       <button class="iconbtn dark" id="acct" aria-label="Account and crew">${ICON_MORE}</button></div>
-    <div class="section-head"><h2>Rigs · ${fleet.machines.length}</h2><button class="linkbtn" id="addm">+ Add machine</button></div>
+    <div class="section-head"><h2>Operators · ${fleet.machines.length}</h2><button class="linkbtn" id="addm">+ Add operator</button></div>
     <div class="rig-grid">${fleet.machines.map((mc) => {
       const los = byM(mc.id), def = los.find((l) => l.is_default) || los[0];
       return `<a class="rig-card" href="#/rig/${mc.id}">
-        <div class="rig-top"><div><div class="t-brand">${esc(mc.brand || '')} ${esc(mc.model)}</div><div class="rig-name">${esc(rigName(mc))}</div></div>
+        <div class="rig-top"><div><div class="t-brand">Operator · ${esc(mc.brand || '')} ${esc(mc.model)}</div><div class="rig-name">${esc(rigName(mc))}</div></div>
           <span class="pill ${los.length ? 'pill-orange' : ''}">${los.length} loadout${los.length === 1 ? '' : 's'}</span></div>
         ${stripHtml(def)}
-        <div class="rig-foot">${def ? `${ICON_STAR}<span><b>${esc(def.name)}</b> · ${def.part_count} parts</span>` : '<span class="muted">No loadouts yet. Tap to build one.</span>'}${ICON.chev}</div></a>`;
-    }).join('') || `<div class="card empty">No machines yet.<br><br><button class="btn btn-primary" id="addm2">+ Add your first machine</button></div>`}</div>`;
+        <div class="rig-foot">${def ? `${ICON_STAR}<span><b>${esc(def.name)}</b> · ${def.part_count} equipped</span>` : '<span class="muted">No loadouts yet. Tap to build a class.</span>'}${ICON.chev}</div></a>`;
+    }).join('') || `<div class="card empty"><h2>No operators yet</h2><p>Add a drill to start a class.</p><button class="btn btn-primary" id="addm2">+ Add operator</button></div>`}</div>`;
   $('#addm').addEventListener('click', () => addMachineSheet());
   $('#addm2')?.addEventListener('click', () => addMachineSheet());
   $('#acct').addEventListener('click', () => accountSheet());
 }
 function addMachineSheet(prefill) {
-  openSheet(`<div class="sheet-top"><h2>Add a machine</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+  openSheet(`<div class="sheet-top"><h2>Add an operator</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body stack">
       <label class="field"><span>Drill</span><select id="am">${drillOptions(prefill)}</select></label>
       <label class="field"><span>Unit name / number (optional)</span><input id="an" maxlength="60" placeholder="Unit 12, Big Red, #4471…"></label>
       <div class="form-err" id="aerr" hidden></div></div>
-    <div class="sheet-foot"><button class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" style="flex:1" id="ago">Add machine</button></div>`, (sh) => {
+    <div class="sheet-foot"><button class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" style="flex:1" id="ago">Add operator</button></div>`, (sh) => {
     $('#ago', sh).addEventListener('click', async () => {
       const id = +$('#am', sh).value; if (!id) { $('#aerr', sh).textContent = 'Pick a drill.'; $('#aerr', sh).hidden = false; return; }
       const mm = machine(id), c = await sb();
       busy($('#ago', sh), true, 'Adding…');
       const { data, error } = await c.from('bdht_machines').insert({ company_id: ME.company.id, machine_type_id: id, brand: mm.brand, model: mm.model, nickname: $('#an', sh).value.trim() || null }).select().single();
       if (error) { busy($('#ago', sh), false); $('#aerr', sh).textContent = error.message; $('#aerr', sh).hidden = false; return; }
-      closeSheet(); toast('Machine added'); location.hash = `#/rig/${data.id}`;
+      closeSheet(); toast('Operator added'); location.hash = `#/rig/${data.id}`;
     });
   });
 }
@@ -930,24 +988,24 @@ async function viewRig(id) {
   const mc = mr.data; if (!mc) return viewNotFound();
   const los = lr.data || [], cat = machine(mc.machine_type_id);
   app.innerHTML = `
-    <a class="linkbtn" href="#/garage" style="padding-left:0">‹ All rigs</a>
+    <a class="linkbtn" href="#/garage" style="padding-left:0">‹ All operators</a>
     <div class="rig-hero">
-      <div style="min-width:0"><div class="t-brand" style="color:#ff9a55">${esc(rigSub(mc))}</div><h1>${esc(rigName(mc))}</h1>
-        <div class="small" style="color:#bbb">${los.length} loadout${los.length === 1 ? '' : 's'} · shared with ${esc(ME.company.name)}</div></div>
-      <button class="iconbtn dark" id="mmenu" aria-label="Machine options">${ICON_MORE}</button></div>
+      <div style="min-width:0"><div class="t-brand">Operator · ${esc(rigSub(mc))}</div><h1>${esc(rigName(mc))}</h1>
+        <div class="small muted">${los.length} loadout${los.length === 1 ? '' : 's'} · ${esc(ME.company.name)}</div></div>
+      <button class="iconbtn dark" id="mmenu" aria-label="Operator options">${ICON_MORE}</button></div>
     <button class="btn btn-primary btn-block" id="newlo" style="margin:14px 0 4px" ${cat?.pipes.length ? '' : 'disabled'}>+ New loadout</button>
-    <div class="section-head"><h2>Loadouts</h2><span class="small muted">Tap ⋯ to rename, copy or set default</span></div>
+    <div class="section-head"><h2>Loadouts</h2><span class="small muted">Named presets. ⋯ renames, copies, or sets primary</span></div>
     <div class="lo-grid">${los.map((lo) => {
       const pipe = pipeOf(cat, lo.pipe_id), key = loKey(lo);
       return `<article class="lo-card ${lo.is_default ? 'is-default' : ''}">
-        <div class="lo-top"><div style="min-width:0"><div class="lo-name">${esc(lo.name)}${lo.is_default ? `<span class="pill pill-dark">${ICON_STAR}Default</span>` : ''}</div>
-          <div class="small muted">${esc(pipe?.name || 'Pipe')} · ${lo.mode === 'Bit' ? 'Bit' : 'Backreamer'} · ${lo.part_count} parts</div></div>
+        <div class="lo-top"><div style="min-width:0"><div class="lo-name">${esc(lo.name)}${lo.is_default ? `<span class="pill pill-dark">${ICON_STAR}Primary</span>` : ''}</div>
+          <div class="small muted">${esc(pipe?.name || 'Pipe')} · ${lo.mode === 'Bit' ? 'Pilot' : 'Pullback'} · ${lo.part_count} equipped</div></div>
           <button class="iconbtn" data-lomenu="${lo.id}" aria-label="Options for ${esc(lo.name)}">${ICON_MORE}</button></div>
         ${stripHtml(lo)}
         ${key ? `<div class="lo-key"><span>${lo.mode === 'Bit' ? 'Bit' : 'Reamer'}</span><b>${esc(key.name)}</b>${key.pn ? `<code>#${esc(key.pn)}</code>` : ''}</div>` : ''}
-        <div class="lo-actions"><button class="btn btn-outline" data-loedit="${lo.id}">✎ Edit</button><a class="btn btn-primary" href="#/summary?c=${b64e(lo.config)}">Parts &amp; quote</a></div>
+        <div class="lo-actions"><button class="btn btn-outline" data-loedit="${lo.id}">Edit</button><a class="btn btn-primary" href="#/summary?c=${b64e(lo.config)}">Open brief</a></div>
       </article>`;
-    }).join('') || `<div class="card empty">No loadouts for this rig yet.<br>Build one: pick pipe, then tap through tooling from rig to bit.</div>`}</div>`;
+    }).join('') || `<div class="card empty"><h2>No loadouts yet</h2><p>Build one: lock the pipe, then equip each slot from the rig out to the bit.</p></div>`}</div>`;
   const ctxFor = (lo) => ({ machine: { id: mc.id, machine_type_id: mc.machine_type_id, model: mc.model, brand: mc.brand, nickname: mc.nickname }, loadout: lo ? { id: lo.id, name: lo.name } : null });
   $('#newlo').addEventListener('click', () => { loCtx.set(ctxFor(null)); location.hash = `#/pipe/${mc.machine_type_id}`; });
   $$('[data-loedit]').forEach((b) => b.addEventListener('click', () => { const lo = los.find((x) => x.id === b.dataset.loedit); loCtx.set(ctxFor(lo)); location.hash = `#/build?c=${b64e(lo.config)}`; }));
@@ -960,16 +1018,16 @@ function loMenu(lo, mc, los) {
       <label class="field"><span>Name</span><input id="lr" value="${esc(lo.name)}" maxlength="60"></label>
       <button class="btn btn-ghost btn-block" id="lrn">Rename</button>
       <div class="menu-grid">
-        <button class="btn btn-ghost" id="ldef" ${lo.is_default ? 'disabled' : ''}>${ICON_STAR} ${lo.is_default ? 'Default' : 'Set default'}</button>
+        <button class="btn btn-ghost" id="ldef" ${lo.is_default ? 'disabled' : ''}>${ICON_STAR} ${lo.is_default ? 'Primary' : 'Set primary'}</button>
         <button class="btn btn-ghost" id="ldup"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11z"/></svg> Duplicate</button>
         <button class="btn btn-ghost" id="lshare">${ICON.share} Share</button>
-        <a class="btn btn-ghost" href="#/summary?c=${b64e(lo.config)}">${ICON.mail} Quote</a>
+        <a class="btn btn-ghost" href="#/summary?c=${b64e(lo.config)}">${ICON.mail} Brief</a>
       </div>
       <button class="btn btn-ghost btn-block danger" id="ldel">${ICON.trash} Delete loadout</button></div>`, async (sh) => {
     const c = await sb(), done = (m) => { closeSheet(); toast(m); setTimeout(route, 240); };
     const fail = (e) => toast(errMsg(e));
     $('#lrn', sh).addEventListener('click', async () => { const name = $('#lr', sh).value.trim(); if (!name) return; const { error } = await c.from('bdht_loadouts').update({ name, updated_at: new Date().toISOString() }).eq('id', lo.id); error ? fail(error) : done('Renamed'); });
-    $('#ldef', sh).addEventListener('click', async () => { const { error } = await c.rpc('bdht_set_default_loadout', { p_loadout: lo.id }); error ? fail(error) : done(`${lo.name} is now the default`); });
+    $('#ldef', sh).addEventListener('click', async () => { const { error } = await c.rpc('bdht_set_default_loadout', { p_loadout: lo.id }); error ? fail(error) : done(`${lo.name} is now primary`); });
     $('#ldup', sh).addEventListener('click', async () => {
       let name = `${lo.name} copy`, n = 2; while (los.some((x) => x.name === name)) name = `${lo.name} copy ${n++}`;
       const { id, created_at, updated_at, is_default, created_by, ...rest } = lo;
@@ -977,7 +1035,7 @@ function loMenu(lo, mc, los) {
     });
     $('#lshare', sh).addEventListener('click', async () => {
       const url = shareUrl(lo.config), title = `${lo.name} · ${rigName(mc)}`;
-      if (navigator.share) { try { await navigator.share({ title, text: `${title} drill string (The Better Down Hole Tool)`, url }); } catch {} } else { await copyText(url); toast('Link copied'); }
+      if (navigator.share) { try { await navigator.share({ title, text: `${title} loadout (The Better Down Hole Tool)`, url }); } catch {} } else { await copyText(url); toast('Link copied'); }
     });
     $('#ldel', sh).addEventListener('click', async () => { if (!confirm(`Delete “${lo.name}”?`)) return; const { error } = await c.from('bdht_loadouts').delete().eq('id', lo.id); error ? fail(error) : done('Deleted'); });
   });
@@ -987,10 +1045,10 @@ function machineMenu(mc, nLo) {
     <div class="sheet-body stack">
       <label class="field"><span>Unit name / number</span><input id="mn" value="${esc(mc.nickname || '')}" maxlength="60" placeholder="Unit 12"></label>
       <button class="btn btn-ghost btn-block" id="mns">Save name</button>
-      <button class="btn btn-ghost btn-block danger" id="mdel">${ICON.trash} Remove machine${nLo ? ` and its ${nLo} loadout${nLo > 1 ? 's' : ''}` : ''}</button></div>`, async (sh) => {
+      <button class="btn btn-ghost btn-block danger" id="mdel">${ICON.trash} Remove operator${nLo ? ` and its ${nLo} loadout${nLo > 1 ? 's' : ''}` : ''}</button></div>`, async (sh) => {
     const c = await sb();
     $('#mns', sh).addEventListener('click', async () => { const { error } = await c.from('bdht_machines').update({ nickname: $('#mn', sh).value.trim() || null }).eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Saved'); setTimeout(route, 240); });
-    $('#mdel', sh).addEventListener('click', async () => { if (!confirm(`Remove ${rigName(mc)}${nLo ? ' and its loadouts' : ''}?`)) return; const { error } = await c.from('bdht_machines').delete().eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Machine removed'); if (!error) location.hash = '#/garage'; });
+    $('#mdel', sh).addEventListener('click', async () => { if (!confirm(`Remove ${rigName(mc)}${nLo ? ' and its loadouts' : ''}?`)) return; const { error } = await c.from('bdht_machines').delete().eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Operator removed'); if (!error) location.hash = '#/garage'; });
   });
 }
 
@@ -1036,9 +1094,9 @@ async function saveToRigSection(cfg, sh) {
   if (!ME.user || !ME.member) { box.innerHTML = guestUpsell('save'); return; }
   const c = await sb(); const { data } = await c.from('bdht_machines').select('*').eq('machine_type_id', cfg.m).order('created_at');
   const mm = machine(cfg.m);
-  box.innerHTML = `<div class="form-sub"><b>Save as a loadout on a rig</b><span class="small muted">Shared with ${esc(ME.company.name)}</span></div>
+  box.innerHTML = `<div class="form-sub"><b>Save on an operator</b><span class="small muted">Shared with ${esc(ME.company.name)}</span></div>
     <div class="stack" style="margin-top:8px">${(data || []).map((mc) => `<button class="choice" data-rig="${mc.id}"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div>${ICON.chev}</button>`).join('') ||
-      `<p class="small muted">No ${esc(mm?.model || '')} in your rigs yet.</p><button class="btn btn-ghost btn-block" id="addthis">+ Add a ${esc(mm?.model || 'machine')} to my rigs</button>`}</div>`;
+      `<p class="small muted">No ${esc(mm?.model || '')} in your operators yet.</p><button class="btn btn-ghost btn-block" id="addthis">+ Add a ${esc(mm?.model || 'drill')}</button>`}</div>`;
   $$('[data-rig]', box).forEach((b) => b.addEventListener('click', () => {
     const mc = data.find((x) => x.id === b.dataset.rig);
     closeSheet(); setTimeout(() => loSaveSheet(cfg, { machine: mc, loadout: null }), 230);
@@ -1053,6 +1111,7 @@ async function route() {
   const q = new URLSearchParams(qs || '');
   const parts = path.split('/').filter(Boolean);
   const navKey = ['rig', 'account', 'setup'].includes(parts[0]) ? 'garage' : parts[0];
+  document.body.dataset.view = parts[0] || 'home';
   $$('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === navKey));
   if (!$('#sheet').hidden) closeSheet();
   try {

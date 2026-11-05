@@ -371,6 +371,10 @@ h3{font-size:16px;font-weight:800}
 .sum-head small{color:var(--amber-2);font-weight:900;letter-spacing:.14em;font-size:11px}
 .sum-head h1{font-size:28px;margin-top:4px}
 .sum-head p{margin:6px 0 0;color:var(--ink-2);font-size:14px}
+.sum-head .btn{margin-top:14px}
+.lo-name-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.lo-name-list li{display:flex;justify-content:space-between;gap:8px;align-items:baseline;font-size:14px;border-top:1px solid var(--line);padding-top:6px}
+.lo-name-list span{color:var(--mute);font-size:12px;font-weight:700;white-space:nowrap}
 .lines{list-style:none;margin:0;padding:0}
 .line{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;padding:12px;border-top:1px solid var(--line);align-items:center}
 .line:first-child{border-top:0}
@@ -419,6 +423,8 @@ h3{font-size:16px;font-weight:800}
 .sheet-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 16px 8px;flex:none}
 .sheet-body{overflow:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch}
 .sheet-foot{flex:none;padding:10px 16px calc(12px + var(--safe-b));border-top:1px solid var(--line);display:flex;gap:10px}
+.sheet-actions{flex-direction:column;align-items:stretch}
+.sheet-actions .btn{width:100%}
 .gallery{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -16px;padding:0 16px 6px}
 .gallery img{flex:none;width:86%;max-width:420px;aspect-ratio:3/2;object-fit:contain;background:#e7eef5;border-radius:12px;scroll-snap-align:center}
 .gallery.single img{width:100%}

@@ -58,7 +58,6 @@ h3{font-size:16px;font-weight:700}
 .btn-dark{background:var(--ink);color:#fff}
 .btn-outline{border-color:var(--ink);background:#fff}
 .btn-ghost{background:transparent;border-color:var(--line)}
-.btn-ghost-light{background:transparent;color:#fff;border-color:#555;min-height:44px;font-size:14px}
 .btn-block{width:100%}
 .btn-sm{min-height:40px;padding:0 12px;font-size:14px;border-radius:10px}
 .btn[disabled]{opacity:.45;pointer-events:none}
@@ -230,12 +229,6 @@ h3{font-size:16px;font-weight:700}
 .field input,.field select,.field textarea{width:100%;min-height:48px;border:2px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;background:#fff}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--orange)}
 
-/* dealer */
-.store{display:grid;gap:10px}
-.store h3{font-size:18px}
-.store .addr{color:var(--mute);font-size:14px}
-.store-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-
 /* sheet */
 .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;opacity:0;transition:opacity .2s}
 .sheet-backdrop.show{opacity:1}
@@ -260,10 +253,7 @@ h3{font-size:16px;font-weight:700}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
 .sitefoot{background:var(--ink);color:#bbb;padding:18px 16px 110px}
-.sitefoot-dealer{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;color:#fff}
-.sitefoot-dealer small{display:block;color:var(--orange);font-weight:800;letter-spacing:.12em;font-size:11px}
-.sitefoot-calls{display:flex;gap:8px}
-.fineprint{max-width:1180px;margin:14px auto 0;font-size:12px;line-height:1.5}
+.fineprint{max-width:1180px;margin:0 auto;font-size:12px;line-height:1.5}
 .skeleton{height:80px;border-radius:var(--r);background:linear-gradient(90deg,#eee,#f7f7f7,#eee);background-size:200% 100%;animation:sh 1.2s infinite}
 @keyframes sh{to{background-position:-200% 0}}
 @media print{.topbar,.stepper,.actionbar,.sitefoot,.no-print,.share-grid,.cta{display:none!important}main{padding:0}.card{box-shadow:none;border:1px solid #ccc}body{background:#fff}}

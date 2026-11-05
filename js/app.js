@@ -1,20 +1,8 @@
-/* The Better Down Hole Tool – mobile-first prototype for Ditch Witch of Arkansas.
-   Data: site/data/catalog.json + site/data/roadmaps/<id>.json, generated from hddadvisor.com public APIs
-   by tools/build_data.py. Compatibility rules mirror hddadvisor.com's own configurator logic. */
+/* The Better Down Hole Tool – mobile-first HDD drill-string builder.
+   Data: data/catalog.json + data/roadmaps/<id>.json, generated from public manufacturer catalog APIs
+   by tools/build_data.py. Compatibility rules mirror the source configurator. */
 
 const IMG_HOST = 'https://www.hddadvisor.com';
-const DEALER = {
-  name: 'Ditch Witch of Arkansas',
-  email: 'sales@dwopg.com',            // Orange Power Group sales inbox, listed on dwopg.com / ditchwitchark.com
-  site: 'https://ditchwitchark.com/',
-  stores: [
-    { city: 'Little Rock', addr: '13319 Interstate 30 E., Little Rock, AR 72209', phone: '(501) 316-3200', tel: '+15013163200',
-      map: 'https://maps.google.com/?q=13319+Interstate+30+E,+Little+Rock,+AR+72209' },
-    { city: 'Springdale', addr: '368 Albano Dr, Springdale, AR 72762', phone: '(479) 419-9771', tel: '+14794199771',
-      map: 'https://maps.google.com/?q=368+Albano+Dr,+Springdale,+AR+72762' },
-  ],
-  hours: 'Mon–Fri 7:30 am – 5:00 pm',
-};
 
 /* ---------- tiny helpers ---------- */
 const $ = (s, el = document) => el.querySelector(s);
@@ -41,9 +29,7 @@ const ICON = {
   mail: '<svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5-8-5V6l8 5 8-5z"/></svg>',
   print: '<svg viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 0 0-3 3v6h4v4h12v-4h4v-6a3 3 0 0 0-3-3zm-3 11H8v-5h8zm3-7a1 1 0 1 1 0-2 1 1 0 0 1 0 2zM18 3H6v4h12z"/></svg>',
   save: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></svg>',
-  phone: '<svg viewBox="0 0 24 24"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1A17 17 0 0 1 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1z"/></svg>',
   trash: '<svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.5l-1-1h-5l-1 1H5v2h14z"/></svg>',
-  pin: '<svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.3 7 13 7 13s7-7.7 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>',
   pipe: '<svg viewBox="0 0 40 40"><rect x="2" y="15" width="7" height="10" rx="1.5" fill="#FF6600"/><rect x="9" y="17" width="22" height="6" fill="#bbb"/><rect x="31" y="15" width="7" height="10" rx="1.5" fill="#FF6600"/></svg>',
 };
 
@@ -176,7 +162,7 @@ function lineItems(rm, cfg, rows) {
   return out;
 }
 const connStr = (p) => [p.cl, [p.cr, p.cr2].filter(Boolean).join(' & ')].filter(Boolean).join(' → ');
-const pnTxt = (p) => p.pn || 'ask dealer';
+const pnTxt = (p) => p.pn || 'not listed';
 
 /* ---------- UI shell ---------- */
 const app = $('#app');
@@ -245,7 +231,7 @@ function viewHome() {
     <img src="img/hero-wide.jpg" alt="" fetchpriority="high">
     <div class="hero-body">
       <h1>Build the right drill string. <em>From your phone.</em></h1>
-      <p><b>The Better Down Hole Tool.</b> Pick your drill and pipe, tap through the tooling from rig to bit, and send the parts list to Ditch Witch of Arkansas.</p>
+      <p><b>The Better Down Hole Tool.</b> Pick your drill and pipe, tap through the tooling from rig to bit, and share or export the parts list.</p>
       <a class="btn btn-primary btn-block" href="#/drill" style="max-width:360px">Start: pick your drill ${ICON.chev.replace('class="chev"', 'style="fill:#fff"')}</a>
     </div>
   </section>
@@ -259,10 +245,8 @@ function viewHome() {
     <li><span class="num">1</span><div><h3>Pick your drill</h3><p>All current Ditch Witch® and Vermeer® models.</p></div></li>
     <li><span class="num">2</span><div><h3>Pick your pipe</h3><p>Only pipe that fits your drill is shown.</p></div></li>
     <li><span class="num">3</span><div><h3>Build the string</h3><p>Threads are matched for you, and adapters are added automatically.</p></div></li>
-    <li><span class="num">4</span><div><h3>Send it</h3><p>Text, email or share the parts list, or ask your dealer for a quote.</p></div></li>
-  </ol></div>
-  <div class="section-head"><h2>Your dealer</h2></div>
-  ${dealerCard()}`;
+    <li><span class="num">4</span><div><h3>Send it</h3><p>Text, email, copy, or print the parts list.</p></div></li>
+  </ol></div>`;
 }
 function savedRow(s) {
   return `<div class="choice" style="cursor:default">
@@ -272,20 +256,6 @@ function savedRow(s) {
       <div class="c-sub">${esc(s.title)} · ${new Date(s.ts).toLocaleDateString()}</div></a>
     <a class="iconbtn" href="#/build?c=${b64e(s.cfg)}" aria-label="Edit">${ICON.chev}</a></div>`;
 }
-function dealerCard(compact) {
-  return `<div class="card pad stack">
-    <div><small class="muted" style="font-weight:800;letter-spacing:.1em">YOUR DEALER</small><h2>${DEALER.name}</h2>
-    <div class="small muted">${DEALER.hours} · part of Orange Power Group</div></div>
-    ${DEALER.stores.map((s) => `<div class="store">
-      <div><h3>${s.city}</h3><div class="addr">${s.addr}</div></div>
-      <div class="store-actions">
-        <a class="btn btn-dark" href="tel:${s.tel}">${ICON.phone} ${s.phone}</a>
-        <a class="btn btn-ghost" href="${s.map}" target="_blank" rel="noopener">${ICON.pin} Directions</a>
-      </div></div>`).join('')}
-    ${compact ? '' : `<a class="btn btn-outline btn-block" href="mailto:${DEALER.email}?subject=${encodeURIComponent('HDD tooling question')}">${ICON.mail} ${DEALER.email}</a>`}
-  </div>`;
-}
-
 /* Step 1 – drill */
 let drillFilter = { brand: 'all', q: '' };
 async function viewDrill() {
@@ -312,7 +282,7 @@ async function viewDrill() {
           const n = m.pipes.length;
           return `<a class="tile ${m.brand === 'Vermeer' ? 'vermeer' : ''}" href="#/pipe/${m.id}">
             <div><div class="t-brand">${esc(m.brand)}</div><div class="t-model">${esc(m.model)}</div></div>
-            <div class="t-meta">${n ? `${n} pipe option${n === 1 ? '' : 's'}` : 'Ask your dealer'}</div></a>`;
+            <div class="t-meta">${n ? `${n} pipe option${n === 1 ? '' : 's'}` : 'No pipe listed'}</div></a>`;
         }).join('')}</div>`).join('') +
       (drillFilter.brand !== 'Ditch Witch' ? `<div class="note" style="margin-top:16px">${ICON.info.replace('<svg', '<svg width="20" height="20" style="flex:none;fill:#e05500"')}<span>Running a Vermeer®? Ditch Witch drill pipe HIWS1® and HXT® is compatible with all Vermeer® Firestick® threads.</span></div>` : '');
   };
@@ -344,8 +314,8 @@ async function viewPipe(mid) {
         <div class="c-main"><div class="c-title">${esc(p.name)}</div>
           <div class="c-sub">${p.pn ? `Part # <b style="font-family:ui-monospace,Menlo,monospace;color:#e05500">${esc(p.pn)}</b>` : ''}</div></div>${ICON.chev}</a>` : `
       <div class="choice" aria-disabled="true" style="opacity:.55;cursor:not-allowed"><div class="pipe-ico">${ICON.pipe}</div>
-        <div class="c-main"><div class="c-title">${esc(p.name)}</div><div class="c-sub">${p.pn ? `Part # ${esc(p.pn)} · ` : ''}Tooling data not loaded yet, so ask your dealer</div></div></div>`).join('') ||
-      `<div class="empty">No pipe is listed for this drill. Call your dealer.</div>`}
+        <div class="c-main"><div class="c-title">${esc(p.name)}</div><div class="c-sub">${p.pn ? `Part # ${esc(p.pn)} · ` : ''}Tooling data not loaded yet</div></div></div>`).join('') ||
+      `<div class="empty">No pipe is listed for this drill.</div>`}
     </div>
     ${m.brand === 'Vermeer' ? `<div class="note" style="margin-top:16px"><span>Ditch Witch drill pipe HIWS1® and HXT® is compatible with all Vermeer® Firestick® threads.</span></div>` : ''}`;
   mountLoBanner();
@@ -377,7 +347,7 @@ function partRow(p, { selected, multi, sel = true, compact } = {}) {
   return `<div class="part ${selected ? 'sel' : ''} ${multi ? 'multi' : ''}" ${sel ? `role="button" tabindex="0" data-pick="${p.id}" aria-pressed="${!!selected}"` : ''}>
     <div class="thumb">${imgTag(p.img, 240, 120, p.name)}</div>
     <div class="p-main"><div class="p-name">${esc(p.name)}</div>
-      <div class="p-pn">${p.pn ? `#${esc(p.pn)}` : '<span class="muted">Part # from dealer</span>'}</div>
+      <div class="p-pn">${p.pn ? `#${esc(p.pn)}` : '<span class="muted">Part # not listed</span>'}</div>
       ${connStr(p) ? `<div class="p-conn">${esc(connStr(p))}</div>` : ''}
       ${!compact && p.short ? `<div class="p-short">${esc(p.short)}</div>` : ''}</div>
     <div class="p-act">
@@ -446,7 +416,7 @@ function renderBuild(rm, focusNext) {
       <div class="preview"><div class="preview-head"><span>RIG</span><span>${cfg.mode === 'Bit' ? 'BIT' : 'REAMER'} END →</span></div>
         <div class="strip"><span class="rig">${esc(m?.model || 'RIG')}</span>${strip || '<span class="small muted">Your string appears here</span>'}</div></div>
       <div class="timeline" style="margin-top:18px">${secHtml}</div>
-      ${!pending && rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note" style="margin-top:14px">${ICON.info.replace('<svg', '<svg width="20" height="20" style="flex:none;fill:#e05500"')}<span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} in Ditch Witch's data fits this string.</b> Try a different choice in an earlier step, or <a href="#/dealer">ask your dealer</a> for the right tooling.</span></div>` : ''}
+      ${!pending && rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note" style="margin-top:14px">${ICON.info.replace('<svg', '<svg width="20" height="20" style="flex:none;fill:#e05500"')}<span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} in the catalog fits this string.</b> Try a different choice in an earlier step.</span></div>` : ''}
     </div>
     <aside class="build-aside">
       <div class="aside-card"><h3>Parts so far</h3>
@@ -528,7 +498,7 @@ function browseSheet(rm, sid) {
 function showPart(rm, id, stacked) {
   const p = rm.parts[id];
   const photos = [...new Set([...(p.imgs || []), p.img].filter(Boolean))];
-  const specs = Object.entries({ 'Part #': p.pn || 'Ask your dealer', Connection: connStr(p), 'Recommended ground': p.soil, ...(p.specs || {}) }).filter(([, v]) => v);
+  const specs = Object.entries({ 'Part #': p.pn || 'Not listed', Connection: connStr(p), 'Recommended ground': p.soil, ...(p.specs || {}) }).filter(([, v]) => v);
   const prev = stacked ? $('#sheet').innerHTML : null;
   openSheet(`<div class="sheet-top"><div><div class="small muted" style="font-weight:800;letter-spacing:.06em">${esc((p.type || '').replace(/_/g, ' ').toUpperCase())}</div><h2>${esc(p.name)}</h2></div>
       <button class="iconbtn" data-close aria-label="Close">✕</button></div>
@@ -538,7 +508,7 @@ function showPart(rm, id, stacked) {
       <dl class="specs">${specs.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
       ${p.desc?.length ? `<ul class="bullets">${p.desc.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>` : ''}
       ${(p.docs || []).filter((d) => d.url).map((d) => `<a class="btn btn-ghost btn-block" href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>`).join('')}
-      <p class="small muted">Photos and specs from Ditch Witch (via hddadvisor.com).</p>
+      <p class="small muted">Photos and specs from the public manufacturer catalog.</p>
     </div>
     <div class="sheet-foot">${p.pn ? `<button class="btn btn-ghost" id="cpn">Copy part #</button>` : ''}<button class="btn btn-primary" style="flex:1" ${stacked ? 'id="back"' : 'data-close'}>${stacked ? '‹ Back to list' : 'Close'}</button></div>`, (sh) => {
     $('#cpn', sh)?.addEventListener('click', async () => { await copyText(p.pn); toast(`Copied ${p.pn}`); });
@@ -565,7 +535,7 @@ function saveSheet(cfg) {
 
 /* Step 4 – summary */
 function listText(cfg, items, withLink = true) {
-  const lines = [`HDD drill string: ${titleOf(cfg)}`, 'Built with The Better Down Hole Tool (Ditch Witch of Arkansas)', ''];
+  const lines = [`HDD drill string: ${titleOf(cfg)}`, 'Built with The Better Down Hole Tool', ''];
   items.forEach((l, i) => lines.push(`${i + 1}. ${l.part.name}: PN ${pnTxt(l.part)}, qty ${l.qty}${l.acc ? ' (add-on)' : ''}`));
   if (withLink) lines.push('', `Open it: ${shareUrl(cfg)}`);
   return lines.join('\n');
@@ -587,12 +557,12 @@ async function viewSummary(q) {
     <div class="sum-grid"><div class="stack">
       <div class="sum-head"><small>PARTS LIST · ${cfg.mode === 'Bit' ? 'BIT' : 'BACKREAMER'} CONFIG</small>
         <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''}</p></div>
-      ${rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this string in Ditch Witch's data.</b> <a href="#/dealer">Ask your dealer</a> for the right tooling.</span></div>` : ''}
+      ${rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} in the catalog fits this string.</b> Try a different choice in an earlier step.</span></div>` : ''}
       ${pending.length ? `<div class="note no-print"><span><b>${pending.length} step${pending.length > 1 ? 's' : ''} still open</b> (${esc(pending.map((r) => r.sec.name).join(', '))}). <a href="#/build?c=${b64e(cfg)}">Finish building</a></span></div>` : ''}
       <div class="card"><ul class="lines">${items.map((l) => `
         <li class="line ${l.acc ? 'acc-line' : ''}"><div class="thumb">${imgTag(l.part.img, 200, 100, l.part.name)}</div>
           <div><div class="l-sec">${esc(l.sec)}${l.auto ? ' · auto' : ''}</div><div class="l-name">${esc(l.part.name)}</div>
-            <div class="l-row"><span class="l-pn">${l.part.pn ? '#' + esc(l.part.pn) : '<span class="muted">Part # from dealer</span>'}</span>
+            <div class="l-row"><span class="l-pn">${l.part.pn ? '#' + esc(l.part.pn) : '<span class="muted">Part # not listed</span>'}</span>
               <span class="qty no-print"><button data-dq="${l.key}" data-d="-1" aria-label="Less">−</button><input inputmode="numeric" data-qk="${l.key}" value="${l.qty}" aria-label="Quantity"><button data-dq="${l.key}" data-d="1" aria-label="More">+</button></span>
             </div></div></li>`).join('') || '<li class="empty">No parts selected yet.</li>'}</ul></div>
       <div class="share-grid no-print">
@@ -607,42 +577,37 @@ async function viewSummary(q) {
       </div>
     </div>
     <aside class="sum-aside stack">
-      <div class="cta"><h2>Get a quote from Ditch Witch of Arkansas</h2>
-        <p>Send this list to the parts counter. They'll confirm fit, stock and price.</p>
+      <div class="cta"><h2>Share or export this parts list</h2>
+        <p>Copy, text, email, or print the list. Confirm part numbers and fit before you order.</p>
         <div class="stack">
-          <label class="field"><span style="color:#fff">Your name</span><input id="qn" autocomplete="name" value="${esc(store.get('hdda.contact', {}).name || '')}"></label>
-          <label class="field"><span style="color:#fff">Company / phone</span><input id="qc" autocomplete="organization" value="${esc(store.get('hdda.contact', {}).co || '')}"></label>
-          <label class="field"><span style="color:#fff">Store</span><select id="qs">${DEALER.stores.map((s) => `<option>${s.city}</option>`).join('')}</select></label>
-          <a class="btn btn-dark btn-block" id="q-mail" href="#">${ICON.mail} Email quote request</a>
-          <div class="cta-actions" style="grid-template-columns:1fr 1fr">${DEALER.stores.map((s) => `<a class="btn" href="tel:${s.tel}">${ICON.phone} ${s.city}</a>`).join('')}</div>
+          <button class="btn btn-dark btn-block" id="q-share">${ICON.share} Share list</button>
+          <button class="btn btn-block" id="q-copy">${ICON.link} Copy parts list</button>
+          <a class="btn btn-block" id="q-mail" href="#">${ICON.mail} Email list</a>
+          <button class="btn btn-block" id="q-print">${ICON.print} Print / PDF</button>
         </div></div>
     </aside></div>`;
     setActionbar(`<div class="ab-info"><strong>${items.length} parts</strong>${items.reduce((a, l) => a + l.qty, 0)} pcs total</div>
       <button class="btn btn-ghost btn-sm" id="ab-share" aria-label="Share">${ICON.share}</button>
-      <a class="btn btn-primary" href="#" id="ab-quote">Request quote</a>`);
+      <button class="btn btn-primary" id="ab-copy">Copy list</button>`);
     const text = listText(cfg, items);
     const subj = `Drill string parts list: ${titleOf(cfg)}`;
+    const mailHref = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}`;
     $('#sh-sms').href = `sms:?&body=${encodeURIComponent(text)}`;
-    $('#sh-mail').href = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}`;
-    const quoteHref = () => {
-      const c = { name: $('#qn').value.trim(), co: $('#qc').value.trim() }; store.set('hdda.contact', c);
-      const body = `Hi ${DEALER.name} (${$('#qs').value} store),\n\nPlease quote the parts below and confirm they fit.\n\n${text}\n\nName: ${c.name}\nCompany / phone: ${c.co}\n`;
-      return `mailto:${DEALER.email}?subject=${encodeURIComponent('Quote request: ' + titleOf(cfg))}&body=${encodeURIComponent(body)}`;
-    };
-    $('#q-mail').addEventListener('click', (e) => { e.preventDefault(); location.href = quoteHref(); });
-    $('#ab-quote').addEventListener('click', (e) => {
-      e.preventDefault();
-      if (matchMedia('(min-width:980px)').matches) location.href = quoteHref();
-      else { $('.cta').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('#qn').focus({ preventScroll: true }), 500); }
-    });
+    $('#sh-mail').href = mailHref;
+    $('#q-mail').href = mailHref;
     const share = async () => {
       if (navigator.share) { try { await navigator.share({ title: subj, text: listText(cfg, items, false), url: shareUrl(cfg) }); } catch {} }
       else { await copyText(text); toast('Parts list copied'); }
     };
     $('#sh-share').addEventListener('click', share);
     $('#ab-share').addEventListener('click', share);
+    $('#q-share').addEventListener('click', share);
+    const copyList = async () => { await copyText(text); toast('Parts list copied'); };
     $('#sh-copy').addEventListener('click', async () => { await copyText(shareUrl(cfg)); toast('Link copied'); });
+    $('#q-copy').addEventListener('click', copyList);
+    $('#ab-copy').addEventListener('click', copyList);
     $('#sh-print').addEventListener('click', () => window.print());
+    $('#q-print').addEventListener('click', () => window.print());
     $('#sh-mode').addEventListener('click', () => { cfg.mode = cfg.mode === 'Bit' ? 'Backreamer' : 'Bit'; draw(); window.scrollTo({ top: 0 }); });
     $$('[data-save]').forEach((b) => b.addEventListener('click', () => saveSheet(cfg)));
     $$('[data-dq]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.dq; cfg.q[k] = Math.max(0, (cfg.q[k] ?? 1) + +b.dataset.d); draw(); }));
@@ -663,11 +628,6 @@ function viewSaved() {
     if (!confirm('Delete this saved string?')) return;
     store.set(SAVED_KEY, getSaved().filter((s) => s.id !== b.dataset.del)); updateSavedBadge(); viewSaved();
   }));
-}
-function viewDealer() {
-  setStepper(0); setActionbar('');
-  app.innerHTML = `<h1>Ditch Witch of Arkansas</h1><p class="muted" style="margin:6px 0 14px">Sales, service, rentals and parts for HDD tooling statewide.</p>
-    ${dealerCard()}<p class="small muted" style="margin-top:12px">More at <a href="${DEALER.site}" target="_blank" rel="noopener">ditchwitchark.com</a></p>`;
 }
 function viewNotFound() {
   setStepper(0); setActionbar('');
@@ -1103,7 +1063,6 @@ async function route() {
       case 'build': await viewBuild(q); break;
       case 'summary': await viewSummary(q); break;
       case 'saved': viewSaved(); break;
-      case 'dealer': viewDealer(); break;
       case 'account': await viewAccount(q); break;
       case 'setup': await viewSetup(); break;
       case 'garage': await viewGarage(); break;

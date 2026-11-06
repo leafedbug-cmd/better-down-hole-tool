@@ -2,6 +2,8 @@
    Data: data/catalog.json + data/roadmaps/<id>.json, generated from public manufacturer catalog APIs
    by tools/build_data.py. Compatibility rules mirror the source configurator. */
 import { FREE_MACHINE_LIMIT, canAddMachine } from './billing.mjs';
+import { normalizeConfig, quantity } from './config.mjs';
+import { compute, lineItems, isLoadoutReady } from './compatibility.mjs';
 
 const IMG_HOST = 'https://www.hddadvisor.com';
 
@@ -57,8 +59,7 @@ const b64d = (s) => { try { return JSON.parse(decodeURIComponent(escape(atob(s.r
 const newCfg = (m, p, r) => ({ m, p, r, mode: 'Bit', sel: {}, acc: {}, q: {} });
 function cfgFromQuery(q) {
   const c = q.get('c') && b64d(q.get('c'));
-  if (!c || !c.r) return null;
-  return Object.assign(newCfg(), c);
+  return normalizeConfig(c);
 }
 const shareUrl = (cfg, view = 'summary') => `${location.origin}${location.pathname}#/${view}?c=${b64e(cfg)}`;
 
@@ -83,90 +84,7 @@ async function loadRoadmap(id) {
 const machine = (id) => CATALOG.machines.find((m) => m.id === +id);
 const pipeOf = (m, pid) => m?.pipes.find((p) => p.id === +pid);
 
-/* ---------- compatibility engine (mirrors hddadvisor.com isPartsCompatible) ---------- */
-function swapGender(c) {
-  if (c.includes('M') && !c.includes('MM')) return c.replace('M', 'F');
-  if (c.includes('F')) return c.replace('F', 'M');
-  return c;
-}
-function compat(L, R) {
-  if (!L || !R) return false;
-  if (L.type === 'Collar' && R.type === 'Drill_Pipe') return (R.collars || []).includes(L.id);
-  if (L.rc != null && R.type === 'Collar') return L.rc === R.id;
-  if (R.lc != null && L.type === 'Collar') return R.lc === L.id;
-  if (!R.cl) return false; // empty connections never "match" (stricter than the original, avoids false positives)
-  return [L.cr, L.cr2].filter(Boolean).map(swapGender).includes(R.cl);
-}
-function linkOK(L, R, P) {
-  if (compat(L.part, R)) return true;
-  if (L.accChoice > 0) return compat(P[L.accChoice], R);
-  if (L.accChoice === 0) return false;
-  return L.accs.some((a) => compat(P[a], R));
-}
-/* Walk the string from the rig outwards. Returns one row per section with status:
-   done (user picked) | auto (only one fits) | pending (needs a pick) | skip (nothing fits = not needed) | locked (waiting on an earlier pick) */
-function compute(rm, cfg) {
-  const P = rm.parts, rows = [], secs = rm.sections.filter((x) => x.mode === cfg.mode), n = secs.length;
-  const item = (o) => ({ part: P[o.id], accs: o.acc || [], accChoice: undefined });
-  const fitsAfter = (F, o) => !F || F.some((L) => linkOK(L, P[o.id], P));
-  // collars are sleeves, not threaded joints: the part before a collar still mates with the part after it
-  const after = (items, F) => (items.every((x) => x.part.type === 'Collar') ? (F ? [...items, ...F] : null) : items);
-  // lookahead: from frontier F at section i, can the string still reach the bit / backreamer?
-  const memo = new Map();
-  const canFinish = (i, F) => {
-    if (i >= n) return true;
-    const k = `${i}|${F ? F.map((L) => L.part.id + ':' + L.accChoice).join(',') : '-'}`;
-    if (memo.has(k)) return memo.get(k);
-    memo.set(k, false);
-    const c = secs[i].opts.filter((o) => fitsAfter(F, o));
-    const ok = c.length ? c.some((o) => canFinish(i + 1, after([item(o)], F))) : i < n - 1 && canFinish(i + 1, F);
-    memo.set(k, ok); return ok;
-  };
-  let F = null, locked = false;
-  secs.forEach((s, i) => {
-    const row = { sec: s, status: '', cands: [], sel: [], acc: {}, hidden: 0 };
-    rows.push(row);
-    if (locked) { row.status = 'locked'; return; }
-    const fits = s.opts.filter((o) => fitsAfter(F, o));
-    if (!fits.length) { row.status = 'skip'; return; }
-    const viable = fits.filter((o) => canFinish(i + 1, after([item(o)], F)));
-    row.cands = viable.length ? viable : fits;
-    row.hidden = fits.length - row.cands.length;
-    const want = (cfg.sel[s.id] || []).filter((id) => row.cands.some((o) => o.id === id));
-    if (want.length) { row.sel = want; row.status = 'done'; }
-    else if (row.cands.length === 1) { row.sel = [row.cands[0].id]; row.status = 'auto'; }
-    else { row.status = 'pending'; locked = true; }
-    // auto-add an adapter/accessory on the upstream part when the chosen part only fits through it
-    if (F) for (const L of F) {
-      if (L.accChoice !== undefined || !L.accs.length) continue;
-      const needs = row.sel.map((id) => P[id]).filter((R) => !compat(L.part, R));
-      if (!needs.length) continue;
-      const a = L.accs.find((a) => needs.some((R) => compat(P[a], R)));
-      if (a) { L.accChoice = a; L.row.acc[L.part.id] = { id: a, auto: true }; }
-    }
-    if (row.sel.length) {
-      const items = row.sel.map((id) => {
-        const opt = s.opts.find((o) => o.id === id), accs = opt.acc || [];
-        let ch = cfg.acc[`${s.id}.${id}`];
-        if (ch !== undefined && ch !== 0 && !accs.includes(ch)) ch = undefined;
-        if (ch > 0) row.acc[id] = { id: ch, auto: false };
-        return { part: P[id], accs, accChoice: ch, row };
-      });
-      F = after(items, F);
-    }
-  });
-  return rows;
-}
-function lineItems(rm, cfg, rows) {
-  const P = rm.parts, out = [];
-  for (const r of rows) for (const id of r.sel) {
-    out.push({ key: `${r.sec.id}.${id}`, sec: r.sec.name, part: P[id], auto: r.status === 'auto' });
-    const a = r.acc[id];
-    if (a) out.push({ key: `${r.sec.id}.${id}.a${a.id}`, sec: `${r.sec.name} add-on`, part: P[a.id], acc: true, auto: a.auto });
-  }
-  for (const l of out) l.qty = cfg.q[l.key] ?? 1;
-  return out;
-}
+/* ---------- part labels ---------- */
 const connStr = (p) => [p.cl, [p.cr, p.cr2].filter(Boolean).join(' & ')].filter(Boolean).join(' → ');
 const pnTxt = (p) => p.pn || 'not listed';
 
@@ -289,8 +207,9 @@ function savedRow(s, { del = false } = {}) {
 }
 /* Step 1 – drill */
 let drillFilter = { brand: 'all', q: '' };
-async function viewDrill() {
+async function viewDrill(isCurrent = () => true) {
   await loadCatalog();
+  if (!isCurrent()) return;
   setStepper(1, null); setActionbar('');
   app.innerHTML = `
     ${pageHead('Step 01 · Drill class', 'Choose your drill', 'This is the operator you are building for. Tap a Ditch Witch® or Vermeer® model, or search “JT25” or “D24”.')}
@@ -328,8 +247,9 @@ async function viewDrill() {
 }
 
 /* Step 2 – pipe */
-async function viewPipe(mid) {
+async function viewPipe(mid, isCurrent = () => true) {
   await loadCatalog();
+  if (!isCurrent()) return;
   const m = machine(mid);
   if (!m) return viewNotFound();
   setStepper(2, { m: m.id }); setActionbar('');
@@ -354,14 +274,16 @@ async function viewPipe(mid) {
 
 /* Step 3 – build */
 let buildCfg = null;
-async function viewBuild(q) {
+async function viewBuild(q, isCurrent = () => true) {
   await loadCatalog();
   const cfg = cfgFromQuery(q);
-  if (!cfg) return viewNotFound();
-  buildCfg = cfg;
+  if (!isCurrent()) return;
+  if (!cfg || pipeOf(machine(cfg.m), cfg.p)?.roadmap !== cfg.r) return viewNotFound();
   let rm;
   app.innerHTML = '<div class="stack"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>';
-  try { rm = await loadRoadmap(cfg.r); } catch (e) { app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  try { rm = await loadRoadmap(cfg.r); } catch (e) { if (isCurrent()) app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  if (!isCurrent()) return;
+  buildCfg = cfg;
   renderBuild(rm);
 }
 function titleOf(cfg) {
@@ -370,7 +292,7 @@ function titleOf(cfg) {
 }
 function persistBuild(replace = true) {
   const url = `#/build?c=${b64e(buildCfg)}`;
-  if (replace) history.replaceState(null, '', url);
+  if (replace) { history.replaceState(null, '', url); currentHash = location.hash; }
   store.set(LAST_KEY, { cfg: buildCfg, title: titleOf(buildCfg) });
   rememberBuilder();
   setStepper(3, buildCfg);
@@ -402,6 +324,9 @@ function slotCell(r, i, P) {
   } else if (r.status === 'pending') {
     state = 'open'; tag = 'Open';
     plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">+</span></span>`;
+  } else if (r.status === 'blocked') {
+    state = 'open'; tag = 'Needs changes';
+    plate = '<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">!</span></span>';
   } else if (r.status === 'skip') {
     state = 'skip'; tag = 'Skipped';
     plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">–</span></span>`;
@@ -415,6 +340,7 @@ function renderBuild(rm, focusNext) {
   const rows = compute(rm, cfg);
   const items = lineItems(rm, cfg, rows);
   const pending = rows.find((r) => r.status === 'pending');
+  const ready = isLoadoutReady(rows);
   persistBuild();
   const strip = rows.map((r, i) => slotCell(r, i, P)).join('');
 
@@ -423,7 +349,10 @@ function renderBuild(rm, focusNext) {
     const s = r.sec; n++;
     const multi = s.multi;
     let body = '', chip = '';
-    if (r.status === 'skip') {
+    if (r.status === 'blocked') {
+      chip = '<span class="pill pill-warn">Needs changes</span>';
+      body = '<p class="sec-note">No compatible end tool fits. Change an earlier slot to complete this loadout.</p>';
+    } else if (r.status === 'skip') {
       chip = '<span class="pill">Skipped</span>';
       body = `<p class="sec-note">Nothing fits the slot before this one, so this slot stays empty.</p>`;
     } else if (r.status === 'locked') {
@@ -448,7 +377,7 @@ function renderBuild(rm, focusNext) {
       }).join('') + (r.cands.length > 1 ? `<button class="linkbtn" data-browse="${s.id}">${multi ? 'Add or remove' : `Swap (${r.cands.length} fit this slot)`}</button>` : '');
     }
     const dot = r.status === 'done' || r.status === 'auto' ? '✓' : n;
-    const cls = { done: 'done', auto: 'done', pending: 'pending', skip: 'skip', locked: 'locked' }[r.status];
+    const cls = { done: 'done', auto: 'done', pending: 'pending', blocked: 'pending', skip: 'skip', locked: 'locked' }[r.status];
     return `<div class="sec ${cls}" id="sec-${s.id}"><span class="sec-dot" aria-hidden="true">${dot}</span><div class="sec-body">
       <div class="sec-head"><div><p class="sec-kicker">Slot ${String(n).padStart(2, '0')}</p><h3>${esc(s.name)}</h3></div>${chip}</div>${body}</div></div>`;
   }).join('');
@@ -470,19 +399,19 @@ function renderBuild(rm, focusNext) {
         <div class="meter" role="img" aria-label="${donePct} of ${rows.length} slots settled"><span style="width:${pct}%"></span></div>
         <div class="strip"><span class="rig">${esc(m?.model || 'RIG')}</span>${strip || '<span class="small muted">Slots appear here</span>'}</div></div>
       <div class="timeline" style="margin-top:18px">${secHtml}</div>
-      ${!pending && rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note" style="margin-top:14px">${ICON.info}<span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
+      ${!pending && rows.length && rows[rows.length - 1].status === 'blocked' ? `<div class="note" style="margin-top:14px">${ICON.info}<span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
     </div>
     <aside class="build-aside">
       <div class="aside-card"><h3>Equipped</h3>
         <ul class="mini-list">${items.map((l) => `<li><span>${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}</ul>
-        <a class="btn btn-primary btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">${pending ? 'Review loadout' : 'Confirm class'}</a>
+        <a class="btn btn-primary btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">${ready ? 'Confirm class' : 'Review loadout'}</a>
         <button class="btn btn-ghost btn-block" style="margin-top:8px" data-save>${ICON.save} Save loadout</button>
       </div>
     </aside></div>`;
 
   const confirmHref = `#/summary?c=${b64e(cfg)}`;
-  setActionbar(`<div class="ab-info"><strong>${items.length} equipped</strong><span class="ab-line">${pending ? `Open · ${esc(pending.sec.name)}` : `Class ready · ${donePct}/${rows.length}`}</span>${pending ? `<a class="ab-review" href="${confirmHref}">Review</a>` : ''}</div>
-    ${ctx && !pending
+  setActionbar(`<div class="ab-info"><strong>${items.length} equipped</strong><span class="ab-line">${pending ? `Open · ${esc(pending.sec.name)}` : ready ? `Class ready · ${donePct}/${rows.length}` : 'Needs changes · no compatible end tool'}</span>${pending ? `<a class="ab-review" href="${confirmHref}">Review</a>` : ''}</div>
+    ${ctx && ready
       ? `<button class="btn btn-primary" data-save>${ICON.save} Save</button><a class="btn btn-ghost" href="${confirmHref}">Confirm</a>`
       : `<button class="btn btn-ghost btn-sm" data-save aria-label="Save loadout">${ICON.save}</button>${pending ? `<button class="btn btn-primary" type="button" data-equip-next>Equip</button>` : `<a class="btn btn-primary" href="${confirmHref}">Confirm</a>`}`}`);
   mountLoBanner();
@@ -521,7 +450,7 @@ function renderBuild(rm, focusNext) {
     const nxt = compute(rm, cfg).find((r) => r.status === 'pending');
     const el = nxt && $(`#sec-${nxt.sec.id}`);
     if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-    else if (!nxt) toast('Loadout complete');
+    else if (isLoadoutReady(compute(rm, cfg))) toast('Loadout complete');
   }
 }
 function browseSheet(rm, sid) {
@@ -742,17 +671,21 @@ function listText(cfg, items, withLink = true) {
   if (withLink) lines.push('', `Open it: ${shareUrl(cfg)}`);
   return lines.join('\n');
 }
-async function viewSummary(q) {
+async function viewSummary(q, isCurrent = () => true) {
   await loadCatalog();
   const cfg = cfgFromQuery(q);
-  if (!cfg) return viewNotFound();
+  if (!isCurrent()) return;
+  if (!cfg || pipeOf(machine(cfg.m), cfg.p)?.roadmap !== cfg.r) return viewNotFound();
   let rm;
-  try { rm = await loadRoadmap(cfg.r); } catch (e) { app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  try { rm = await loadRoadmap(cfg.r); } catch (e) { if (isCurrent()) app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  if (!isCurrent()) return;
   buildCfg = cfg;
   const draw = () => {
     const rows = compute(rm, cfg), items = lineItems(rm, cfg, rows);
-    const pending = rows.filter((r) => r.status === 'pending' || r.status === 'locked');
+    const pending = rows.filter((r) => ['pending', 'locked', 'blocked'].includes(r.status));
+    const ready = isLoadoutReady(rows);
     history.replaceState(null, '', `#/summary?c=${b64e(cfg)}`);
+    currentHash = location.hash;
     rememberBuilder();
     setStepper(4, cfg);
     const m = machine(cfg.m), p = pipeOf(m, cfg.p);
@@ -762,13 +695,13 @@ async function viewSummary(q) {
         <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config</p>
         <button class="btn btn-primary" data-done style="margin-top:14px">${ICON.save} Save loadout</button>
         <p class="small" style="margin:8px 0 0;color:#d5deea">${needsGarageSave(cfg) ? 'Not in My rigs yet. Saving puts it on this drill.' : 'Saved to My rigs.'}</p></div>
-      ${rows.length && rows[rows.length - 1].status === 'skip' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
+      ${rows.length && rows[rows.length - 1].status === 'blocked' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
       ${pending.length ? `<div class="note no-print"><span><b>${pending.length} slot${pending.length > 1 ? 's' : ''} still open</b> (${esc(pending.map((r) => r.sec.name).join(', '))}). <a href="#/build?c=${b64e(cfg)}">Finish equipping</a></span></div>` : ''}
       <div class="card"><ul class="lines">${items.map((l) => `
         <li class="line ${l.acc ? 'acc-line' : ''}"><div class="thumb">${imgTag(l.part.img, 200, 100, l.part.name)}</div>
           <div><div class="l-sec">${esc(l.sec)}${l.auto ? ' · auto' : ''}</div><div class="l-name">${esc(l.part.name)}</div>
             <div class="l-row"><span class="l-pn">${l.part.pn ? '#' + esc(l.part.pn) : '<span class="muted">Part # not listed</span>'}</span>
-              <span class="qty no-print"><button data-dq="${l.key}" data-d="-1" aria-label="Less">−</button><input inputmode="numeric" data-qk="${l.key}" value="${l.qty}" aria-label="Quantity"><button data-dq="${l.key}" data-d="1" aria-label="More">+</button></span>
+              <span class="print-qty">Qty: ${l.qty}</span><span class="qty no-print"><button data-dq="${l.key}" data-d="-1" aria-label="Less">−</button><input inputmode="numeric" data-qk="${l.key}" value="${esc(l.qty)}" aria-label="Quantity"><button data-dq="${l.key}" data-d="1" aria-label="More">+</button></span>
             </div></div></li>`).join('') || '<li class="empty">No parts selected yet.</li>'}</ul></div>
       <div class="share-grid no-print">
         <button class="btn btn-ghost" id="sh-share">${ICON.share}Share</button>
@@ -792,7 +725,7 @@ async function viewSummary(q) {
           <button class="btn btn-block" id="q-print">${ICON.print} Print / PDF</button>
         </div></div>
     </aside></div>`;
-    setActionbar(`<div class="ab-info"><strong>${needsGarageSave(cfg) ? 'Not saved' : 'Saved'}</strong><span class="ab-line">${items.length} equipped${pending.length ? ` · ${pending.length} open` : ' · class ready'}</span></div>
+    setActionbar(`<div class="ab-info"><strong>${needsGarageSave(cfg) ? 'Not saved' : 'Saved'}</strong><span class="ab-line">${items.length} equipped${ready ? ' · class ready' : ` · ${pending.length} incomplete`}</span></div>
       <button class="btn btn-ghost btn-sm" id="ab-copy">Copy</button>
       <button class="btn btn-primary" data-done>${ICON.save} Save loadout</button>`);
     const text = listText(cfg, items);
@@ -815,8 +748,8 @@ async function viewSummary(q) {
     $('#q-print').addEventListener('click', () => window.print());
     $('#sh-mode').addEventListener('click', () => { cfg.mode = cfg.mode === 'Bit' ? 'Backreamer' : 'Bit'; draw(); window.scrollTo({ top: 0 }); });
     $$('[data-done]').forEach((b) => b.addEventListener('click', () => openDoneSheet(cfg)));
-    $$('[data-dq]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.dq; cfg.q[k] = Math.max(0, (cfg.q[k] ?? 1) + +b.dataset.d); draw(); }));
-    $$('[data-qk]').forEach((i) => i.addEventListener('change', () => { cfg.q[i.dataset.qk] = Math.max(0, parseInt(i.value, 10) || 0); draw(); }));
+    $$('[data-dq]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.dq; cfg.q[k] = quantity(quantity(cfg.q[k]) + +b.dataset.d); draw(); }));
+    $$('[data-qk]').forEach((i) => i.addEventListener('change', () => { cfg.q[i.dataset.qk] = quantity(i.value); draw(); }));
   };
   draw();
 }
@@ -892,8 +825,9 @@ function drillOptions(sel) {
 function busy(btn, on, label) { if (!btn) return; if (on) { btn.dataset.l = btn.innerHTML; btn.innerHTML = label || 'Working…'; btn.disabled = true; } else { btn.innerHTML = btn.dataset.l || btn.innerHTML; btn.disabled = false; } }
 
 /* sign up / sign in / finish setup */
-async function viewAccount(q) {
+async function viewAccount(q, isCurrent = () => true) {
   await loadCatalog(); await meReady();
+  if (!isCurrent()) return;
   setStepper(0); setActionbar('');
   if (q.get('m') === 'reset' && ME.user) {
     app.innerHTML = `<div class="auth-wrap"><h1>Set a new password</h1>
@@ -910,7 +844,7 @@ async function viewAccount(q) {
     return;
   }
   if (ME.user && ME.member) { location.replace('#/garage'); return; }
-  if (ME.user) return viewSetup();
+  if (ME.user) return viewSetup(isCurrent);
   const mode = q.get('m') === 'signin' ? 'signin' : 'signup';
   app.innerHTML = `<div class="auth-wrap">
     ${pageHead(mode === 'signup' ? 'New crew' : 'Returning crew', mode === 'signup' ? 'Set up your crew' : 'Welcome back', mode === 'signup' ? 'Save a named loadout for every drill your crew runs, and share those classes with the company.' : 'Sign in to open your operators and loadouts.')}
@@ -948,8 +882,9 @@ async function viewAccount(q) {
     error ? err(error.message) : toast('Check your email for a reset link');
   });
 }
-async function viewSetup() {
+async function viewSetup(isCurrent = () => true) {
   await loadCatalog(); await meReady();
+  if (!isCurrent()) return;
   setStepper(0); setActionbar('');
   if (!ME.user) { location.replace('#/account'); return; }
   if (ME.member) { location.replace('#/garage'); return; }
@@ -1179,10 +1114,13 @@ function requestAddOperator(count, prefill) {
   if (!canAddMachine(count, isEntitled())) return upgradeSheet();
   return addMachineSheet(prefill);
 }
-async function viewGarage() {
-  await loadCatalog(); setStepper(0); setActionbar('');
+async function viewGarage(isCurrent = () => true) {
+  await loadCatalog();
+  if (!isCurrent()) return;
+  setStepper(0); setActionbar('');
   app.innerHTML = '<div class="stack"><div class="skeleton"></div><div class="skeleton"></div></div>';
   await meReady();
+  if (!isCurrent()) return;
   const phone = getSaved();
   const unsaved = store.get(LAST_KEY, null);
   const unsavedOpen = unsaved?.cfg?.r && needsGarageSave(unsaved.cfg);
@@ -1205,16 +1143,19 @@ async function viewGarage() {
   if (!ME.member) { location.replace('#/setup'); return; }
   let finish = null;
   try { finish = await consumePendingSave(); } catch (e) { toast(errMsg(e)); }
+  if (!isCurrent()) return;
   if (billingFlag === 'success' && !isEntitled()) {
     toast('Checkout finished. Unlimited operators turn on when Stripe confirms the subscription.');
     for (let i = 0; i < 3 && !isEntitled(); i++) {
       await new Promise((r) => setTimeout(r, 2000));
       await refreshMe();
+      if (!isCurrent()) return;
     }
     if (isEntitled()) toast('Unlimited operators are on.');
   } else if (billingFlag === 'cancel') toast('Checkout canceled. This crew is still on the free plan.');
   else if (billingFlag === 'portal') toast('Back from billing. Pull to refresh if the plan looks stale.');
-  let fleet; try { fleet = await fetchFleet(); } catch (e) { app.innerHTML = `<div class="card empty">${esc(errMsg(e))}</div>`; return; }
+  let fleet; try { fleet = await fetchFleet(); } catch (e) { if (isCurrent()) app.innerHTML = `<div class="card empty">${esc(errMsg(e))}</div>`; return; }
+  if (!isCurrent()) return;
   const count = fleet.machines.length;
   const atLimit = !canAddMachine(count, isEntitled());
   const byM = (id) => fleet.loadouts.filter((l) => l.machine_id === id);
@@ -1299,14 +1240,18 @@ async function accountSheet(machineCount) {
 }
 
 /* one machine: its loadout cards ("create a class") */
-async function viewRig(id) {
-  await loadCatalog(); setStepper(0); setActionbar('');
+async function viewRig(id, isCurrent = () => true) {
+  await loadCatalog();
+  if (!isCurrent()) return;
+  setStepper(0); setActionbar('');
   await meReady();
+  if (!isCurrent()) return;
   if (!ME.member) { location.replace(ME.user ? '#/setup' : '#/account'); return; }
   app.innerHTML = '<div class="stack"><div class="skeleton"></div><div class="skeleton"></div></div>';
   const c = await sb();
   const [mr, lr] = await Promise.all([c.from('bdht_machines').select('*').eq('id', id).maybeSingle(),
     c.from('bdht_loadouts').select('*').eq('machine_id', id).order('is_default', { ascending: false }).order('updated_at', { ascending: false })]);
+  if (!isCurrent()) return;
   const mc = mr.data; if (!mc) return viewNotFound();
   const los = lr.data || [], cat = machine(mc.machine_type_id);
   app.innerHTML = `
@@ -1439,7 +1384,10 @@ async function saveToRigSection(cfg, sh) {
 }
 
 /* ---------- router ---------- */
+let routeId = 0;
 async function route() {
+  const id = ++routeId, requestedHash = location.hash;
+  const isCurrent = () => id === routeId && location.hash === requestedHash;
   const h = location.hash.slice(1) || '/';
   const [path, qs] = h.split('?');
   const q = new URLSearchParams(qs || '');
@@ -1451,18 +1399,19 @@ async function route() {
   try {
     switch (parts[0]) {
       case undefined: viewHome(); break;
-      case 'drill': await viewDrill(); break;
-      case 'pipe': await viewPipe(parts[1]); break;
-      case 'build': await viewBuild(q); break;
-      case 'summary': await viewSummary(q); break;
+      case 'drill': await viewDrill(isCurrent); break;
+      case 'pipe': await viewPipe(parts[1], isCurrent); break;
+      case 'build': await viewBuild(q, isCurrent); break;
+      case 'summary': await viewSummary(q, isCurrent); break;
       case 'saved': viewSaved(); break;
-      case 'account': await viewAccount(q); break;
-      case 'setup': await viewSetup(); break;
-      case 'garage': await viewGarage(); break;
-      case 'rig': await viewRig(parts[1]); break;
+      case 'account': await viewAccount(q, isCurrent); break;
+      case 'setup': await viewSetup(isCurrent); break;
+      case 'garage': await viewGarage(isCurrent); break;
+      case 'rig': await viewRig(parts[1], isCurrent); break;
       default: viewNotFound();
     }
   } catch (e) {
+    if (!isCurrent()) return;
     console.error(e);
     app.innerHTML = `<div class="card empty"><h2>Something went wrong</h2><p>${esc(e.message)}</p><a class="btn btn-primary" href="#/">Home</a></div>`;
   }

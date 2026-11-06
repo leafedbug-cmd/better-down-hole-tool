@@ -1,6 +1,7 @@
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2.119.0';
 import { adminClient } from '../_shared/supabase_admin.ts';
 import { entitledFor, keepStoredSubscription } from '../_shared/entitlement.ts';
+import { withBillingLock } from '../_shared/billing_lock.ts';
 import { priceId } from '../_shared/http.ts';
 import { idOf, stripeClient, stripeCryptoProvider, type Stripe } from '../_shared/stripe.ts';
 
@@ -29,34 +30,65 @@ Deno.serve(async (req) => {
   }
 
   const admin = adminClient();
-  const claimed = await claimEvent(admin, event);
-  if (!claimed) return new Response(JSON.stringify({ ok: true, duplicate: true }), { status: 200 });
-
+  const token = crypto.randomUUID();
+  let claimed = false;
   try {
-    const companyId = await dispatch(stripe, admin, event);
-    if (companyId) {
-      await admin.from('bdht_stripe_events').update({ company_id: companyId }).eq('id', event.id);
+    const { data: claim, error: claimError } = await admin.rpc('bdht_claim_stripe_event', {
+      p_id: event.id, p_type: event.type, p_token: token,
+    });
+    if (claimError) throw claimError;
+    if (claim === 'processed') {
+      return new Response(JSON.stringify({ ok: true, duplicate: true }), { status: 200 });
     }
+    if (claim !== 'claimed') return new Response('Event is still processing', { status: 503 });
+    claimed = true;
+
+    const targetCompany = await eventCompany(stripe, admin, event);
+    const companyId = targetCompany
+      ? await withBillingLock(admin, targetCompany, () => dispatch(stripe, admin, event))
+      : null;
+    // An event is complete only after every state change succeeded. A crashed
+    // worker leaves an expiring claim, so a later delivery can resume processing.
+    const { error: completeError } = await admin.from('bdht_stripe_events').update({
+      company_id: companyId,
+      processed_at: new Date().toISOString(),
+      lease_until: null,
+    }).eq('id', event.id).eq('claim_token', token).select('id').single();
+    if (completeError) throw completeError;
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    await admin.from('bdht_stripe_events').delete().eq('id', event.id);
+    if (claimed) {
+      const { error: releaseError } = await admin.from('bdht_stripe_events').delete()
+        .eq('id', event.id).eq('claim_token', token).is('processed_at', null);
+      if (releaseError) console.error('webhook claim release', releaseError.message);
+    }
     const message = error instanceof Error ? error.message : 'Webhook failed';
     console.error('bdht-stripe-webhook', event.type, event.id, message);
     return new Response('Webhook handler failed', { status: 500 });
   }
 });
 
-async function claimEvent(admin: SupabaseClient, event: Stripe.Event): Promise<boolean> {
-  const { error } = await admin.from('bdht_stripe_events').insert({
-    id: event.id,
-    event_type: event.type,
-  });
-  if (!error) return true;
-  if (error.code === '23505') return false;
-  throw error;
+/** Resolve the company before taking the same lease used by Checkout. */
+async function eventCompany(stripe: Stripe, admin: SupabaseClient, event: Stripe.Event): Promise<string | null> {
+  const object = event.data.object as unknown as Record<string, unknown>;
+  let customerId = idOf(object.customer);
+  const chargeId = idOf(object.charge);
+  if (!customerId && chargeId) customerId = idOf((await stripe.charges.retrieve(chargeId)).customer);
+  const mapped = await companyIdForCustomer(admin, customerId);
+  if (mapped) return mapped;
+  const metadata = object.metadata as Record<string, string> | undefined;
+  const fromMetadata = await companyIdFromMetadata(admin, metadata?.company_id);
+  if (fromMetadata) return fromMetadata;
+  const subscriptionId = event.type.startsWith('invoice.')
+    ? subscriptionIdFromInvoice(event.data.object as Stripe.Invoice)
+    : idOf(object.subscription);
+  if (!subscriptionId) return null;
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  return await companyIdForCustomer(admin, idOf(subscription.customer))
+    ?? await companyIdFromMetadata(admin, subscription.metadata?.company_id);
 }
 
 async function dispatch(stripe: Stripe, admin: SupabaseClient, event: Stripe.Event): Promise<string | null> {
@@ -70,7 +102,9 @@ async function dispatch(stripe: Stripe, admin: SupabaseClient, event: Stripe.Eve
     case 'customer.subscription.deleted':
     case 'customer.subscription.paused':
     case 'customer.subscription.resumed':
-      return applySubscription(admin, event.data.object as Stripe.Subscription);
+      // Events can arrive out of order. Read Stripe while holding the company
+      // lease instead of trusting the event's historical subscription snapshot.
+      return applySubscription(admin, await stripe.subscriptions.retrieve(event.data.object.id));
     case 'invoice.paid':
     case 'invoice.payment_failed':
       return syncInvoice(stripe, admin, event.data.object as Stripe.Invoice, event.type === 'invoice.payment_failed');
@@ -110,12 +144,14 @@ async function syncInvoice(
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   const companyId = await applySubscription(admin, subscription);
   if (!companyId) return null;
+  if (idOf(subscription.latest_invoice) !== invoice.id) return companyId;
+  invoice = await stripe.invoices.retrieve(invoice.id);
   const patch: Record<string, unknown> = {
     latest_invoice_id: invoice.id,
     latest_invoice_status: invoice.status,
     updated_at: new Date().toISOString(),
   };
-  if (failed) patch.payment_failed_at = new Date().toISOString();
+  if (failed && invoice.status !== 'paid') patch.payment_failed_at = new Date().toISOString();
   else if (invoice.status === 'paid') patch.payment_failed_at = null;
   const { error } = await admin.from('bdht_billing').update(patch).eq('company_id', companyId);
   if (error) throw error;

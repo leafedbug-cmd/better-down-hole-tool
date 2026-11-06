@@ -25,7 +25,7 @@ export function corsHeaders(req: Request): Record<string, string> {
 }
 
 export function json(req: Request, status: number, body: unknown): Response {
-  return new Response(JSON.stringify(body), {
+  return new Response(status === 204 ? null : JSON.stringify(body), {
     status,
     headers: { ...corsHeaders(req), 'Content-Type': 'application/json' },
   });

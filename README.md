@@ -7,6 +7,9 @@ Mobile-first HDD drill-string builder: pick a drill and pipe, build a compatible
 - Accounts: Supabase Auth plus Postgres with row-level security. Only the public (publishable) key is in this repo.
 - Plans: a free company can save 3 operators. Unlimited operators are $2.99/month through Stripe Checkout. See [Stripe billing setup](#stripe-billing-setup).
 
+See [FIX_HANDOFF.md](FIX_HANDOFF.md) for the bug fixes, regression-test commands,
+remaining catalog checks, and required migration-before-function deployment order.
+
 ## Stripe billing setup
 
 Live account `acct_1ThaUY5HCaoEY4se` (BuggedLab). Product `prod_VZhAn4095ltie4` (“The Better Down Hole Tool — Unlimited”), price `price_1UYXlp5HCaoEY4setSBdQtHh` ($2.99/month USD). The product tax code is already `txcd_10103001` (Software as a service (SaaS) - business use). See the [tax code guide](https://docs.stripe.com/tax/tax-codes.md).

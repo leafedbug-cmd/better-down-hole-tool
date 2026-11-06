@@ -1,10 +1,10 @@
 import { adminClient } from '../_shared/supabase_admin.ts';
 import { stripeClient } from '../_shared/stripe.ts';
 import { requireOwner } from '../_shared/owner.ts';
-import { PORTAL_RETURN_URL, json } from '../_shared/http.ts';
+import { PORTAL_RETURN_URL, corsHeaders, json } from '../_shared/http.ts';
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: json(req, 204, {}).headers });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(req) });
   if (req.method !== 'POST') return json(req, 405, { error: 'POST only' });
 
   try {

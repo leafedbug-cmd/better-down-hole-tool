@@ -1,0 +1,20 @@
+Subject: Refund of {{refund_amount}} issued for {{company_name}}
+Preheader: We processed a {{refund_amount}} refund to your {{card_brand}} ending in {{card_last4}}.
+Variables: {{first_name}}, {{company_name}}, {{refund_amount}}, {{refund_date}}, {{card_brand}}, {{card_last4}}, {{charge_id}}, {{garage_url}}, {{manage_billing_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+REFUND CONFIRMATION — {{refund_amount}} refund issued
+
+Hello {{first_name}},
+
+A refund of {{refund_amount}} USD was issued on {{refund_date}} for {{company_name}} to {{card_brand}} ending in {{card_last4}} (charge {{charge_id}}).
+
+Banks typically post refunds within 5 to 10 business days. Machine access in My rigs continues to follow your subscription status.
+
+Open My rigs: {{garage_url}}
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

@@ -1,0 +1,22 @@
+Subject: {{company_name}} is at the 3-machine free limit
+Preheader: Upgrade to The Better Down Hole Tool — Unlimited for $2.99/month to add more machines.
+Variables: {{first_name}}, {{company_name}}, {{machine_count}}, {{free_machine_limit}}, {{plan_name}}, {{amount}}, {{garage_url}}, {{app_url}}, {{support_email}}, {{unsubscribe_url}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+PLAN LIMIT REACHED — 3 of 3 free machines saved
+
+Hello {{first_name}},
+
+{{company_name}} is at the 3-machine limit on the Free plan ({{machine_count}} of {{free_machine_limit}} machines saved). Your existing machines and loadouts are untouched.
+
+To add more machines, upgrade to {{plan_name}} for {{amount}}/month USD:
+{{garage_url}}
+
+Only the company owner can start checkout. Unlimited machines turn on as soon as Stripe confirms the payment.
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.
+Unsubscribe: {{unsubscribe_url}}

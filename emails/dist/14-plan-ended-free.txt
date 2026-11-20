@@ -1,0 +1,22 @@
+Subject: {{company_name}} is back on the Free plan
+Preheader: Existing machines are kept. New machines are capped at 3 unless you resubscribe.
+Variables: {{first_name}}, {{company_name}}, {{plan_name}}, {{amount}}, {{machine_count}}, {{free_machine_limit}}, {{garage_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+PLAN ENDED — {{company_name}} is now on the Free plan
+
+Hello {{first_name}},
+
+The {{plan_name}} subscription for {{company_name}} has ended, and your company is back on the Free plan.
+
+How your account works now:
+- All {{machine_count}} machines and loadouts already saved stay in My rigs.
+- New machines are capped at {{free_machine_limit}} unless you resubscribe.
+- To turn Unlimited back on ({{amount}}/month USD), open My rigs and choose Upgrade:
+{{garage_url}}
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

@@ -1,0 +1,20 @@
+Subject: You have been invited to The Better Down Hole Tool
+Preheader: Use your company invite code to open shared machines and loadouts.
+Variables: {{ .ConfirmationURL }}, {{ .Token }}, {{ .SiteURL }}, {{ .Email }}, {{ .Data.company_name }}, {{ .Data.invite_code }}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+CREW INVITE — Join your crew on BDHT
+
+You have been invited to join your crew{{ if .Data.company_name }} at {{ .Data.company_name }}{{ end }} on The Better Down Hole Tool.
+
+Accept the invite and set up your login:
+{{ .ConfirmationURL }}
+
+Invited email: {{ .Email }}
+{{ if .Data.invite_code }}Crew invite code: {{ .Data.invite_code }}{{ end }}
+
+--
+The Better Down Hole Tool
+Web: {{ .SiteURL }}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

@@ -1,0 +1,24 @@
+Subject: Cancellation scheduled for {{company_name}} on {{period_end}}
+Preheader: Unlimited machines remain active until {{period_end}}.
+Variables: {{first_name}}, {{company_name}}, {{plan_name}}, {{period_end}}, {{machine_count}}, {{manage_billing_url}}, {{garage_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+SUBSCRIPTION UPDATE — Unlimited ends on {{period_end}}
+
+Hello {{first_name}},
+
+{{plan_name}} for {{company_name}} is scheduled to end on {{period_end}}. You will not be billed again.
+
+What happens next:
+- Unlimited machine access stays active through {{period_end}}.
+- After {{period_end}}, your company drops back to the 3-machine Free cap for NEW machines.
+- Every machine and loadout already saved ({{machine_count}} currently) stays on your company.
+
+If you want to keep Unlimited on, open My rigs and select "Manage billing" before {{period_end}}:
+{{manage_billing_url}}
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

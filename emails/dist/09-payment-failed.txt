@@ -1,0 +1,25 @@
+Subject: Payment failed for {{company_name}} on The Better Down Hole Tool
+Preheader: Update your card in Manage billing. Existing machines stay saved; new machines are capped at 3.
+Variables: {{first_name}}, {{company_name}}, {{plan_name}}, {{amount}}, {{card_brand}}, {{card_last4}}, {{manage_billing_url}}, {{garage_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+ACTION NEEDED · BILLING — We could not process your {{amount}} payment
+
+Hello {{first_name}},
+
+The monthly charge of {{amount}} USD for {{company_name}} ({{card_brand}} ending in {{card_last4}}) failed.
+
+What this means right now:
+- Existing machines and loadouts already saved in My rigs are kept.
+- New machines are capped at 3 until billing is active again.
+
+To update your card, open My rigs and click "Manage billing":
+{{manage_billing_url}}
+
+Unlimited machine creation turns back on as soon as Stripe confirms the payment.
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

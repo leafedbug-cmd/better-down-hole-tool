@@ -1,0 +1,24 @@
+Subject: Confirm your email for The Better Down Hole Tool
+Preheader: Tap the link inside to confirm your email and finish setting up your company.
+Variables: {{ .ConfirmationURL }}, {{ .Token }}, {{ .TokenHash }}, {{ .SiteURL }}, {{ .Email }}, {{ .Data.employee_name }}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+ACCOUNT SETUP — Confirm your email address
+
+Hello{{ if .Data.employee_name }} {{ .Data.employee_name }}{{ end }},
+
+Confirm {{ .Email }} to finish setting up your crew account on The Better Down Hole Tool:
+
+{{ .ConfirmationURL }}
+
+One-time code (if prompted): {{ .Token }}
+
+Once confirmed, sign in to add your company and save loadouts on up to 3 machines for free.
+
+If you did not create an account, you can ignore this email.
+
+--
+The Better Down Hole Tool
+Web: {{ .SiteURL }}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

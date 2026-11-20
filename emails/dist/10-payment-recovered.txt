@@ -1,0 +1,21 @@
+Subject: Payment received — Unlimited is restored for {{company_name}}
+Preheader: Your subscription is active again and the 3-machine cap is lifted.
+Variables: {{first_name}}, {{company_name}}, {{plan_name}}, {{amount}}, {{renewal_date}}, {{garage_url}}, {{manage_billing_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+PLAN RESTORED — Payment confirmed — Unlimited is back on
+
+Hello {{first_name}},
+
+Stripe confirmed the {{amount}} USD payment for {{company_name}}.
+
+{{plan_name}} is active again, and the 3-machine cap is removed.
+Next renewal date: {{renewal_date}}.
+
+Open My rigs: {{garage_url}}
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

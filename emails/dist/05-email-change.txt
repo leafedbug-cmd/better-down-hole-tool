@@ -1,0 +1,22 @@
+Subject: Confirm your new email address for The Better Down Hole Tool
+Preheader: Confirm this change to update your sign-in email.
+Variables: {{first_name}}, {{old_email}}, {{new_email}}, {{email_change_url}}, {{otp_code}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+ACCOUNT SECURITY — Confirm your email change
+
+Hello {{first_name}},
+
+Confirm changing your sign-in email on The Better Down Hole Tool from {{old_email}} to {{new_email}}:
+
+{{email_change_url}}
+
+Confirmation code: {{otp_code}}
+
+If you did not request this change, do not open the link and contact {{support_email}}.
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

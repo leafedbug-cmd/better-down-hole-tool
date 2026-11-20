@@ -1,0 +1,24 @@
+Subject: [BDHT Alert] Dispute {{dispute_id}} opened for {{company_name}}
+Preheader: Charge {{charge_id}} ({{amount}}) was disputed. Evidence due {{dispute_due_date}}.
+Variables: {{company_name}}, {{company_id}}, {{dispute_id}}, {{charge_id}}, {{amount}}, {{dispute_reason}}, {{dispute_due_date}}, {{stripe_dashboard_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+INTERNAL ALERT · DISPUTE — Charge dispute opened
+
+[BDHT Internal Alert] Charge dispute opened
+
+Company: {{company_name}} ({{company_id}})
+Dispute ID: {{dispute_id}}
+Charge ID: {{charge_id}}
+Amount: {{amount}} USD
+Reason: {{dispute_reason}}
+Evidence due: {{dispute_due_date}}
+
+Review in Stripe Dashboard:
+{{stripe_dashboard_url}}
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

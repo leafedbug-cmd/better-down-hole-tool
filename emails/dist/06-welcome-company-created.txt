@@ -1,0 +1,29 @@
+Subject: {{company_name}} is set up on The Better Down Hole Tool
+Preheader: Your free crew account includes up to 3 machines and your crew invite code.
+Variables: {{first_name}}, {{company_name}}, {{invite_code}}, {{free_machine_limit}}, {{garage_url}}, {{app_url}}, {{support_email}}, {{unsubscribe_url}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+CREW ACCOUNT READY — {{company_name}} is ready
+
+Hello {{first_name}},
+
+{{company_name}} is set up on The Better Down Hole Tool.
+
+Your Free plan includes up to {{free_machine_limit}} machines.
+
+How to set up your first rig:
+1. Open My rigs ({{garage_url}}) and add a machine.
+2. Tap "+ New loadout", lock the drill pipe, and equip each slot from the rig out to the bit or backreamer.
+3. Save the preset so your whole crew can pull the part numbers.
+
+Crew invite code: {{invite_code}}
+(Coworkers choose "Join my company" at signup and enter that code.)
+
+Need more than {{free_machine_limit}} machines later? The company owner can upgrade to The Better Down Hole Tool — Unlimited for $2.99/month in My rigs.
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.
+Unsubscribe: {{unsubscribe_url}}

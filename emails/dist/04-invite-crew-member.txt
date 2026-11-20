@@ -1,0 +1,22 @@
+Subject: Join {{company_name}} on The Better Down Hole Tool
+Preheader: Use your company invite code to open shared machines and loadouts.
+Variables: {{company_name}}, {{invited_by}}, {{invite_code}}, {{invite_url}}, {{user_email}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+CREW INVITE — Join your crew on BDHT
+
+{{invited_by}} invited you to join {{company_name}} on The Better Down Hole Tool.
+
+Open the app and sign up:
+{{invite_url}}
+
+When prompted, choose "Join my company" and enter this crew invite code:
+{{invite_code}}
+
+Once you join, you can open and edit drill-string loadouts for your company's machines.
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

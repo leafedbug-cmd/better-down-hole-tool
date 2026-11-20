@@ -1,0 +1,26 @@
+Subject: Payment receipt ({{amount}}) for {{company_name}}
+Preheader: Receipt for {{plan_name}} — {{amount}} paid on {{payment_date}}.
+Variables: {{first_name}}, {{company_name}}, {{plan_name}}, {{amount}}, {{payment_date}}, {{renewal_date}}, {{card_brand}}, {{card_last4}}, {{invoice_id}}, {{manage_billing_url}}, {{garage_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+PAYMENT RECEIPT — Paid {{amount}} for {{plan_name}}
+
+Hello {{first_name}},
+
+Payment receipt for {{company_name}}:
+
+Plan: {{plan_name}}
+Amount paid: {{amount}} USD
+Date paid: {{payment_date}}
+Payment method: {{card_brand}} ending in {{card_last4}}
+Next renewal: {{renewal_date}}
+Invoice ID: {{invoice_id}}
+
+Download official PDF invoices or update billing details via "Manage billing" in My rigs:
+{{manage_billing_url}}
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

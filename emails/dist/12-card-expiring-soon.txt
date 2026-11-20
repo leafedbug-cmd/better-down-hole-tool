@@ -1,0 +1,19 @@
+Subject: Card ending in {{card_last4}} expires soon for {{company_name}}
+Preheader: Update your card in Manage billing so your Unlimited plan does not lapse.
+Variables: {{first_name}}, {{company_name}}, {{plan_name}}, {{card_brand}}, {{card_last4}}, {{card_exp_month}}, {{card_exp_year}}, {{renewal_date}}, {{manage_billing_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+PAYMENT METHOD NOTICE — Your {{card_brand}} card expires {{card_exp_month}}/{{card_exp_year}}
+
+Hello {{first_name}},
+
+The {{card_brand}} card ending in {{card_last4}} on file for {{company_name}} expires {{card_exp_month}}/{{card_exp_year}}.
+
+Update your card before the next renewal ({{renewal_date}}) via "Manage billing" in My rigs:
+{{manage_billing_url}}
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

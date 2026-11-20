@@ -1,0 +1,24 @@
+Subject: Unlimited machines are active for {{company_name}}
+Preheader: Stripe confirmed your subscription. The 3-machine cap is removed.
+Variables: {{first_name}}, {{company_name}}, {{plan_name}}, {{amount}}, {{renewal_date}}, {{garage_url}}, {{manage_billing_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+SUBSCRIPTION ACTIVE — Unlimited machines are on
+
+Hello {{first_name}},
+
+Stripe confirmed the subscription for {{company_name}}. Your company is now on {{plan_name}} ({{amount}}/month USD).
+
+What changed:
+- The 3-machine cap is removed for your whole company.
+- Crew members at {{company_name}} can add machines and save loadouts on them.
+- Next renewal date: {{renewal_date}}.
+
+Open My rigs: {{garage_url}}
+To update your card, view invoices, or cancel at period end, use the "Manage billing" button in My rigs ({{manage_billing_url}}).
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

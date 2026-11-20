@@ -1,0 +1,23 @@
+Subject: [BDHT Alert] Early fraud warning {{fraud_warning_id}} for {{company_name}}
+Preheader: Radar flagged charge {{charge_id}} ({{fraud_type}}). Review in Stripe.
+Variables: {{company_name}}, {{company_id}}, {{fraud_warning_id}}, {{charge_id}}, {{amount}}, {{fraud_type}}, {{stripe_dashboard_url}}, {{app_url}}, {{support_email}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+INTERNAL ALERT · RADAR EFW — Early fraud warning received
+
+[BDHT Internal Alert] Radar early fraud warning received
+
+Company: {{company_name}} ({{company_id}})
+Fraud warning ID: {{fraud_warning_id}}
+Charge ID: {{charge_id}}
+Amount: {{amount}} USD
+Fraud type: {{fraud_type}}
+
+The webhook does not cancel or refund automatically. Review in Stripe Radar:
+{{stripe_dashboard_url}}
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.

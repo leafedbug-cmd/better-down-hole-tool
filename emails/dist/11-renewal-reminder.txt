@@ -1,0 +1,20 @@
+Subject: Upcoming {{amount}} renewal for {{company_name}} on {{renewal_date}}
+Preheader: Your Unlimited plan renews on {{renewal_date}}.
+Variables: {{first_name}}, {{company_name}}, {{plan_name}}, {{amount}}, {{renewal_date}}, {{card_brand}}, {{card_last4}}, {{manage_billing_url}}, {{app_url}}, {{support_email}}, {{unsubscribe_url}}
+------------------------------------------------------------------------
+
+THE BETTER DOWN HOLE Tool (BDHT)
+RENEWAL NOTICE — {{plan_name}} renews on {{renewal_date}}
+
+Hello {{first_name}},
+
+{{plan_name}} for {{company_name}} is scheduled to renew on {{renewal_date}} for {{amount}} USD ({{card_brand}} ending in {{card_last4}}).
+
+No action is needed to stay on Unlimited. To update your card or cancel at period end, open My rigs and select "Manage billing":
+{{manage_billing_url}}
+
+--
+The Better Down Hole Tool
+Support: {{support_email}} | Web: {{app_url}}
+Independent drill-string loadout builder. Not affiliated with any equipment manufacturer.
+Unsubscribe: {{unsubscribe_url}}

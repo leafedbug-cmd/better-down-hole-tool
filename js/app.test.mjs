@@ -88,7 +88,7 @@ test('every roadmap references existing parts; incomplete end tools never count 
     }
   }
   assert.equal(runs, 272);
-  assert.equal(blocked, 13);
+  assert.equal(blocked, 12); // 6088/Bit unblocked by tools/fix_catalog.mjs (tricone + 3.25SS pipe box)
   assert.equal(isLoadoutReady([]), false);
 });
 

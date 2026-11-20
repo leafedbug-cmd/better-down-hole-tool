@@ -4,7 +4,7 @@ import { FREE_MACHINE_LIMIT, canAddMachine, entitledFor, keepStoredSubscription 
 
 const PRICE = 'price_1UYXlp5HCaoEY4setSBdQtHh';
 
-test('free companies stop at 3 operators', () => {
+test('free companies stop at 3 machines', () => {
   assert.equal(canAddMachine(2, false), true);
   assert.equal(canAddMachine(FREE_MACHINE_LIMIT, false), false);
   assert.equal(canAddMachine(FREE_MACHINE_LIMIT, null), false);

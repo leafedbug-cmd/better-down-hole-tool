@@ -73,7 +73,7 @@ begin
   if paid is true then return new; end if;
   select count(*)::integer into n from public.bdht_machines where company_id = new.company_id;
   if n >= 3 then
-    raise exception 'Free plan includes 3 operators. Upgrade for unlimited.' using errcode = 'P0001';
+    raise exception 'Free plan includes 3 machines. Upgrade for unlimited.' using errcode = 'P0001';
   end if;
   return new;
 end;

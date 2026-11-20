@@ -1,4 +1,11 @@
 # Gateway JWT check. The webhook authenticates with the Stripe signature instead.
+# bdht-signup has no user session: public sign-ups stay disabled on this shared
+# project, and the browser sends a publishable key rather than a user JWT.
+# The function validates the body, rate-limits, and creates the user with the
+# service role. Do not turn verify_jwt on for it.
+[functions.bdht-signup]
+verify_jwt = false
+
 [functions.bdht-create-checkout]
 verify_jwt = true
 

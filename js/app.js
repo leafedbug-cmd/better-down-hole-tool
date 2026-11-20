@@ -2,6 +2,8 @@
    Data: data/catalog.json + data/roadmaps/<id>.json, generated from public manufacturer catalog APIs
    by tools/build_data.py. Compatibility rules mirror the source configurator. */
 import { FREE_MACHINE_LIMIT, canAddMachine } from './billing.mjs';
+import { canAddSignupMachine, equipmentCopy, signupMachineCap, signupMachineLimitError, signupMachinePayload } from './equipment.mjs';
+import { friendlyAuthError } from './signup-errors.mjs';
 import { normalizeConfig, quantity } from './config.mjs';
 import { compute, lineItems, isLoadoutReady } from './compatibility.mjs';
 
@@ -175,14 +177,14 @@ function viewHome() {
       <a class="btn btn-primary btn-block" href="#/drill">Start a loadout ${ICON.chev}</a>
     </div>
   </section>
-  ${ME.member ? `<a class="choice rig-cta" href="#/garage"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="small muted">${esc(ME.company.name)}</div><div class="c-title">Operators and loadouts</div></div>${ICON.chev}</a>` :
+  ${ME.member ? `<a class="choice rig-cta" href="#/garage"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="small muted">${esc(ME.company.name)}</div><div class="c-title">Machines and loadouts</div></div>${ICON.chev}</a>` :
     `<a class="choice rig-cta" href="#/account"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">Save a class for every rig</div><div class="c-sub">Free crew account. Guests can still build and share a loadout.</div></div>${ICON.chev}</a>`}
   ${lastHtml ? `<div class="section-head"><h2>Continue</h2></div>${lastHtml}` : ''}
   ${saved.length ? `<div class="section-head"><h2>Saved loadouts</h2><a class="linkbtn" href="#/saved">See all</a></div>
     <div class="lo-grid">${saved.map((s) => savedRow(s)).join('')}</div>` : ''}
   <div class="section-head"><h2>How a class is built</h2></div>
   <div class="howto"><ol style="display:contents">
-    <li><span class="num">1</span><div><h3>Choose the drill</h3><p>Current Ditch Witch® and Vermeer® models. This is the operator.</p></div></li>
+    <li><span class="num">1</span><div><h3>Choose the drill</h3><p>Current Ditch Witch® and Vermeer® models. This is the machine the loadout is for.</p></div></li>
     <li><span class="num">2</span><div><h3>Lock the pipe</h3><p>Only pipe that fits that drill can be equipped.</p></div></li>
     <li><span class="num">3</span><div><h3>Equip the slots</h3><p>Fill the string from housing to bit. Threads and adapters match as you go.</p></div></li>
     <li><span class="num">4</span><div><h3>Confirm and send</h3><p>Text, email, copy, or print the loadout.</p></div></li>
@@ -212,7 +214,7 @@ async function viewDrill(isCurrent = () => true) {
   if (!isCurrent()) return;
   setStepper(1, null); setActionbar('');
   app.innerHTML = `
-    ${pageHead('Step 01 · Drill class', 'Choose your drill', 'This is the operator you are building for. Tap a Ditch Witch® or Vermeer® model, or search “JT25” or “D24”.')}
+    ${pageHead('Step 01 · Drill class', 'Choose your drill', 'This is the machine you are building for. Tap a Ditch Witch® or Vermeer® model, or search “JT25” or “D24”.')}
     <div class="stack">
       <div class="searchbox">${ICON.search}<input id="q" type="search" inputmode="search" autocomplete="off" placeholder="Search drill model" value="${esc(drillFilter.q)}" aria-label="Search drill model"><button class="clear" id="clear" aria-label="Clear" ${drillFilter.q ? '' : 'hidden'}>×</button></div>
       <div class="seg" role="group" aria-label="Brand">
@@ -609,9 +611,9 @@ async function openDoneSheet(cfg) {
     <div class="sheet-body stack">
       <label class="field"><span>Loadout name</span><input id="lname" value="${esc(def)}" maxlength="60"></label>
       <div class="chips">${['Rock setup', 'Sand pilot', 'Clay pilot', 'Backream 12in'].map((s) => `<button type="button" class="chip" data-sug="${s}">${s}</button>`).join('')}</div>
-      ${list.length ? `<div class="form-sub"><b>Operator</b><span class="small muted">Where it shows in My rigs</span></div>
+      ${list.length ? `<div class="form-sub"><b>Machine</b><span class="small muted">Where it shows in My rigs</span></div>
         <div class="stack">${list.map((mc) => `<button type="button" class="choice" data-mc="${mc.id}" aria-pressed="${mc.id === pre}"><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div></button>`).join('')}</div>`
-        : `<p>This drill is not in My rigs yet. Saving adds it as an operator.</p>
+        : `<p>This drill is not in My rigs yet. Saving adds it as a machine.</p>
            <label class="field"><span>Unit name (optional)</span><input id="an" maxlength="60" placeholder="Unit 12"></label>`}
       <p class="small muted">Everyone at ${esc(ME.company.name)} will see it.</p>
       <div class="form-err" id="lerr" hidden></div>
@@ -757,7 +759,7 @@ async function viewSummary(q, isCurrent = () => true) {
 function viewSaved() {
   setStepper(0); setActionbar('');
   const list = getSaved();
-  app.innerHTML = `${pageHead('On this phone', 'Saved loadouts', 'These presets stay on this device. Crew accounts keep loadouts on each operator.')}
+  app.innerHTML = `${pageHead('On this phone', 'Saved loadouts', 'These presets stay on this device. Crew accounts keep loadouts on each machine.')}
     <div class="lo-grid">${list.map((s) => savedRow(s, { del: true })).join('') ||
       `<div class="card empty"><h2>No loadouts on this phone</h2><p>Build one, then save it.</p><a class="btn btn-primary" href="#/drill">Start a loadout</a></div>`}</div>`;
   $$('[data-del]').forEach((b) => b.addEventListener('click', () => {
@@ -838,7 +840,7 @@ async function viewAccount(q, isCurrent = () => true) {
       e.preventDefault(); const pw = $('#npw').value;
       if (pw.length < 8) { $('#ferr').innerHTML = '<div class="form-err">Use at least 8 characters.</div>'; return; }
       const c = await sb(); const { error } = await c.auth.updateUser({ password: pw });
-      if (error) { $('#ferr').innerHTML = `<div class="form-err">${esc(errMsg(error))}</div>`; return; }
+      if (error) { $('#ferr').innerHTML = `<div class="form-err">${esc(friendlyAuthError(error))}</div>`; return; }
       toast('Password updated'); location.replace(ME.member ? '#/garage' : '#/setup');
     });
     return;
@@ -847,7 +849,7 @@ async function viewAccount(q, isCurrent = () => true) {
   if (ME.user) return viewSetup(isCurrent);
   const mode = q.get('m') === 'signin' ? 'signin' : 'signup';
   app.innerHTML = `<div class="auth-wrap">
-    ${pageHead(mode === 'signup' ? 'New crew' : 'Returning crew', mode === 'signup' ? 'Set up your crew' : 'Welcome back', mode === 'signup' ? 'Save a named loadout for every drill your crew runs, and share those classes with the company.' : 'Sign in to open your operators and loadouts.')}
+    ${pageHead(mode === 'signup' ? 'New crew' : 'Returning crew', mode === 'signup' ? 'Set up your crew' : 'Welcome back', mode === 'signup' ? 'Save a named loadout for every machine your crew runs, and share those classes with the company.' : 'Sign in to open your machines and loadouts.')}
     <div class="seg" role="tablist" style="margin-bottom:14px">
       <button aria-pressed="${mode === 'signup'}" data-go="#/account">Sign up</button>
       <button aria-pressed="${mode === 'signin'}" data-go="#/account?m=signin">Sign in</button></div>
@@ -868,18 +870,21 @@ async function viewAccount(q, isCurrent = () => true) {
     busy($('#go'), true, 'Signing in…');
     const c = await sb();
     const { error } = await c.auth.signInWithPassword({ email, password });
-    if (error) { busy($('#go'), false); return err(error.message === 'Email not confirmed' ? 'Confirm your email first. Check your inbox for the link.' : error.message); }
+    if (error) { busy($('#go'), false); return err(friendlyAuthError(error)); }
     await refreshMe();
     const pend = store.get(PENDING_KEY, null);
     if (!ME.member && pend && pend.email?.toLowerCase() === email.toLowerCase()) {
-      try { await runSetup(pend); } catch (e) { busy($('#go'), false); return err(errMsg(e)); }
+      try { await runSetup(pend); } catch (e) {
+        if (/already belong/i.test(errMsg(e))) await refreshMe();
+        else { busy($('#go'), false); return err(friendlyAuthError(e)); }
+      }
     }
     location.hash = ME.member ? '#/garage' : '#/setup';
   });
   $('#forgot').addEventListener('click', async () => {
     const email = $('#e').value.trim(); if (!email) return err('Type your email above first.');
     const c = await sb(); const { error } = await c.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname + '#/account?m=signin' });
-    error ? err(error.message) : toast('Check your email for a reset link');
+    error ? err(friendlyAuthError(error)) : toast('Check your email for a reset link');
   });
 }
 async function viewSetup(isCurrent = () => true) {
@@ -888,11 +893,12 @@ async function viewSetup(isCurrent = () => true) {
   setStepper(0); setActionbar('');
   if (!ME.user) { location.replace('#/account'); return; }
   if (ME.member) { location.replace('#/garage'); return; }
-  app.innerHTML = `<div class="auth-wrap">${pageHead('Crew', 'Finish setting up', `Signed in as ${esc(ME.user.email)}. Add your company and the drills you run.`)}${onboardForm(false)}</div>`;
+  app.innerHTML = `<div class="auth-wrap">${pageHead('Crew', 'Finish setting up', `Signed in as ${esc(ME.user.email)}. Add your company and the machines you run.`)}${onboardForm(false)}</div>`;
   mountOnboard(false);
 }
 function onboardForm(withAuth) {
   const p = store.get(PENDING_KEY, {}) || {};
+  const copy = equipmentCopy('new');
   return `<form class="card pad stack" id="fon" novalidate>
     <div class="seg" id="cmode"><button type="button" data-cm="new" aria-pressed="true">New company</button><button type="button" data-cm="join" aria-pressed="false">Join my company</button></div>
     <label class="field" data-show="new"><span>Company name</span><input id="co" autocomplete="organization" maxlength="120" placeholder="e.g. Ozark Boring LLC" value="${esc(p.company || '')}"></label>
@@ -900,72 +906,85 @@ function onboardForm(withAuth) {
     <label class="field"><span>Your name</span><input id="emp" autocomplete="name" maxlength="120" placeholder="First and last name" value="${esc(p.employee || '')}"></label>
     ${withAuth ? `<label class="field"><span>Email</span><input id="e" type="email" autocomplete="email" inputmode="email"></label>
     <label class="field"><span>Password <em class="muted" style="font-style:normal;font-weight:500">(8+ characters)</em></span><input id="pw" type="password" autocomplete="new-password" minlength="8"></label>` : ''}
-    <div><div class="form-sub"><b>Your operators</b><span class="small muted" id="msub">Free plan: up to ${FREE_MACHINE_LIMIT} drills. Upgrade later for unlimited at $2.99/month.</span></div>
+    <div><div class="form-sub"><b id="mtitle">${copy.title}</b><span class="small muted" id="msub">${copy.detail}</span><span class="small muted" id="mcount"></span></div>
       <div id="mlist" class="stack" style="margin-top:10px"></div>
-      <button type="button" class="btn btn-ghost btn-block" id="madd" style="margin-top:10px">+ Add another operator</button></div>
+      <button type="button" class="btn btn-ghost btn-block" id="madd" style="margin-top:10px">+ Add another machine</button></div>
     <div class="form-err" id="err" hidden></div>
     <button class="btn btn-primary btn-block" id="go">${withAuth ? 'Create account' : 'Save and continue'}</button>
   </form>`;
 }
 function mountOnboard(withAuth) {
   let cm = 'new';
-  const rows = (store.get(PENDING_KEY, {}) || {}).machines?.length ? store.get(PENDING_KEY).machines : [{ id: '', nick: '' }];
+  const saved = store.get(PENDING_KEY, {}) || {};
+  const rows = saved.machines?.length ? saved.machines.map((r) => ({ id: r.id || '', nick: r.nick || '' })) : [{ id: '', nick: '' }];
   const draw = () => {
+    const copy = equipmentCopy(cm);
+    $('#mtitle').textContent = copy.title;
+    $('#msub').textContent = copy.detail;
+    const cap = signupMachineCap(cm);
+    $('#mcount').textContent = rows.length ? `${rows.length} of ${cap} machines` : 'No machines yet';
+    $('#madd').textContent = rows.length ? '+ Add another machine' : '+ Add a machine';
     $('#mlist').innerHTML = rows.map((r, i) => `<div class="mrow">
-      <label class="field"><span>Drill ${i + 1}</span><select data-mi="${i}" data-k="id">${drillOptions(r.id)}</select></label>
-      <label class="field"><span>Unit name / #</span><input data-mi="${i}" data-k="nick" maxlength="60" placeholder="Unit 12" value="${esc(r.nick)}"></label>
-      ${rows.length > 1 ? `<button type="button" class="iconbtn" data-mrm="${i}" aria-label="Remove drill ${i + 1}">${ICON.trash}</button>` : ''}</div>`).join('');
+      <div class="mrow-head"><b>Machine ${i + 1}</b>
+        ${(rows.length > 1 || cm === 'join') ? `<button type="button" class="iconbtn" data-mrm="${i}" aria-label="Remove machine ${i + 1}">${ICON.trash}</button>` : ''}</div>
+      <label class="field"><span>Drill</span><select data-mi="${i}" data-k="id">${drillOptions(r.id)}</select></label>
+      <label class="field"><span>Unit name</span><input data-mi="${i}" data-k="nick" maxlength="60" placeholder="Unit 12, Big Red, #4471" value="${esc(r.nick)}" autocomplete="off"></label>
+    </div>`).join('') || '<p class="small muted">No machines on this signup. Add one if this crew should start with equipment.</p>';
     $$('[data-mi]').forEach((el) => el.addEventListener('input', () => { rows[+el.dataset.mi][el.dataset.k] = el.value; }));
     $$('[data-mrm]').forEach((b) => b.addEventListener('click', () => { rows.splice(+b.dataset.mrm, 1); draw(); }));
   };
   draw();
   $('#madd').addEventListener('click', () => {
-    if (cm === 'new' && rows.length >= FREE_MACHINE_LIMIT) {
-      err(`Free crews can add ${FREE_MACHINE_LIMIT} operators at signup. Upgrade in the garage for unlimited.`);
-      return;
-    }
-    rows.push({ id: '', nick: '' }); draw(); $$('#mlist select').at(-1).focus();
+    if (!canAddSignupMachine(cm, rows.length)) { err(signupMachineLimitError(cm)); return; }
+    rows.push({ id: '', nick: '' }); draw(); $$('#mlist select').at(-1)?.focus();
   });
   $$('[data-cm]').forEach((b) => b.addEventListener('click', () => {
     cm = b.dataset.cm; $$('[data-cm]').forEach((x) => x.setAttribute('aria-pressed', x === b));
     $$('[data-show]').forEach((el) => { el.hidden = el.dataset.show !== cm; });
-    $('#msub').textContent = cm === 'join'
-      ? 'Optional. A free company stops at 3 operators. A paid company can add more after you join.'
-      : `Free plan: up to ${FREE_MACHINE_LIMIT} drills. Upgrade later for unlimited at $2.99/month.`;
+    if (cm === 'new' && !rows.length) rows.push({ id: '', nick: '' });
+    err('');
+    draw();
   }));
   const err = (m) => { const e = $('#err'); e.textContent = m; e.hidden = !m; if (m) e.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
   $('#fon').addEventListener('submit', async (ev) => {
     ev.preventDefault(); err('');
+    const packed = signupMachinePayload(rows, machine, cm === 'join');
+    if (packed.error) return err(packed.error);
     const p = { mode: cm, company: $('#co').value.trim(), code: $('#code').value.trim().toUpperCase(), employee: $('#emp').value.trim(),
-      machines: rows.filter((r) => r.id).map((r) => ({ id: +r.id, nick: r.nick.trim() })) };
+      machines: packed.machines.map((m) => ({ id: m.machine_type_id, nick: m.nickname })) };
     if (cm === 'new' && !p.company) return err('Enter your company name.');
-    if (cm === 'join' && p.code.length < 6) return err('Enter the invite code from your company’s account owner.');
+    if (cm === 'join' && p.code.length < 6) return err('Enter the invite code from your company owner.');
     if (!p.employee) return err('Enter your name.');
-    if (cm === 'new' && !p.machines.length) return err('Pick at least one drill.');
-    if (cm === 'new' && p.machines.length > FREE_MACHINE_LIMIT) return err(`Free crews can add ${FREE_MACHINE_LIMIT} operators. Upgrade after signup for unlimited.`);
     const go = $('#go'); busy(go, true, withAuth ? 'Creating account…' : 'Saving…');
     try {
       if (withAuth) {
         p.email = $('#e').value.trim(); const password = $('#pw').value;
         if (!/^\S+@\S+\.\S+$/.test(p.email)) throw new Error('Enter a valid email.');
         if (password.length < 8) throw new Error('Password needs at least 8 characters.');
+        if (password.length > 72) throw new Error('Password must be 72 characters or fewer.');
         store.set(PENDING_KEY, p);
         const c = await sb();
-        const { data, error } = await c.auth.signUp({ email: p.email, password, options: { data: { employee_name: p.employee }, emailRedirectTo: location.origin + location.pathname + '#/account?m=signin' } });
-        if (error) throw error;
-        if (!data.session) { busy(go, false); return viewCheckEmail(p.email); }
+        const { data, error } = await c.functions.invoke('bdht-signup', { body: {
+          mode: p.mode, company: p.company, code: p.code, employee: p.employee, email: p.email, password,
+          machines: packed.machines,
+        } });
+        if (error) throw await readFunctionError(error);
+        if (data?.error) throw new Error(data.error);
+        const signed = await c.auth.signInWithPassword({ email: p.email, password });
+        if (signed.error) throw new Error('Your account was created. Sign in with the same email and password to open it.');
+        store.set(PENDING_KEY, null);
         await refreshMe();
+        const first = p.employee.split(' ')[0];
+        toast(data?.capped
+          ? `Welcome, ${first}! Free plan saved 3 machines. Upgrade in My rigs for unlimited.`
+          : `Welcome, ${first}!`);
+        location.hash = '#/garage';
+        return;
       }
       await runSetup(p);
       toast(`Welcome, ${p.employee.split(' ')[0]}!`); location.hash = '#/garage';
-    } catch (e) { busy(go, false); err(errMsg(e)); }
+    } catch (e) { busy(go, false); err(friendlyAuthError(e)); }
   });
-}
-function viewCheckEmail(email) {
-  app.innerHTML = `<div class="auth-wrap"><div class="card pad stack" style="text-align:center">
-    <div style="font-size:44px">✉️</div><h1>Check your email</h1>
-    <p>We sent a confirmation link to <b>${esc(email)}</b>. Tap it, then sign in. Your company and drills will be set up automatically.</p>
-    <a class="btn btn-primary btn-block" href="#/account?m=signin">I confirmed, sign in</a></div></div>`;
 }
 async function runSetup(p) {
   const c = await sb();
@@ -983,7 +1002,7 @@ async function runSetup(p) {
     }
   }
   store.set(PENDING_KEY, null); await refreshMe();
-  if (stoppedAtLimit) toast('Free plan stops at 3 operators. Upgrade in the garage for unlimited.');
+  if (stoppedAtLimit) toast('Free plan stops at 3 machines. Upgrade in My rigs for unlimited.');
 }
 
 /* garage: the company's machines */
@@ -1005,8 +1024,8 @@ function stripHtml(lo, cls = 'lo-strip') {
 function guestUpsell(where) {
   return `<div class="upsell card pad stack">
     <div class="upsell-ico">${ICON_RIG}</div>
-    <h2>${where === 'garage' ? 'Operators and loadouts' : 'Save it on an operator'}</h2>
-    <p>Free crew account, up to ${FREE_MACHINE_LIMIT} operators. Each drill is an operator, and each saved setup is a named loadout. Unlimited operators are $2.99/month.</p>
+    <h2>${where === 'garage' ? 'Machines and loadouts' : 'Save it on a machine'}</h2>
+    <p>Free crew account, up to ${FREE_MACHINE_LIMIT} machines. Each saved drill is a machine, and each saved setup is a named loadout. Unlimited machines are $2.99/month.</p>
     <a class="btn btn-primary btn-block" href="#/account">Create free account</a>
     <a class="btn btn-ghost btn-block" href="#/account?m=signin">I have an account</a></div>`;
 }
@@ -1026,12 +1045,12 @@ function planCopy(count) {
     return { title: 'Unlimited · $2.99/mo', detail, paid: true };
   }
   const title = count > FREE_MACHINE_LIMIT
-    ? `Free · ${count} operators saved`
-    : `Free · ${count} of ${FREE_MACHINE_LIMIT} operators`;
-  let detail = 'Unlimited operators are $2.99/month.';
-  if (count >= FREE_MACHINE_LIMIT) detail = 'This crew is at the free limit. Upgrade for unlimited operators, $2.99/month.';
+    ? `Free · ${count} machines saved`
+    : `Free · ${count} of ${FREE_MACHINE_LIMIT} machines`;
+  let detail = 'Unlimited machines are $2.99/month.';
+  if (count >= FREE_MACHINE_LIMIT) detail = 'This crew is at the free limit. Upgrade for unlimited machines, $2.99/month.';
   if (b.subscription_status === 'past_due' || b.payment_failed_at) {
-    detail = 'The last invoice failed. New operators stay capped at 3 until billing is active. Existing operators stay.';
+    detail = 'The last invoice failed. New machines stay capped at 3 until billing is active. Existing machines stay.';
   }
   return { title, detail, paid: false };
 }
@@ -1041,7 +1060,7 @@ function billingAlerts() {
   const notes = [];
   if (b.open_dispute_id) notes.push('A charge on this subscription was disputed. The owner can review it in Manage billing.');
   if (b.fraud_warning_id) notes.push('The card network flagged a charge for possible fraud. Review the warning in the Stripe Dashboard.');
-  if (b.last_refunded_at) notes.push(`A charge was refunded${b.last_refund_amount ? ` ($${(b.last_refund_amount / 100).toFixed(2)})` : ''}. Operator access still follows the subscription status.`);
+  if (b.last_refunded_at) notes.push(`A charge was refunded${b.last_refund_amount ? ` ($${(b.last_refund_amount / 100).toFixed(2)})` : ''}. Machine access still follows the subscription status.`);
   return notes.map((text) => `<div class="note note-warn"><span>${esc(text)}</span></div>`).join('');
 }
 function planBanner(count) {
@@ -1067,6 +1086,16 @@ async function functionError(error) {
     if (body?.error) message = body.error;
   } catch { /* body already consumed */ }
   return new Error(message);
+}
+async function readFunctionError(error) {
+  let message = error?.message || '';
+  try {
+    const body = await error?.context?.json?.();
+    if (typeof body?.error === 'string') message = body.error;
+    else if (typeof body?.message === 'string') message = body.message;
+    else if (typeof body?.msg === 'string') message = body.msg;
+  } catch { /* body already consumed */ }
+  return new Error(friendlyAuthError(message));
 }
 async function startCheckout(btn) {
   if (ME.member?.role !== 'owner') return toast('The company owner upgrades the plan.');
@@ -1101,10 +1130,10 @@ function wirePlanActions(root = document) {
 }
 function upgradeSheet() {
   const owner = ME.member?.role === 'owner';
-  openSheet(`<div class="sheet-top"><div><div class="small muted">Unlimited operators</div><h2>$2.99/month</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+  openSheet(`<div class="sheet-top"><div><div class="small muted">Unlimited machines</div><h2>$2.99/month</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body stack">
-      <p>Free crews save up to ${FREE_MACHINE_LIMIT} operators. Unlimited removes that cap for the whole company. Checkout is on Stripe. This page does not unlock the plan by itself.</p>
-      ${owner ? '' : '<p class="small muted">Ask the company owner to upgrade. Members can keep using the operators already saved.</p>'}
+      <p>Free crews save up to ${FREE_MACHINE_LIMIT} machines. Unlimited removes that cap for the whole company. Checkout is on Stripe. This page does not unlock the plan by itself.</p>
+      ${owner ? '' : '<p class="small muted">Ask the company owner to upgrade. Members can keep using the machines already saved.</p>'}
     </div>
     <div class="sheet-foot">${owner ? '<button class="btn btn-primary" style="flex:1" id="upgrade">Continue to checkout</button>' : '<button class="btn btn-ghost" data-close>Close</button>'}</div>`, (sh) => {
     wirePlanActions(sh);
@@ -1126,11 +1155,11 @@ async function viewGarage(isCurrent = () => true) {
   const unsavedOpen = unsaved?.cfg?.r && needsGarageSave(unsaved.cfg);
   const billingFlag = consumeBillingReturn();
   if (!ME.user) {
-    app.innerHTML = `${pageHead('Class select', 'My rigs', 'Each drill is an operator. Each saved setup is a named loadout. Sign in to keep the class on that drill.')}
+    app.innerHTML = `${pageHead('Class select', 'My rigs', 'Each saved drill is a machine. Each saved setup is a named loadout. Sign in to keep the class on that machine.')}
       ${unsavedOpen ? `<div class="note" style="margin-bottom:12px"><span><b>${esc(unsaved.title || 'This loadout')} is not in My rigs yet.</b> Sign in and it is saved on the drill. <button class="linkbtn" id="stash-in" type="button">Sign in and save</button></span></div>` : ''}
       ${phone.length ? `<div class="section-head"><h2>On this phone</h2><a class="linkbtn" href="#/saved">See all</a></div><div class="lo-grid">${phone.slice(0, 4).map((s) => savedRow(s)).join('')}</div>` : ''}
       <div class="rig-grid" style="margin-top:12px"><a class="rig-card rig-locked" href="#/account">
-        <div class="rig-top"><div><div class="t-brand">Operator</div><div class="rig-name">Your drills</div></div><span class="pill">Locked</span></div>
+        <div class="rig-top"><div><div class="t-brand">Machine</div><div class="rig-name">Your machines</div></div><span class="pill">Locked</span></div>
         <p class="small muted" style="margin:0">Crew loadouts show up here after you sign in.</p>
         <div class="rig-foot"><span>Sign in to open My rigs</span>${ICON.chev}</div>
       </a></div>
@@ -1145,13 +1174,13 @@ async function viewGarage(isCurrent = () => true) {
   try { finish = await consumePendingSave(); } catch (e) { toast(errMsg(e)); }
   if (!isCurrent()) return;
   if (billingFlag === 'success' && !isEntitled()) {
-    toast('Checkout finished. Unlimited operators turn on when Stripe confirms the subscription.');
+    toast('Checkout finished. Unlimited machines turn on when Stripe confirms the subscription.');
     for (let i = 0; i < 3 && !isEntitled(); i++) {
       await new Promise((r) => setTimeout(r, 2000));
       await refreshMe();
       if (!isCurrent()) return;
     }
-    if (isEntitled()) toast('Unlimited operators are on.');
+    if (isEntitled()) toast('Unlimited machines are on.');
   } else if (billingFlag === 'cancel') toast('Checkout canceled. This crew is still on the free plan.');
   else if (billingFlag === 'portal') toast('Back from billing. Pull to refresh if the plan looks stale.');
   let fleet; try { fleet = await fetchFleet(); } catch (e) { if (isCurrent()) app.innerHTML = `<div class="card empty">${esc(errMsg(e))}</div>`; return; }
@@ -1166,17 +1195,17 @@ async function viewGarage(isCurrent = () => true) {
       <button class="iconbtn dark" id="acct" aria-label="Account and crew">${ICON_MORE}</button></div>
     ${planBanner(count)}
     ${billingAlerts()}
-    <div class="section-head"><h2>Operators · ${count}</h2><button class="linkbtn" id="addm">${atLimit ? 'Upgrade for unlimited' : '+ Add operator'}</button></div>
+    <div class="section-head"><h2>Equipment · ${count}</h2><button class="linkbtn" id="addm">${atLimit ? 'Upgrade for unlimited' : '+ Add machine'}</button></div>
     <div class="rig-grid">${fleet.machines.map((mc) => {
       const los = byM(mc.id), def = los.find((l) => l.is_default) || los[0];
       return `<a class="rig-card" href="#/rig/${mc.id}">
-        <div class="rig-top"><div><div class="t-brand">Operator · ${esc(mc.brand || '')} ${esc(mc.model)}</div><div class="rig-name">${esc(rigName(mc))}</div></div>
+        <div class="rig-top"><div><div class="t-brand">Machine · ${esc(mc.brand || '')} ${esc(mc.model)}</div><div class="rig-name">${esc(rigName(mc))}</div></div>
           <span class="pill ${los.length ? 'pill-orange' : ''}">${los.length} loadout${los.length === 1 ? '' : 's'}</span></div>
         ${stripHtml(def)}
         <ul class="lo-name-list">${los.map((lo) => `<li><b>${lo.is_default ? '★ ' : ''}${esc(lo.name)}</b><span>${lo.mode === 'Bit' ? 'Pilot' : 'Pullback'} · ${lo.part_count}</span></li>`).join('') || '<li class="muted">No loadouts yet</li>'}</ul>
         <div class="rig-foot">${def ? `<span><b>${los.length} loadout${los.length === 1 ? '' : 's'}</b></span>` : '<span class="muted">No loadouts yet. Tap to build a class.</span>'}${ICON.chev}</div></a>`;
-    }).join('') || `<div class="card empty"><h2>No operators yet</h2><p>Add a drill to start a class.</p><button class="btn btn-primary" id="addm2">+ Add operator</button></div>`}</div>
-    ${finish?.pending ? `<div class="note" style="margin-top:12px"><span><b>Finish saving “${esc(finish.pending.name)}”.</b> Pick the operator.
+    }).join('') || `<div class="card empty"><h2>No machines yet</h2><p>Add a machine to start a loadout.</p><button class="btn btn-primary" id="addm2">+ Add machine</button></div>`}</div>
+    ${finish?.pending ? `<div class="note" style="margin-top:12px"><span><b>Finish saving “${esc(finish.pending.name)}”.</b> Pick the machine.
       <span class="chips" style="margin-top:8px">${finish.machines.map((mc) => `<button type="button" class="chip" data-finish="${mc.id}">${esc(rigName(mc))}</button>`).join('')}</span></span></div>` : ''}`;
   const openAdd = () => requestAddOperator(count);
   $('#addm').addEventListener('click', openAdd);
@@ -1194,12 +1223,12 @@ async function viewGarage(isCurrent = () => true) {
   wirePlanActions();
 }
 function addMachineSheet(prefill) {
-  openSheet(`<div class="sheet-top"><h2>Add an operator</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+  openSheet(`<div class="sheet-top"><h2>Add a machine</h2><button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body stack">
       <label class="field"><span>Drill</span><select id="am">${drillOptions(prefill)}</select></label>
-      <label class="field"><span>Unit name / number (optional)</span><input id="an" maxlength="60" placeholder="Unit 12, Big Red, #4471…"></label>
+      <label class="field"><span>Unit name</span><input id="an" maxlength="60" placeholder="Unit 12, Big Red, #4471…" autocomplete="off"></label>
       <div class="form-err" id="aerr" hidden></div></div>
-    <div class="sheet-foot"><button class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" style="flex:1" id="ago">Add operator</button></div>`, (sh) => {
+    <div class="sheet-foot"><button class="btn btn-ghost" data-close>Cancel</button><button class="btn btn-primary" style="flex:1" id="ago">Add machine</button></div>`, (sh) => {
     $('#ago', sh).addEventListener('click', async () => {
       const id = +$('#am', sh).value; if (!id) { $('#aerr', sh).textContent = 'Pick a drill.'; $('#aerr', sh).hidden = false; return; }
       const mm = machine(id), c = await sb();
@@ -1210,7 +1239,7 @@ function addMachineSheet(prefill) {
         if (/Free plan includes 3/.test(error.message || '')) { closeSheet(); setTimeout(upgradeSheet, 220); return; }
         $('#aerr', sh).textContent = errMsg(error); $('#aerr', sh).hidden = false; return;
       }
-      closeSheet(); toast('Operator added'); location.hash = `#/rig/${data.id}`;
+      closeSheet(); toast('Machine added'); location.hash = `#/rig/${data.id}`;
     });
   });
 }
@@ -1255,11 +1284,11 @@ async function viewRig(id, isCurrent = () => true) {
   const mc = mr.data; if (!mc) return viewNotFound();
   const los = lr.data || [], cat = machine(mc.machine_type_id);
   app.innerHTML = `
-    <a class="linkbtn" href="#/garage" style="padding-left:0">‹ All operators</a>
+    <a class="linkbtn" href="#/garage" style="padding-left:0">‹ All machines</a>
     <div class="rig-hero">
-      <div style="min-width:0"><div class="t-brand">Operator · ${esc(rigSub(mc))}</div><h1>${esc(rigName(mc))}</h1>
+      <div style="min-width:0"><div class="t-brand">Machine · ${esc(rigSub(mc))}</div><h1>${esc(rigName(mc))}</h1>
         <div class="small muted">${los.length} loadout${los.length === 1 ? '' : 's'} · ${esc(ME.company.name)}</div></div>
-      <button class="iconbtn dark" id="mmenu" aria-label="Operator options">${ICON_MORE}</button></div>
+      <button class="iconbtn dark" id="mmenu" aria-label="Machine options">${ICON_MORE}</button></div>
     <button class="btn btn-primary btn-block" id="newlo" style="margin:14px 0 4px" ${cat?.pipes.length ? '' : 'disabled'}>+ New loadout</button>
     <div class="section-head"><h2>Loadouts</h2><span class="small muted">Named presets. ⋯ renames, copies, or sets primary</span></div>
     <div class="lo-grid">${los.map((lo) => {
@@ -1312,10 +1341,10 @@ function machineMenu(mc, nLo) {
     <div class="sheet-body stack">
       <label class="field"><span>Unit name / number</span><input id="mn" value="${esc(mc.nickname || '')}" maxlength="60" placeholder="Unit 12"></label>
       <button class="btn btn-ghost btn-block" id="mns">Save name</button>
-      <button class="btn btn-ghost btn-block danger" id="mdel">${ICON.trash} Remove operator${nLo ? ` and its ${nLo} loadout${nLo > 1 ? 's' : ''}` : ''}</button></div>`, async (sh) => {
+      <button class="btn btn-ghost btn-block danger" id="mdel">${ICON.trash} Remove machine${nLo ? ` and its ${nLo} loadout${nLo > 1 ? 's' : ''}` : ''}</button></div>`, async (sh) => {
     const c = await sb();
     $('#mns', sh).addEventListener('click', async () => { const { error } = await c.from('bdht_machines').update({ nickname: $('#mn', sh).value.trim() || null }).eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Saved'); setTimeout(route, 240); });
-    $('#mdel', sh).addEventListener('click', async () => { if (!confirm(`Remove ${rigName(mc)}${nLo ? ' and its loadouts' : ''}?`)) return; const { error } = await c.from('bdht_machines').delete().eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Operator removed'); if (!error) location.hash = '#/garage'; });
+    $('#mdel', sh).addEventListener('click', async () => { if (!confirm(`Remove ${rigName(mc)}${nLo ? ' and its loadouts' : ''}?`)) return; const { error } = await c.from('bdht_machines').delete().eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Machine removed'); if (!error) location.hash = '#/garage'; });
   });
 }
 
@@ -1372,10 +1401,10 @@ async function saveToRigSection(cfg, sh) {
   ]);
   const mm = machine(cfg.m);
   const atLimit = !canAddMachine(counted.count || 0, isEntitled());
-  const addLabel = atLimit ? 'Upgrade for another operator' : `+ Add a ${mm?.model || 'drill'}`;
-  box.innerHTML = `<div class="form-sub"><b>Save on an operator</b><span class="small muted">Shared with ${esc(ME.company.name)}</span></div>
+  const addLabel = atLimit ? 'Upgrade for another machine' : `+ Add a ${mm?.model || 'drill'}`;
+  box.innerHTML = `<div class="form-sub"><b>Save on a machine</b><span class="small muted">Shared with ${esc(ME.company.name)}</span></div>
     <div class="stack" style="margin-top:8px">${(data || []).map((mc) => `<button class="choice" data-rig="${mc.id}"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div>${ICON.chev}</button>`).join('') ||
-      `<p class="small muted">No ${esc(mm?.model || '')} in your operators yet.</p><button class="btn ${atLimit ? 'btn-primary' : 'btn-ghost'} btn-block" id="addthis">${esc(addLabel)}</button>`}</div>`;
+      `<p class="small muted">No ${esc(mm?.model || '')} in your machines yet.</p><button class="btn ${atLimit ? 'btn-primary' : 'btn-ghost'} btn-block" id="addthis">${esc(addLabel)}</button>`}</div>`;
   $$('[data-rig]', box).forEach((b) => b.addEventListener('click', () => {
     const mc = data.find((x) => x.id === b.dataset.rig);
     closeSheet(); setTimeout(() => loSaveSheet(cfg, { machine: mc, loadout: null }), 230);

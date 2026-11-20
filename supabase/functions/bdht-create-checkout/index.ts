@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
           const stillEntitled = entitledFor(existing.status, priceOn(existing), price);
           if (stillEntitled) {
             return json(req, 409, {
-              error: 'This company already has unlimited operators. Use Manage billing.',
+              error: 'This company already has unlimited machines. Use Manage billing.',
               code: 'already_active',
             });
           }
@@ -110,7 +110,7 @@ Deno.serve(async (req) => {
         metadata: { company_id: owner.companyId, app: 'bdht' },
         subscription_data: {
           billing_mode: { type: 'flexible' },
-          description: 'Unlimited operators for The Better Down Hole Tool',
+          description: 'Unlimited machines for The Better Down Hole Tool',
           metadata: { company_id: owner.companyId, app: 'bdht' },
         },
       }, { idempotencyKey: `bdht_checkout_${attempt.attempt_id}` });

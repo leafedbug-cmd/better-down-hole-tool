@@ -1,4 +1,4 @@
-/** Free-plan operator cap. Paid access is bdht_billing.entitled, set by the webhook. */
+/** Free-plan machine cap. Paid access is bdht_billing.entitled, set by the webhook. */
 export const FREE_MACHINE_LIMIT = 3;
 
 export const UNLIMITED_STATUSES = ['active', 'trialing'];

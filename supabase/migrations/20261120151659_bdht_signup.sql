@@ -149,7 +149,9 @@ begin
     if v_code !~ '^[A-Z0-9]{6,12}$' then
       raise exception 'Enter the invite code from your company owner.' using errcode = 'P0001';
     end if;
-    select id into cid from public.bdht_companies where invite_code = v_code;
+    -- Lock the company now so concurrent joins serialize here instead of
+    -- deadlocking on a KEY SHARE -> FOR UPDATE upgrade in the machine trigger.
+    select id into cid from public.bdht_companies where invite_code = v_code for update;
     if cid is null then
       raise exception 'Invite code not found' using errcode = 'P0001';
     end if;

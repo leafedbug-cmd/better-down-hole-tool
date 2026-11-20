@@ -13,14 +13,21 @@ export function normalizeConfig(value) {
     && Number.isSafeInteger(Number(v)) && Number(v) > 0 ? Number(v) : null;
   const m = id(value.m), p = id(value.p), r = id(value.r);
   if (!m || !p || !r || !['Bit', 'Backreamer'].includes(value.mode ?? 'Bit')) return null;
-  const entries = (v) => v && typeof v === 'object' && !Array.isArray(v) ? Object.entries(v) : [];
+  const entries = (v, max = 256) => v && typeof v === 'object' && !Array.isArray(v)
+    ? Object.entries(v).slice(0, max)
+    : [];
+  // optional Radius alternates the user added to the list: { secId: [radiusPn] } (see radius.mjs isRadiusPn)
+  const altPn = (v) => typeof v === 'string' && /^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$/.test(v);
+  const alt = Object.fromEntries(entries(value.alt, 64).filter(([k, v]) => /^\d+$/.test(k) && Array.isArray(v))
+    .map(([k, v]) => [k, [...new Set(v.slice(0, 20).filter(altPn))]]).filter(([, v]) => v.length));
   return {
     m, p, r, mode: value.mode ?? 'Bit',
-    sel: Object.fromEntries(entries(value.sel).filter(([k, v]) => /^\d+$/.test(k) && Array.isArray(v))
-      .map(([k, v]) => [k, [...new Set(v.map(id).filter(Boolean))]])),
-    acc: Object.fromEntries(entries(value.acc).filter(([k, v]) => /^\d+\.\d+$/.test(k) && (v === 0 || id(v)))
+    sel: Object.fromEntries(entries(value.sel, 64).filter(([k, v]) => /^\d+$/.test(k) && Array.isArray(v))
+      .map(([k, v]) => [k, [...new Set(v.slice(0, 100).map(id).filter(Boolean))]])),
+    acc: Object.fromEntries(entries(value.acc, 256).filter(([k, v]) => /^\d+\.\d+$/.test(k) && (v === 0 || id(v)))
       .map(([k, v]) => [k, Number(v)])),
-    q: Object.fromEntries(entries(value.q).filter(([k]) => /^\d+\.\d+(?:\.a\d+)?$/.test(k))
+    q: Object.fromEntries(entries(value.q, 256).filter(([k]) => /^\d+\.(?:\d+(?:\.a\d+)?|R[A-Za-z0-9][A-Za-z0-9._-]{0,39})$/.test(k))
       .map(([k, v]) => [k, quantity(v)])),
+    ...(Object.keys(alt).length ? { alt } : {}),
   };
 }

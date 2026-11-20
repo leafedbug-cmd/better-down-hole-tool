@@ -91,7 +91,7 @@ npx --yes deno test --allow-read --allow-env supabase/tests/billing-reliability.
 
 ## Catalog follow-up
 
-Thirteen first-choice smoke paths still have no compatible terminal tool in the
+Twelve first-choice smoke paths still have no compatible terminal tool in the
 current data. They now display an incomplete state correctly. Verify the catalog
 against manufacturer references before changing connections or available parts:
 
@@ -101,10 +101,35 @@ against manufacturer references before changing connections or available parts:
 | 5609 | Backreamer |
 | 5621 | Backreamer |
 | 5818 | Backreamer |
-| 6088 | Bit |
 | 6803 | Backreamer |
 | 6804 | Backreamer |
 | 6805 | Backreamer |
 | 6821 | Backreamer |
 | 6842 | Bit and Backreamer |
 | 6970 | Bit and Backreamer |
+
+### Data corrections (`tools/fix_catalog.mjs`)
+
+`node tools/fix_catalog.mjs` applies these to `data/roadmaps/` and is safe to re-run
+(run it after any re-fetch; `js/catalog-fixes.test.mjs` fails if they are missing):
+
+- `3.25M` → `3.25 M`, `3.44M` → `3.44 M`, `2.25-6F EZ3` → `2.25 F EZ3` (spacing/typo; parts could not mate).
+- Hawkeye starter rods 918-2437 / 918-3046 / 918-3047: `350 F` / `390 F` → `Hawkeye®  350 F` / `Hawkeye®  390 F`.
+- Tricones 400-2521 / 400-2315: `3.5 API M` → `3.5 M API R` (3-1/2 API Reg pin; matches the housings offered in those slots). Unblocks 6088/Bit.
+- All Terrain 3.25SS pipe 355-1258: box `3.25 F` → `3.25SS F` (matches its own pin), old `3.25 F` kept as `cr2`.
+- #200 Switch-Connect starter rod 400-10264 removed from the JT9 1.30-pipe roadmaps (kept on #200-pipe roadmaps).
+- AT120 TCI tricones 400-3368..3371 `4.5 M API IF` → `4.5 M API R`, and their Rockmaster housings 400-10099/10101/10277/10278 `4.5 F API IF` → `4.5 F API R` (DW names say API-R; Radius 2022 catalog p.24 confirms 4-1/2 Reg).
+- 400-2287 `1.63 M EZ3` → `1.63 M EZ2` (1.63 is only ever EZ2; Radius catalog pp.10-12).
+
+Deliberately **not** changed (need a manufacturer reference):
+
+- 908-4311 / 918-2492 starter rods on JT2720 Mach 1 have a `1.69 M` rig side; the pipe is 2.11. Radius uses 1.69-6 only for JT1720, so these are likely JT1720 parts listed on the wrong roadmap (the solver already hides them).
+- 908-4233 (`#602 F`), 908-5194 (`#802 F`), 190-1396 backreamer (`3.5 API M`).
+- `2.0 API IF` is Radius's `2" IF` (catalog pp.11, 14, 21), distinct from 2-3/8" IF.
+
+### Radius alternates
+
+`node tools/radius_catalog.mjs --pdf "<Radius catalog.pdf>"` rebuilds `data/radius/parts.json` and `crossref.json`
+from the 2022 print catalog, merging product URLs/photos from `data/radius/web.json` (radiushdd.com scrape).
+No prices are published. Radius photos are off (`RADIUS_IMAGES_ENABLED` in `js/radius.mjs`) until Radius grants permission.
+

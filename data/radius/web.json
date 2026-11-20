@@ -1,0 +1,4568 @@
+{
+ "source": "https://www.radiushdd.com",
+ "fetched": "2026-11-20",
+ "notes": {
+  "scope": "All product cards from the Ditch Witch brand listing (/ditch-witch/, 201 items) plus 28 JT9-relevant category listings. Entries with a \"jt9\" key are the JT9 pilot: \"model\" = Radius names JT922 / JT920-922 / JT10 (JT9 runs the same 1.30 DW pipe as JT922 coarse); \"thread\" = a connection matches a JT9 roadmap connection (2\" IF, 2-3/8 Reg, 1.63 EZ2, DW 5/3-bolt 12mm). conn labels are verbatim Radius wording; only pilot entries have conn filled in. specs = Radius product-page custom fields where the page was fetched.",
+  "machines": "Only machines Radius itself names (title, image alt text, or product-page Model Compatibility). Radius never names JT9 anywhere on the site.",
+  "imgPattern": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/{size}/products/{bcProductId}/{imageId}/{file}__{hash}.{uploadEpoch}.jpg?c=1 ; size = 80w|160w|320w|640w|960w|1280w|1920w|2560w|500x659|1280x1280|original. Not derivable from the part number; must be scraped. Served by Cloudflare with access-control-allow-origin: * and Cache-Control max-age=31556926 public; content-negotiates webp.",
+  "productUrlPattern": "https://www.radiushdd.com/{partNumber} (1152 product URLs in /xmlsitemap.php?type=products&page=1)",
+  "bcProductId": "BigCommerce product id. The store launched about Jan 2022 with ids 13860-14700; ids 15500-16010 were added mid/late 2022 (image upload epochs ~Aug 2022); ids >= 18000 (Radius TCI Tricones, slug URLs, images Apr 2025) are clearly newer than a 2022 print catalog."
+ },
+ "parts": {
+  "950-1008": {
+   "pn": "950-1008",
+   "name": "Focus TCI Tricone - 6\" dia. 2-7/8 API Reg Pin, SB527S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1008",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13863/1731/91bc501aeaa9348e74147be41980__95020.1659449074.jpg?c=1",
+   "bcProductId": 13863
+  },
+  "950-1009": {
+   "pn": "950-1009",
+   "name": "Focus Mill Tooth Tricone - 5-1/2\" dia. 2-7/8 API Reg Pin, SB117S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1009",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13864/1721/efe83c4eece424f65b90d67803ab__81332.1659448368.jpg?c=1",
+   "bcProductId": 13864
+  },
+  "950-1010": {
+   "pn": "950-1010",
+   "name": "Focus Mill Tooth Tricone - 6\" dia. 3-1/2 API Reg Pin, SB117S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1010",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13865/1725/818a8b90947d5fced24ed36944d8__35564.1659448436.jpg?c=1",
+   "bcProductId": 13865
+  },
+  "950-1011": {
+   "pn": "950-1011",
+   "name": "Focus TCI Tricone - 6-1/2\" dia. 3-1/2 API Reg Pin, SB527S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1011",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13866/1755/68003a99fac46a8647b425f1c4ed__31767.1659449837.jpg?c=1",
+   "bcProductId": 13866
+  },
+  "950-1012": {
+   "pn": "950-1012",
+   "name": "Focus TCI Tricone - 6-3/4\" dia. 3-1/2 API Reg Pin, SB527S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1012",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13867/1765/d3662625b9b310a6a1374682e002__77893.1659449937.jpg?c=1",
+   "bcProductId": 13867
+  },
+  "950-1013": {
+   "pn": "950-1013",
+   "name": "Focus TCI Tricone - 7-7/8\" dia. 4-1/2 API Reg Pin, SB527S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1013",
+   "img": null,
+   "bcProductId": null
+  },
+  "950-1014": {
+   "pn": "950-1014",
+   "name": "Focus TCI Tricone - 8-1/2\" dia. 4-1/2 API Reg Pin, SB527S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1014",
+   "img": null,
+   "bcProductId": null
+  },
+  "950-1015": {
+   "pn": "950-1015",
+   "name": "Focus TCI Tricone - 9-7/8\" dia. 6-5/8 API Reg Pin, SB527S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1015",
+   "img": null,
+   "bcProductId": null
+  },
+  "950-1016": {
+   "pn": "950-1016",
+   "name": "Focus TCI Tricone - 12-1/4\" dia. 6-5/8 API Reg Pin, SB527S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1016",
+   "img": null,
+   "bcProductId": null
+  },
+  "950-1017": {
+   "pn": "950-1017",
+   "name": "Focus Mill Tooth Tricone - 6-1/2\" dia. 3-1/2 API Reg Pin, SB117S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1017",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13872/1771/44151100c64bac78a738cd47ecaf__05066.1659450000.jpg?c=1",
+   "bcProductId": 13872
+  },
+  "950-1018": {
+   "pn": "950-1018",
+   "name": "Focus Mill Tooth Tricone - 6-3/4\" dia. 3-1/2 API Reg Pin, SB117S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1018",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13873/1777/025b71c9b4f9e37d67a8538c194a__06423.1659450074.jpg?c=1",
+   "bcProductId": 13873
+  },
+  "950-1020": {
+   "pn": "950-1020",
+   "name": "Focus Mill Tooth Tricone - 9-7/8\" dia. 6-5/8 API Reg Pin, SB117S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1020",
+   "img": null,
+   "bcProductId": null
+  },
+  "950-1023": {
+   "pn": "950-1023",
+   "name": "Focus TCI Tricone - 5-1/2\" dia. 2-7/8\" API Reg Pin, SB527S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1023",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13878/1783/de40a5ade655c12010d6a52f9491__57012.1659450246.jpg?c=1",
+   "bcProductId": 13878
+  },
+  "950-1026": {
+   "pn": "950-1026",
+   "name": "Focus TCI Tricone - 5.5\"",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1026",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13880/1785/de40a5ade655c12010d6a52f9491__34239.1659450344.jpg?c=1",
+   "bcProductId": 13880
+  },
+  "950-1035": {
+   "pn": "950-1035",
+   "name": "Focus Mill Tooth Tricone - 5-1/2\" dia. 2-7/8 API Reg Pin, Open Bearing",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1035",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13881/1791/42b0f18b9d61290c4ca2aafcc134__52584.1659450432.jpg?c=1",
+   "bcProductId": 13881
+  },
+  "950-1044": {
+   "pn": "950-1044",
+   "name": "Focus TCI Tricone - 5-7/8\" dia. 3-1/2\" API Reg Pin, SB527S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1044",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13888/2928/f948770f5e1c5849d17fc5177fd6__16400.1660230451.jpg?c=1",
+   "bcProductId": 13888
+  },
+  "950-1059": {
+   "pn": "950-1059",
+   "name": "Focus Mill Tooth Tricone - 6-1/4\" dia. 3-1/2 API Reg Pin, SB537S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1059",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13902/1821/31ae46b35c747c7a348674f7203f__40053.1659451308.jpg?c=1",
+   "bcProductId": 13902
+  },
+  "950-1063": {
+   "pn": "950-1063",
+   "name": "Radius PDC Bit, 5.625 3Blade,2.875 API Reg Pin",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1063",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13906/2922/cc0ef60d95caee4686f316369a5e__36366.1660230283.jpg?c=1",
+   "bcProductId": 13906
+  },
+  "950-1067": {
+   "pn": "950-1067",
+   "name": "Focus TCI Tricone - 6.5\" - 3.5\" API Reg Pin, SB637S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1067",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13910/1832/d3662625b9b310a6a1374682e002__50272.1659451677.jpg?c=1",
+   "bcProductId": 13910
+  },
+  "950-1073": {
+   "pn": "950-1073",
+   "name": "TCI Tricone, New - 6.25\" dia. 3.5\" API Reg Pin SB600S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1073",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13916/3246/SRCmaroon__65686__57930.1689280963.jpg?c=1",
+   "bcProductId": 13916
+  },
+  "950-1075": {
+   "pn": "950-1075",
+   "name": "PDC Bit, 5.5\" 5 Blade, 2.875\" Reg Pin",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1075",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13918/1864/716060a18ace486d8996e86a2db4__52339.1659452264.jpg?c=1",
+   "bcProductId": 13918
+  },
+  "950-1076": {
+   "pn": "950-1076",
+   "name": "PDC Bit, 6.5\" 5 Blade, 3.5\" Reg Pin",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-1076",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13919/1866/716060a18ace486d8996e86a2db4__28900.1659452291.jpg?c=1",
+   "bcProductId": 13919
+  },
+  "950-3005": {
+   "pn": "950-3005",
+   "name": "Cobble Bit - 3\"",
+   "type": "Bit",
+   "conn": {
+    "l": "2\" IF Pin",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-3005",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13929/1874/571f32b64eedbd079180d9efbc85__81474.1659452909.jpg?c=1",
+   "specs": {
+    "Threads": "2 IF - Pin - API",
+    "Outside Width": "3",
+    "Brand": "Radius",
+    "Product Type": "Cobble",
+    "Ground Condition": "Gravel-Cobble"
+   },
+   "jt9": "thread",
+   "bcProductId": 13929
+  },
+  "950-3505": {
+   "pn": "950-3505",
+   "name": "Cobble Bit - 3500 series W/ Hot Shot Pull-Back Adapter 2-3/8\" API Reg Pin",
+   "type": "Bit",
+   "conn": {
+    "l": "2-3/8\" API Reg Pin",
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720",
+    "Ditch Witch AT2720",
+    "Ditch Witch JT3020",
+    "Ditch Witch AT3020",
+    "Ditch Witch JT4020",
+    "Ditch Witch AT4020"
+   ],
+   "url": "https://www.radiushdd.com/950-3505",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13934/873/950-3505__98972.1643735735.jpg?c=1",
+   "specs": {
+    "Threads": "2-3/8 Reg - Pin - API",
+    "Outside Width": "3.5",
+    "Brand": "Radius",
+    "Product Type": "Cobble",
+    "Compatible Rigs": "Astec - DD3238",
+    "Rig Type": "24-49K",
+    "Ground Condition": "Gravel-Cobble"
+   },
+   "jt9": "thread",
+   "bcProductId": 13934
+  },
+  "950-3506": {
+   "pn": "950-3506",
+   "name": "Radius PDC Bit - 3.5\" 2.375\" API Reg Pin",
+   "type": "Bit",
+   "conn": {
+    "l": "2-3/8\" API Reg Pin",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-3506",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13935/1544/foWYtrlk__34022.1659098489.jpg?c=1",
+   "specs": {
+    "Threads": "2-3/8 Reg - Pin - API",
+    "Outside Width": "3.5",
+    "Brand": "Radius",
+    "Product Type": "PDC Bits",
+    "Compatible Rigs": "Astec - DD3238",
+    "Rig Type": "24-49K"
+   },
+   "jt9": "thread",
+   "bcProductId": 13935
+  },
+  "950-4505": {
+   "pn": "950-4505",
+   "name": "Cobble Bit - 4500 series 2-7/8\" Reg Pin",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-4505",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13939/882/950-4505-4__52908.1643737667.jpg?c=1",
+   "bcProductId": 13939
+  },
+  "950-5005": {
+   "pn": "950-5005",
+   "name": "Cobble Bit - 5000 series 3-1/2\" API Reg Pin",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-5005",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13944/874/950-5005__73310.1643736382.jpg?c=1",
+   "bcProductId": 13944
+  },
+  "950-6505": {
+   "pn": "950-6505",
+   "name": "Cobble Bit - 6500 series 4-1/2\" API Reg Pin",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/950-6505",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13946/886/950-6505__60844.1643737718.jpg?c=1",
+   "bcProductId": 13946
+  },
+  "951-2751": {
+   "pn": "951-2751",
+   "name": "Radius Rock Housing - 2700 series 2\" IF Box x Box-(Subsite only)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "2\" IF Box"
+   },
+   "machines": [
+    "Ditch Witch JT920",
+    "Ditch Witch JT920L",
+    "Ditch Witch JT921",
+    "Ditch Witch JT922",
+    "Ditch Witch JT1220"
+   ],
+   "url": "https://www.radiushdd.com/951-2751",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13953/404/951-2751_Standard__84836.1642697472.jpg?c=1",
+   "specs": {
+    "Outside Width": "2.75",
+    "Brand": "Radius",
+    "Transmitter": "Subsite",
+    "Product Type": "Radius Rock Housing",
+    "Compatible Rigs": "Astec - DD1416",
+    "Rig Type": "4-6K"
+   },
+   "jt9": "thread",
+   "bcProductId": 13953
+  },
+  "951-3020": {
+   "pn": "951-3020",
+   "name": "Radius Rock Housing - 3000 series 2\" IF Box x Box (Subsite only)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "2\" IF Box"
+   },
+   "machines": [
+    "Ditch Witch JT1220",
+    "Ditch Witch JT1720",
+    "Ditch Witch JT2020"
+   ],
+   "url": "https://www.radiushdd.com/951-3020",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13956/709/951-3020__84213.1642800742.jpg?c=1",
+   "specs": {
+    "Outside Width": "3",
+    "Brand": "Radius",
+    "Transmitter": "Subsite",
+    "Product Type": "Housings",
+    "Compatible Rigs": "Astec - DD2024",
+    "Rig Type": "15-23K"
+   },
+   "jt9": "thread",
+   "bcProductId": 13956
+  },
+  "951-3030": {
+   "pn": "951-3030",
+   "name": "Radius Rock Housing - 3000 series 2\" IF Box x Box (DCI only)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "2\" IF Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/951-3030",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13957/710/951-3030__75049.1642800777.jpg?c=1",
+   "specs": {
+    "Outside Width": "3",
+    "Brand": "Radius",
+    "Transmitter": "DCI",
+    "Product Type": "Housings",
+    "Compatible Rigs": "Astec - DD2024",
+    "Rig Type": "15-23K"
+   },
+   "jt9": "thread",
+   "bcProductId": 13957
+  },
+  "951-3040": {
+   "pn": "951-3040",
+   "name": "Radius Rock Housing - 3\" dia. 2\" IF Box x Box (Universal)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "2\" IF Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/951-3040",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13958/1888/ba68affc2ebac432e3a8e0880609__80503.1659453387.jpg?c=1",
+   "specs": {
+    "Outside Width": "3",
+    "Brand": "Radius",
+    "Transmitter": "Universal",
+    "Product Type": "Housings"
+   },
+   "jt9": "thread",
+   "bcProductId": 13958
+  },
+  "951-3500": {
+   "pn": "951-3500",
+   "name": "Radius Rock Housing - 3500 series 2-3/8\" Reg Box x 3500 Radius Pin",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2-3/8\" Reg Box",
+    "r": "3500 Radius Pin"
+   },
+   "machines": [
+    "Ditch Witch JT2720",
+    "Ditch Witch AT2720",
+    "Ditch Witch JT3020",
+    "Ditch Witch AT3020",
+    "Ditch Witch JT4020",
+    "Ditch Witch AT4020"
+   ],
+   "url": "https://www.radiushdd.com/951-3500",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13959/407/951-3500-2_Standard__30845.1642697559.jpg?c=1",
+   "specs": {
+    "Threads": "3.5 - Pin - Radius HSG",
+    "Outside Width": "3.5",
+    "Brand": "Radius",
+    "Transmitter": "Clocking",
+    "Product Type": "Radius Rock Housing",
+    "Compatible Rigs": "Astec - DD3238",
+    "Rig Type": "15-23K"
+   },
+   "jt9": "thread",
+   "bcProductId": 13959
+  },
+  "951-3510": {
+   "pn": "951-3510",
+   "name": "Radius Rock Housing HiFlo - 3500 series 2-3/8\" REG Box x 3.5\" Radius Pin",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2-3/8\" REG Box",
+    "r": "3.5\" Radius Pin"
+   },
+   "machines": [
+    "Ditch Witch JT2720",
+    "Ditch Witch AT2720",
+    "Ditch Witch JT3020",
+    "Ditch Witch AT3020",
+    "Ditch Witch JT4020",
+    "Ditch Witch AT4020"
+   ],
+   "url": "https://www.radiushdd.com/951-3510",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13963/408/951-3510_Standard__41211.1642697613.jpg?c=1",
+   "specs": {
+    "Threads": "3.5 - Pin - Radius HSG",
+    "Outside Width": "3.5",
+    "Brand": "Radius",
+    "Transmitter": "Clocking",
+    "Product Type": "Radius Rock Housing",
+    "Compatible Rigs": "Astec - DD3238",
+    "Rig Type": "15-23K"
+   },
+   "jt9": "thread",
+   "bcProductId": 13963
+  },
+  "951-3540": {
+   "pn": "951-3540",
+   "name": "Radius Rock Housing-3-1/2\" 2.375\" Reg Bx x Bx (Universal)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2.375\" Reg Box",
+    "r": "2.375\" Reg Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/951-3540",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13966/3217/21vrQikI__18722.1680723489.jpg?c=1",
+   "specs": {
+    "Outside Width": "3.5",
+    "Brand": "Radius",
+    "Transmitter": "Universal",
+    "Product Type": "Housings"
+   },
+   "jt9": "thread",
+   "bcProductId": 13966
+  },
+  "951-4500": {
+   "pn": "951-4500",
+   "name": "Radius Rock Housing HiFlo - 4500 series 2-7/8 API Reg Box x 4500 Radius Pin",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/951-4500",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13967/409/951-4500_Standard__82445.1642697642.jpg?c=1",
+   "bcProductId": 13967
+  },
+  "951-4530": {
+   "pn": "951-4530",
+   "name": "Radius Rock Housing - 4500 series 2-7/8\" Reg Box x Box (DCI)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/951-4530",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13971/837/951-4530__25002.1643732229.jpg?c=1",
+   "bcProductId": 13971
+  },
+  "951-4540": {
+   "pn": "951-4540",
+   "name": "Radius Rock Housing - 4.5\" 2.875\" Reg Bx x Bx (Universal) - 951-4540",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/951-4540",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13972/3194/ba68affc2ebac432e3a8e0880609__80503__96961.1667569916.jpg?c=1",
+   "bcProductId": 13972
+  },
+  "951-5000": {
+   "pn": "951-5000",
+   "name": "Radius Rock Housing HiFlo - 5000 series 3-1/2\" Reg Box x 5000 Radius Pin",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/951-5000",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13974/841/951-5000-1__59483.1643732292.jpg?c=1",
+   "bcProductId": 13974
+  },
+  "951-6500": {
+   "pn": "951-6500",
+   "name": "Radius Rock Housing HiFlo- 6500 Series 4-1/2\" Reg Box x 6500 Radius Pin",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/951-6500",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13977/410/951-6500_Standard__19207.1642697704.jpg?c=1",
+   "bcProductId": 13977
+  },
+  "952-0005": {
+   "pn": "952-0005",
+   "name": "3-1/4\" Dirt Housing Vermeer 6 bolt 2-3/8\" Reg Box (DCI)(1/2\"-13)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0005",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13983/415/952-0005_Standard__53586.1642697912.jpg?c=1",
+   "bcProductId": 13983
+  },
+  "952-0006": {
+   "pn": "952-0006",
+   "name": "4-1/4\" Dirt Housing Vermeer 6 bolt 2-7/8\" Reg Box (DCI)(5/8\"-11)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0006",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13984/3229/0111__79943.1681851492.jpg?c=1",
+   "bcProductId": 13984
+  },
+  "952-0008": {
+   "pn": "952-0008",
+   "name": "2-1/2\" Dirt Housing Ditch Witch 5 bolt 2\" IF Box (subsite)(12mm)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Ditch Witch 5 bolt (12mm)"
+   },
+   "machines": [
+    "Ditch Witch JT920",
+    "Ditch Witch JT920L",
+    "Ditch Witch JT921",
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/952-0008",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13985/417/952-0008_Standard__76950.1642697962.jpg?c=1",
+   "specs": {
+    "Threads": "2 IF - Box - API",
+    "Blade Connection": "DW - 5-hole (12 mm)",
+    "Outside Width": "2.5",
+    "Brand": "Ditch Witch",
+    "Transmitter": "Subsite",
+    "Product Type": "Housings",
+    "Compatible Rigs": "Ditch Witch - JT1220",
+    "Rig Type": "4-6K"
+   },
+   "jt9": "thread",
+   "bcProductId": 13985
+  },
+  "952-0009": {
+   "pn": "952-0009",
+   "name": "2-3/4\" Dirt Housing Ditch Witch 5 bolt 2\" IF Box (subsite)(12mm)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Ditch Witch 5 bolt (12mm)"
+   },
+   "machines": [
+    "Ditch Witch JT920",
+    "Ditch Witch JT920L",
+    "Ditch Witch JT921",
+    "Ditch Witch JT922",
+    "Ditch Witch JT1220",
+    "Ditch Witch JT1720",
+    "Ditch Witch JT2020"
+   ],
+   "url": "https://www.radiushdd.com/952-0009",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13986/1550/B9JhXrzc__64968.1659098572.jpg?c=1",
+   "specs": {
+    "Threads": "2 IF - Box - API",
+    "Blade Connection": "DW - 5-hole (12 mm)",
+    "Outside Width": "2.75",
+    "Brand": "Ditch Witch",
+    "Transmitter": "Subsite",
+    "Product Type": "Housings",
+    "Compatible Rigs": "Ditch Witch - JT1220",
+    "Rig Type": "7-14K"
+   },
+   "jt9": "thread",
+   "bcProductId": 13986
+  },
+  "952-0010": {
+   "pn": "952-0010",
+   "name": "3\" Dirt Housing Ditch Witch 5 bolt 1.94 Ditch Witch Box (subsite)(12mm)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0010",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13987/419/952-0010_Standard__83820.1642698023.jpg?c=1",
+   "bcProductId": 13987
+  },
+  "952-0011": {
+   "pn": "952-0011",
+   "name": "3-1/4\" Dirt Housing Ditch Witch 6 bolt 2-3/8\" Reg Box (subsite)(16mm)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0011",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13988/420/952-0011_Standard__78036.1642698046.jpg?c=1",
+   "bcProductId": 13988
+  },
+  "952-0012": {
+   "pn": "952-0012",
+   "name": "4-1/4\" Dirt Housing Ditch Witch 6 bolt 2-7/8\" Reg Box (subsite)(20mm)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0012",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/13989/421/952-0012_Standard__91914.1642698068.jpg?c=1",
+   "bcProductId": 13989
+  },
+  "952-0048": {
+   "pn": "952-0048",
+   "name": "180 Blade, Ditch Witch 5 Bolt - 3-1/2\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0048",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14020/1078/952-0048-01__90265.1654202949.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14020
+  },
+  "952-0049": {
+   "pn": "952-0049",
+   "name": "180 Blade, Ditch Witch 5 Bolt - 4\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0049",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14021/435/952-0049_Standard__83385.1642698950.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14021
+  },
+  "952-0051": {
+   "pn": "952-0051",
+   "name": "Jagger Blade, Ditch Witch Ditch Witch 5 Bolt - 4\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0051",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14023/436/952-0051_Standard__90136.1642698976.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14023
+  },
+  "952-0052": {
+   "pn": "952-0052",
+   "name": "Jagger Blade, Ditch Witch 5 Bolt - 5\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0052",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14024/1082/952-0052-01__01228.1654202950.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14024
+  },
+  "952-0053": {
+   "pn": "952-0053",
+   "name": "Steep Taper Jagger Blade, Ditch Witch 5 Bolt - 4\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0053",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14025/3178/J2FB6yXU__57194.1679938789.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14025
+  },
+  "952-0054": {
+   "pn": "952-0054",
+   "name": "Monster Blade, Ditch Witch 5 Bolt- 3-1/2\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0054",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14026/1913/0988d6aef0beb2b8742b54d7ee47__00434.1659456190.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14026
+  },
+  "952-0055": {
+   "pn": "952-0055",
+   "name": "Monster Blade, Ditch Witch 5 Bolt - 4\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0055",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14027/1084/952-0055-01__29723.1654202950.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14027
+  },
+  "952-0056": {
+   "pn": "952-0056",
+   "name": "Monster Blade, Ditch Witch 5 Bolt - 5\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0056",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14028/1086/952-0056-01__20089.1654202950.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14028
+  },
+  "952-0057": {
+   "pn": "952-0057",
+   "name": "Steep TaperRubble Blade, Ditch Witch 5 Bolt - 3\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0057",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14029/1088/952-0057-01__27690.1654202951.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14029
+  },
+  "952-0058": {
+   "pn": "952-0058",
+   "name": "Steep Taper Rubble Blade, Ditch Witch 5 Bolt - 4\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0058",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14030/438/952-0058_Standard__08456.1642699047.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14030
+  },
+  "952-0061": {
+   "pn": "952-0061",
+   "name": "Rubble Blade, Ditch Witch 5 Bolt - 3\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0061",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14031/439/952-0061_Standard__38478.1679938790.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14031
+  },
+  "952-0062": {
+   "pn": "952-0062",
+   "name": "Rubble Blade, Ditch Witch 5 Bolt - 4\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0062",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14032/1090/952-0062-01__49979.1679938790.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14032
+  },
+  "952-0064": {
+   "pn": "952-0064",
+   "name": "180 Blade, Ditch Witch 6 bolt - 5\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0064",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14034/440/952-0064_Standard__40754.1642699144.jpg?c=1",
+   "bcProductId": 14034
+  },
+  "952-0065": {
+   "pn": "952-0065",
+   "name": "180 Blade, Ditch Witch 6 bolt - 5\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0065",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14035/412/952_-0065_Standard__21824.1642697779.jpg?c=1",
+   "bcProductId": 14035
+  },
+  "952-0067": {
+   "pn": "952-0067",
+   "name": "Jagger Blade, Ditch Witch 6 bolt - 5\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0067",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14037/441/952-0067_Standard__62608.1642699198.jpg?c=1",
+   "bcProductId": 14037
+  },
+  "952-0068": {
+   "pn": "952-0068",
+   "name": "Jagger Blade, Ditch Witch 6 bolt - 6\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0068",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14038/1096/952-0068-01__64930.1654202952.jpg?c=1",
+   "bcProductId": 14038
+  },
+  "952-0069": {
+   "pn": "952-0069",
+   "name": "Steep Taper Jagger Blade, Ditch Witch 6 bolt - 5\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0069",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14039/442/952-0069_Standard__93183.1642699259.jpg?c=1",
+   "bcProductId": 14039
+  },
+  "952-0070": {
+   "pn": "952-0070",
+   "name": "Monster Blade, Ditch Witch 6 bolt - 4\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0070",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14040/1914/f4ade772e0199cc4a709443aaf04__84574.1659456422.jpg?c=1",
+   "bcProductId": 14040
+  },
+  "952-0071": {
+   "pn": "952-0071",
+   "name": "Monster Blade, Ditch Witch 6 bolt - 5\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0071",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14041/1098/952-0071-01__49946.1654202952.jpg?c=1",
+   "bcProductId": 14041
+  },
+  "952-0072": {
+   "pn": "952-0072",
+   "name": "Steep Taper Rubble Blade, Ditch Witch 6 bolt - 4\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0072",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14042/443/952-0072_Standard__52390.1642699287.jpg?c=1",
+   "bcProductId": 14042
+  },
+  "952-0079": {
+   "pn": "952-0079",
+   "name": "Rubble Blade, Ditch Witch 6 bolt - 5\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0079",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14045/1100/952-0079-01__73440.1654202952.jpg?c=1",
+   "bcProductId": 14045
+  },
+  "952-0080": {
+   "pn": "952-0080",
+   "name": "Rubble Blade, Ditch Witch 6 bolt - 5\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0080",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14046/1916/86d8d11255bca98c515aef7f26d3__49951.1659456498.jpg?c=1",
+   "bcProductId": 14046
+  },
+  "952-0085": {
+   "pn": "952-0085",
+   "name": "Dirt Blade Adapter, Ditch Witch 5 Bolt - 3000 series 2\" IF Pin - 12mm SHCS",
+   "type": "Other",
+   "conn": {
+    "l": "2\" IF Pin",
+    "r": "Ditch Witch 5 Bolt - 12mm SHCS"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0085",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14051/1559/5xqNsoO4__06761.1659098717.jpg?c=1",
+   "specs": {
+    "Threads": "2 IF - Pin - API",
+    "Blade Connection": "DW - 5-hole (12 mm)",
+    "Outside Width": "3",
+    "Brand": "Ditch Witch",
+    "Product Type": "Blade Adapters",
+    "Compatible Rigs": "Ditch Witch - JT1720",
+    "Rig Type": "15-23K"
+   },
+   "jt9": "thread",
+   "bcProductId": 14051
+  },
+  "952-0086": {
+   "pn": "952-0086",
+   "name": "Dirt Blade Adapter, Ditch Witch 5 Bolt- 3500 series 2-3/8\" Reg Pin - 12mm SHCS",
+   "type": "Other",
+   "conn": {
+    "l": "2-3/8\" Reg Pin",
+    "r": "Ditch Witch 5 Bolt - 12mm SHCS"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0086",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14052/1560/amVEZJRc__48283.1659098742.jpg?c=1",
+   "specs": {
+    "Threads": "2-3/8 Reg - Pin - API",
+    "Blade Connection": "DW - 5-hole (12 mm)",
+    "Outside Width": "3.5",
+    "Brand": "Ditch Witch",
+    "Product Type": "Blade Adapters",
+    "Compatible Rigs": "Ditch Witch - JT25",
+    "Rig Type": "24-49K"
+   },
+   "jt9": "thread",
+   "bcProductId": 14052
+  },
+  "952-0087": {
+   "pn": "952-0087",
+   "name": "Dirt Blade Adapter, Ditch Witch 6 bolt - 3500 series 2-3/8\" Reg Pin - 16mm SHCS",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0087",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14053/1562/Ev8QIF0s__43008.1659098765.jpg?c=1",
+   "bcProductId": 14053
+  },
+  "952-0088": {
+   "pn": "952-0088",
+   "name": "Dirt Blade Adapter, Ditch Witch 6 bolt - 4500 series 2-7/8\" Reg Pin - 20mm SHCS",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0088",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14054/1564/sJZXVtT8__51847.1659098788.jpg?c=1",
+   "bcProductId": 14054
+  },
+  "952-0092": {
+   "pn": "952-0092",
+   "name": "Dirt Blade Adapter, Ditch Witch 5 Bolt- 2700 series 2\" IF Pin - 12mm SHCS",
+   "type": "Other",
+   "conn": {
+    "l": "2\" IF Pin",
+    "r": "Ditch Witch 5 Bolt - 12mm SHCS"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0092",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14058/449/952-0092_Standard__76842.1642699540.jpg?c=1",
+   "specs": {
+    "Threads": "2 IF - Pin - API",
+    "Blade Connection": "DW - 5-hole (12 mm)",
+    "Outside Width": "2.75",
+    "Brand": "Ditch Witch",
+    "Product Type": "Blade Adapters",
+    "Compatible Rigs": "Ditch Witch - JT1220 Mach1",
+    "Rig Type": "7-14K"
+   },
+   "jt9": "thread",
+   "bcProductId": 14058
+  },
+  "952-0094": {
+   "pn": "952-0094",
+   "name": "Steep Taper Jagger Blade, Ditch Witch 6 bolt - 6\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0094",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14060/1104/952-0094-01__62237.1654202953.jpg?c=1",
+   "bcProductId": 14060
+  },
+  "952-0100": {
+   "pn": "952-0100",
+   "name": "Jagger Blade, Ditch Witch 5 Bolt - 3-1/2 wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0100",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14065/1112/952-0100-01__90816.1654202954.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14065
+  },
+  "952-0101": {
+   "pn": "952-0101",
+   "name": "Jagger Blade, Ditch Witch 6 bolt - 4-1/2 wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0101",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14066/1918/3e883a2a42a0caa374d3b8739bfb__72107.1659456667.jpg?c=1",
+   "bcProductId": 14066
+  },
+  "952-0102": {
+   "pn": "952-0102",
+   "name": "Jagger Blade, Ditch Witch 6 bolt - 5\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0102",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14067/1114/952-0102-01__92112.1654202955.jpg?c=1",
+   "bcProductId": 14067
+  },
+  "952-0103": {
+   "pn": "952-0103",
+   "name": "Jagger Blade, Ditch Witch 6 bolt - 8\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0103",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14068/1116/952-0103-01__57496.1654202955.jpg?c=1",
+   "bcProductId": 14068
+  },
+  "952-0109": {
+   "pn": "952-0109",
+   "name": "Steep Taper Jagger Blade, Ditch Witch 6 bolt - 4\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0109",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14074/450/952-0109__09578.1642700138.jpg?c=1",
+   "bcProductId": 14074
+  },
+  "952-0110": {
+   "pn": "952-0110",
+   "name": "Steep Taper Jagger Blade, Ditch Witch 6 bolt - 5\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0110",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14075/1128/952-0110-01__59607.1654202957.jpg?c=1",
+   "bcProductId": 14075
+  },
+  "952-0111": {
+   "pn": "952-0111",
+   "name": "Steep Taper Jagger Blade, Ditch Witch 6 bolt - 8\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0111",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14076/1130/952-0111-01__96918.1654202957.jpg?c=1",
+   "bcProductId": 14076
+  },
+  "952-0117": {
+   "pn": "952-0117",
+   "name": "Monster Blade, Ditch Witch 6 bolt - 6\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0117",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14080/1132/952-0117-01__59675.1654202957.jpg?c=1",
+   "bcProductId": 14080
+  },
+  "952-0118": {
+   "pn": "952-0118",
+   "name": "Monster Blade, Ditch Witch 6 bolt - 8\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0118",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14081/1134/952-0118-01__57336.1654202958.jpg?c=1",
+   "bcProductId": 14081
+  },
+  "952-0120": {
+   "pn": "952-0120",
+   "name": "Rubble Blade, Ditch Witch 6 bolt - 8\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0120",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14083/1921/86d8d11255bca98c515aef7f26d3__96905.1659457048.jpg?c=1",
+   "bcProductId": 14083
+  },
+  "952-0127": {
+   "pn": "952-0127",
+   "name": "Steep Taper Rubble Blade,Ditch-Witch-3bolt-2-1/2 wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0127",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14086/1136/952-0127-01__90512.1654202958.jpg?c=1",
+   "bcProductId": 14086
+  },
+  "952-0129": {
+   "pn": "952-0129",
+   "name": "Jagger Blade, Ditch Witch 3 bolt - 3\" wide 1/2\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 3 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0129",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14088/1922/0065782913b497eda05e8bcf234c__90097.1659457111.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14088
+  },
+  "952-0143": {
+   "pn": "952-0143",
+   "name": "Rubble Blade, Ditch Witch 6 bolt - 10\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0143",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14100/1927/86d8d11255bca98c515aef7f26d3__35360.1659457588.jpg?c=1",
+   "bcProductId": 14100
+  },
+  "952-0145": {
+   "pn": "952-0145",
+   "name": "Steep Taper Jagger Blade, Ditch Witch 5 Bolt - 5\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0145",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14102/1152/952-0145-01__13789.1654202961.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14102
+  },
+  "952-0149": {
+   "pn": "952-0149",
+   "name": "Jagger Blade, Ditch Witch 6 bolt - 10\" wide 1\" Thick - 20mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0149",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14106/1928/3e883a2a42a0caa374d3b8739bfb__90000.1659457617.jpg?c=1",
+   "bcProductId": 14106
+  },
+  "952-0170": {
+   "pn": "952-0170",
+   "name": "Razor Bit, Ditch Witch 5 Bolt- 3-1/2 wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0170",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14127/867/952-0170__79749.1668692683.jpg?c=1",
+   "specs": {
+    "Blade Connection": "DW - 5-hole (12 mm)",
+    "Blade Type": "Razor Blade",
+    "Outside Width": "3.5",
+    "Brand": "Ditch Witch",
+    "Product Type": "Blades"
+   },
+   "jt9": "thread",
+   "bcProductId": 14127
+  },
+  "952-0171": {
+   "pn": "952-0171",
+   "name": "Razor Bit, Ditch Witch 5 Bolt- 4\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0171",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14128/868/952-0171__60948.1668692642.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14128
+  },
+  "952-0172": {
+   "pn": "952-0172",
+   "name": "Razor Bit, Ditch Witch 6 bolt - 4\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0172",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14129/1182/952-0172-01__13064.1654202965.jpg?c=1",
+   "bcProductId": 14129
+  },
+  "952-0173": {
+   "pn": "952-0173",
+   "name": "Razor Bit, Ditch Witch 6 bolt - 5\" wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0173",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14130/1184/952-0173-01__81902.1668692595.jpg?c=1",
+   "bcProductId": 14130
+  },
+  "952-0177": {
+   "pn": "952-0177",
+   "name": "Razor Bit, Ditch Witch 5 Bolt- 5\" wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0177",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14134/859/952-0177-2__06026.1668692533.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14134
+  },
+  "952-0185": {
+   "pn": "952-0185",
+   "name": "Steep Taper Powerpoint Bit, Ditch Witch 6 Bolt - 5\" Wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0185",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14142/1202/952-0185-01__36099.1654202969.jpg?c=1",
+   "bcProductId": 14142
+  },
+  "952-0190": {
+   "pn": "952-0190",
+   "name": "2-1/4\" Dirt Housing Ditch Witch 3 Bolt 2\" IF box (88b Subsite)(12mm)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Ditch Witch 3 Bolt (12mm)"
+   },
+   "machines": [
+    "Ditch Witch JT5",
+    "Ditch Witch JT520"
+   ],
+   "url": "https://www.radiushdd.com/952-0190",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14147/1571/ve9F_PhM__80239.1659098932.jpg?c=1",
+   "specs": {
+    "Threads": "2 IF - Box - API",
+    "Blade Connection": "DW - 5-hole (12 mm)",
+    "Outside Width": "2.25",
+    "Brand": "Ditch Witch",
+    "Transmitter": "Clocking",
+    "Product Type": "Housings",
+    "Compatible Rigs": "Ditch Witch - JT5",
+    "Rig Type": "4-6K"
+   },
+   "jt9": "thread",
+   "bcProductId": 14147
+  },
+  "952-0192": {
+   "pn": "952-0192",
+   "name": "Ultimate Bit, Ditch Witch 5 Bolt - 4\" Wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0192",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14149/1933/2dp-wjBE__20009.1736969817.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14149
+  },
+  "952-0193": {
+   "pn": "952-0193",
+   "name": "Ultimate Bit, Ditch Witch 5 Bolt - 5\" Wide 3/4\" Thick - 12mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": "Ditch Witch 5 Bolt - 12mm SHCS",
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0193",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14150/1934/2dp-wjBE__32450.1659458835.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 14150
+  },
+  "952-0194": {
+   "pn": "952-0194",
+   "name": "Ultimate Bit, Ditch Witch 6 Bolt - 4\" Wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0194",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14151/1212/952-0194-01__16564.1654202970.jpg?c=1",
+   "bcProductId": 14151
+  },
+  "952-0197": {
+   "pn": "952-0197",
+   "name": "Ultimate Bit, Ditch Witch 6 Bolt - 5\" Wide 3/4\" Thick - 16mm SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0197",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14154/1218/952-0197-01__09414.1654202971.jpg?c=1",
+   "bcProductId": 14154
+  },
+  "952-0199": {
+   "pn": "952-0199",
+   "name": "2-1/4\" Dirt Housing Ditch Witch 3 Bolt 2\" IF box (DCI 15\" Sonde)",
+   "type": "Electronic_Housing",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Ditch Witch 3 Bolt"
+   },
+   "machines": [
+    "Ditch Witch JT5",
+    "Ditch Witch JT520"
+   ],
+   "url": "https://www.radiushdd.com/952-0199",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14156/1577/fgFmsjKo__83836.1659098988.jpg?c=1",
+   "specs": {
+    "Threads": "2 IF - Box - API",
+    "Blade Connection": "VM - 5-hole (3/8",
+    "Outside Width": "2.25",
+    "Brand": "Ditch Witch",
+    "Transmitter": "Clocking",
+    "Product Type": "Housings"
+   },
+   "jt9": "thread",
+   "bcProductId": 14156
+  },
+  "952-0204": {
+   "pn": "952-0204",
+   "name": "DW Freedom Blade - 4.5\" 3/4\" Thick - 12MM SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0204",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14161/1226/952-0204-01__84372.1654202972.jpg?c=1",
+   "bcProductId": 14161
+  },
+  "952-0205": {
+   "pn": "952-0205",
+   "name": "Freedom Blade 5\" - Ditch Witch 6 BOLT 3/4\" THICK - 16MM SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0205",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14162/1936/0daf507a03a993618f6defe31299__90398.1659458891.jpg?c=1",
+   "bcProductId": 14162
+  },
+  "952-0206": {
+   "pn": "952-0206",
+   "name": "Freedom Blade 5.5\" - Ditch Witch 6 BOLT 3/4\" THICK - 16MM SHCS",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/952-0206",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14163/1228/952-0206-01__71356.1654202972.jpg?c=1",
+   "bcProductId": 14163
+  },
+  "953-0016": {
+   "pn": "953-0016",
+   "name": "VM DC Flange, D24x40 2-3/8\" FS1 Pin (#600)",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0016",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14179/463/953-0016_Standard__39268.1642700496.jpg?c=1",
+   "bcProductId": 14179
+  },
+  "953-0021": {
+   "pn": "953-0021",
+   "name": "VM DC Flange, D36x50 2-3/8\" FS1 Pin (#650)",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0021",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14184/1584/7FvJIvIM__17765.1659099124.jpg?c=1",
+   "bcProductId": 14184
+  },
+  "953-0029": {
+   "pn": "953-0029",
+   "name": "Ditch Witch Drive Chuck, JT5 1.10-5 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT5"
+   ],
+   "url": "https://www.radiushdd.com/953-0029",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14192/475/953-0029_Standard__61215.1642700816.jpg?c=1",
+   "bcProductId": 14192
+  },
+  "953-0030": {
+   "pn": "953-0030",
+   "name": "Ditch Witch Drive Chuck, JT520 (V2) 1.21-6 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT520"
+   ],
+   "url": "https://www.radiushdd.com/953-0030",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14193/476/953-0030_Standard__45650.1642701195.jpg?c=1",
+   "bcProductId": 14193
+  },
+  "953-0031": {
+   "pn": "953-0031",
+   "name": "Ditch Witch Drive Chuck, JT920/JT920L/921 1.41-6 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT920",
+    "Ditch Witch JT920L"
+   ],
+   "url": "https://www.radiushdd.com/953-0031",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14194/477/953-0031_Standard__06069.1642701222.jpg?c=1",
+   "specs": {
+    "Brand": "Ditch Witch",
+    "Product Type": "Drive chucks",
+    "Compatible Rigs": "Ditch Witch - JT920",
+    "Rig Type": "7-14K"
+   },
+   "bcProductId": 14194
+  },
+  "953-0034": {
+   "pn": "953-0034",
+   "name": "Ditch Witch Drive Chuck, JT1720/1720M1 1.69-6 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1720"
+   ],
+   "url": "https://www.radiushdd.com/953-0034",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14197/480/953-0034_Standard__56765.1642701308.jpg?c=1",
+   "bcProductId": 14197
+  },
+  "953-0035": {
+   "pn": "953-0035",
+   "name": "Ditch Witch Drive Chuck, JT2020 1.94-4 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2020",
+    "Ditch Witch JT20"
+   ],
+   "url": "https://www.radiushdd.com/953-0035",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14198/481/953-0035_Standard__65686.1642701332.jpg?c=1",
+   "bcProductId": 14198
+  },
+  "953-0036": {
+   "pn": "953-0036",
+   "name": "Ditch Witch Drive Chuck, JT2720 1.94-4 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720"
+   ],
+   "url": "https://www.radiushdd.com/953-0036",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14199/482/953-0036_Standard__45670.1642701360.jpg?c=1",
+   "bcProductId": 14199
+  },
+  "953-0037": {
+   "pn": "953-0037",
+   "name": "Ditch Witch Drive Chuck, JT2720M1(small) 2.11-4 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0037",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14200/483/953-0037_Standard__84984.1642701386.jpg?c=1",
+   "bcProductId": 14200
+  },
+  "953-0038": {
+   "pn": "953-0038",
+   "name": "Ditch Witch Drive Chuck, JT3020M1 2.11-4 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT3020M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0038",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14201/484/953-0038_Standard__39521.1642701415.jpg?c=1",
+   "bcProductId": 14201
+  },
+  "953-0039": {
+   "pn": "953-0039",
+   "name": "Ditch Witch Drive Chuck, JT4020 2.40-4 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT4020"
+   ],
+   "url": "https://www.radiushdd.com/953-0039",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14202/1284/7euiQ2V4__75701.1659025160.jpg?c=1",
+   "bcProductId": 14202
+  },
+  "953-0041": {
+   "pn": "953-0041",
+   "name": "Ditch Witch Drive Chuck, JT7020-JT100M1 3.27-4 Pipe Box",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT7020",
+    "Ditch Witch JT100M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0041",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14204/486/953-0041_Standard__80465.1642701470.jpg?c=1",
+   "bcProductId": 14204
+  },
+  "953-0050": {
+   "pn": "953-0050",
+   "name": "Vermeer Lead Rod, LPT - D33x44 2-3/8\" Firestick 2 Box -2-1/8\" LPT Box",
+   "type": "Starter_Rod",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0050",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14212/494/953-0050_Standard__27181.1642701821.jpg?c=1",
+   "bcProductId": 14212
+  },
+  "953-0059": {
+   "pn": "953-0059",
+   "name": "Ditch Witch Transition Sub JT520 1.31-6 EZ2 Pin - 1.21 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT520",
+    "Ditch Witch JT5"
+   ],
+   "url": "https://www.radiushdd.com/953-0059",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14220/1590/HncbHvuE__60084.1659099238.jpg?c=1",
+   "bcProductId": 14220
+  },
+  "953-0060": {
+   "pn": "953-0060",
+   "name": "Ditch Witch Transition Sub JT920/JT920L 1.63-6 EZ2 Pin - 1.41 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": "1.41 Ditch Witch Pin",
+    "r": "1.63-6 EZ2 Pin"
+   },
+   "machines": [
+    "Ditch Witch JT920",
+    "Ditch Witch JT920L"
+   ],
+   "url": "https://www.radiushdd.com/953-0060",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14221/781/953-0060-4__58245.1643059497.JPG?c=1",
+   "specs": {
+    "Brand": "Ditch Witch",
+    "Product Type": "Lead Rods & T-Subs",
+    "Compatible Rigs": "Ditch Witch - JT920",
+    "Rig Type": "7-14K"
+   },
+   "bcProductId": 14221
+  },
+  "953-0061": {
+   "pn": "953-0061",
+   "name": "Ditch Witch Transition Sub JT922 1.63-6 EZ2 Pin - 1.3-5 Coarse",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": "1.3-5 Coarse",
+    "r": "1.63-6 EZ2 Pin"
+   },
+   "machines": [
+    "Ditch Witch JT922",
+    "Ditch Witch JT10"
+   ],
+   "url": "https://www.radiushdd.com/953-0061",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14222/499/953-0061_Standard__99704.1642702090.jpg?c=1",
+   "specs": {
+    "Brand": "Ditch Witch",
+    "Product Type": "Lead Rods & T-Subs",
+    "Rig Type": "7-14K"
+   },
+   "jt9": "model",
+   "bcProductId": 14222
+  },
+  "953-0062": {
+   "pn": "953-0062",
+   "name": "Ditch Witch Transition Sub JT1220 1.88-6 EZ3 Pin - 1.47 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1220"
+   ],
+   "url": "https://www.radiushdd.com/953-0062",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14223/783/953-0062-3__55571.1643059541.jpg?c=1",
+   "bcProductId": 14223
+  },
+  "953-0063": {
+   "pn": "953-0063",
+   "name": "Ditch Witch Transition Sub JT1720 2.00-6 EZ2 Pin - 1.69 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1720"
+   ],
+   "url": "https://www.radiushdd.com/953-0063",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14224/501/953-0063_Standard__05085.1642702142.jpg?c=1",
+   "bcProductId": 14224
+  },
+  "953-0064": {
+   "pn": "953-0064",
+   "name": "Ditch Witch Transition Sub JT2020M1 2.00-6 EZ2 Pin - 1.94 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2020M1",
+    "Ditch Witch JT20"
+   ],
+   "url": "https://www.radiushdd.com/953-0064",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14225/1289/GWQbUXEU__43966.1659025408.jpg?c=1",
+   "bcProductId": 14225
+  },
+  "953-0065": {
+   "pn": "953-0065",
+   "name": "Ditch Witch Transition Sub JT27202.00-6 EZ2 Pin - 1.94 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720"
+   ],
+   "url": "https://www.radiushdd.com/953-0065",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14226/502/953-0065_Standard__23937.1642702175.jpg?c=1",
+   "bcProductId": 14226
+  },
+  "953-0066": {
+   "pn": "953-0066",
+   "name": "Ditch Witch Transition Sub (2.75\" HEX)- JT2720M1 2.25-6 EZ2 Pin - 2.11 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0066",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14227/503/953-0066_Standard__40420.1642702462.jpg?c=1",
+   "bcProductId": 14227
+  },
+  "953-0067": {
+   "pn": "953-0067",
+   "name": "Ditch Witch Transition Sub (2.5\" HEX) - JT2720M1 2.00-6 EZ2 Pin - 2.11 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0067",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14228/788/953-0067-3__60189.1643059580.JPG?c=1",
+   "bcProductId": 14228
+  },
+  "953-0068": {
+   "pn": "953-0068",
+   "name": "Ditch Witch Transition Sub JT3020M1 2.25-6 EZ3 Pin - 2.11 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT3020M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0068",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14229/505/953-0068_Standard__49632.1642702554.jpg?c=1",
+   "bcProductId": 14229
+  },
+  "953-0069": {
+   "pn": "953-0069",
+   "name": "Ditch Witch Transition Sub JT4020M1 2.63-6 EZ2 Pin - 2.59 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT4020M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0069",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14230/506/953-0069_Standard__19484.1642702578.jpg?c=1",
+   "bcProductId": 14230
+  },
+  "953-0070": {
+   "pn": "953-0070",
+   "name": "Ditch Witch Oct Collar,EZ2- w/Hard Facing - 1.5\" JT520",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT520"
+   ],
+   "url": "https://www.radiushdd.com/953-0070",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14231/1591/tCAWZx6k__80504.1659099268.jpg?c=1",
+   "bcProductId": 14231
+  },
+  "953-0071": {
+   "pn": "953-0071",
+   "name": "Ditch Witch Oct Collar,EZ2- w/Hard Facing - 2\" JT920/920L/921/922",
+   "type": "Collar",
+   "conn": {
+    "l": "2.00\" Octagon Collar EZ2",
+    "r": "2.00\" Octagon Collar EZ2"
+   },
+   "machines": [
+    "Ditch Witch JT920",
+    "Ditch Witch JT10",
+    "Ditch Witch JT920L",
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0071",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14232/508/953-0071_Standard__06455.1642702633.jpg?c=1",
+   "specs": {
+    "Brand": "Ditch Witch",
+    "Product Type": "Collars",
+    "Compatible Rigs": "Ditch Witch - JT920",
+    "Rig Type": "7-14K"
+   },
+   "jt9": "model",
+   "bcProductId": 14232
+  },
+  "953-0072": {
+   "pn": "953-0072",
+   "name": "Ditch Witch Oct Collar,EZ3- w/Hard Facing - 2.25\" JT1220M1",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1220M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0072",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14233/509/953-0072_Standard__21097.1642702660.jpg?c=1",
+   "bcProductId": 14233
+  },
+  "953-0073": {
+   "pn": "953-0073",
+   "name": "Ditch Witch Oct Collar,EZ2- w/Hard Facing - 2.5\" 1720/1720M1/2020M1/2720/2720M1",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0073",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14234/1594/W9Nq7exw__69367.1659099289.jpg?c=1",
+   "bcProductId": 14234
+  },
+  "953-0074": {
+   "pn": "953-0074",
+   "name": "Ditch Witch Oct Collar,EZ3- w/Hard Facing - 2.75\" JT3020M1/2720AT/3020AT",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT3020M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0074",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14235/1595/dcQ3_8PI__31585.1659099312.jpg?c=1",
+   "bcProductId": 14235
+  },
+  "953-0075": {
+   "pn": "953-0075",
+   "name": "Ditch Witch Oct Collar,EZ2- w/Hard Facing - 3\" 4020/4020M1",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0075",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14236/1597/alNOV9vU__99300.1659099560.jpg?c=1",
+   "bcProductId": 14236
+  },
+  "953-0076": {
+   "pn": "953-0076",
+   "name": "SUB: 2\" IF Pin x 1.21-6 DW Pipe Pin (JT520)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT520"
+   ],
+   "url": "https://www.radiushdd.com/953-0076",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14237/513/953-0076_Standard__63363.1642702991.jpg?c=1",
+   "bcProductId": 14237
+  },
+  "953-0077": {
+   "pn": "953-0077",
+   "name": "SUB: 2\" IF Pin x 1.41-6 DW Pipe Pin (JT920-922)",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": "1.41-6 DW Pipe Pin",
+    "r": "2\" IF Pin"
+   },
+   "machines": [
+    "Ditch Witch JT920",
+    "Ditch Witch JT920L",
+    "Ditch Witch JT921",
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0077",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14238/1599/p2ReCEWs__10298.1659099588.jpg?c=1",
+   "specs": {
+    "Threads": "1.41 - Pin - DW",
+    "Brand": "Ditch Witch",
+    "Product Type": "Adapters",
+    "Compatible Rigs": "Ditch Witch - JT920",
+    "Rig Type": "7-14K"
+   },
+   "bcProductId": 14238
+  },
+  "953-0078": {
+   "pn": "953-0078",
+   "name": "SUB: 2\" IF Pin x 1.47-4 DW Pipe Pin (JT1220 M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1220M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0078",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14239/515/953-0078_Standard__69229.1642703046.jpg?c=1",
+   "bcProductId": 14239
+  },
+  "953-0079": {
+   "pn": "953-0079",
+   "name": "SUB: 2\" IF Pin x 1.69-6 DW Pipe Pin ( JT1720-1720M1 )",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1720"
+   ],
+   "url": "https://www.radiushdd.com/953-0079",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14240/516/953-0079_Standard__03883.1642703071.jpg?c=1",
+   "bcProductId": 14240
+  },
+  "953-0080": {
+   "pn": "953-0080",
+   "name": "SUB: 2\" IF Pin x 1.94-4 DW Pipe Pin (JT2020M1/JT2720)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2020M1",
+    "Ditch Witch JT2720"
+   ],
+   "url": "https://www.radiushdd.com/953-0080",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14241/517/953-0080_Standard__67219.1642703098.jpg?c=1",
+   "bcProductId": 14241
+  },
+  "953-0081": {
+   "pn": "953-0081",
+   "name": "SUB: 2\" IF Pin x 2.11-4 DW Pipe Pin ( JT2720M1/3020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0081",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14242/1600/GuI5ROXY__49074.1659099605.jpg?c=1",
+   "bcProductId": 14242
+  },
+  "953-0082": {
+   "pn": "953-0082",
+   "name": "SUB: 2\" IF Pin x 1.31 DW EZ2 Box (JT520)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT520",
+    "Ditch Witch JT5"
+   ],
+   "url": "https://www.radiushdd.com/953-0082",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14243/1290/dKod3NJY__62917.1659025464.jpg?c=1",
+   "specs": {
+    "Threads": "1.31 EZ2 - Box - DW",
+    "Brand": "Ditch Witch",
+    "Product Type": "Adapters",
+    "Rig Type": "4-6K"
+   },
+   "bcProductId": 14243
+  },
+  "953-0083": {
+   "pn": "953-0083",
+   "name": "SUB: 2\" IF Pin x 1.63 DW EZ2 Box ( JT920-922)",
+   "type": "Connector",
+   "conn": {
+    "l": "1.63 DW EZ2 Box",
+    "r": "2\" IF Pin"
+   },
+   "machines": [
+    "Ditch Witch JT920",
+    "Ditch Witch JT10",
+    "Ditch Witch JT920L",
+    "Ditch Witch JT921",
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0083",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14244/1291/Dv51f7dI__09874.1659025496.jpg?c=1",
+   "specs": {
+    "Threads": "1.63 EZ2 - Box - DW",
+    "Brand": "Ditch Witch",
+    "Product Type": "Adapters",
+    "Compatible Rigs": "Ditch Witch - JT920",
+    "Rig Type": "4-6K"
+   },
+   "jt9": "model",
+   "bcProductId": 14244
+  },
+  "953-0085": {
+   "pn": "953-0085",
+   "name": "SUB: 2\" IF Pin x 2.0 DW EZ2 Box (1720-M1/2020M1/2720)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0085",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14246/522/953-0085_Standard__81471.1642706088.jpg?c=1",
+   "bcProductId": 14246
+  },
+  "953-0086": {
+   "pn": "953-0086",
+   "name": "SUB: 2\" IF Pin x 2.25 DW EZ2 Box (2720M1 EZ2)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0086",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14247/523/953-0086_Standard__25869.1642706124.jpg?c=1",
+   "bcProductId": 14247
+  },
+  "953-0087": {
+   "pn": "953-0087",
+   "name": "SUB: 2\" IF Pin x 2.25 DW EZ3 Box (3020 EZ3)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0087",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14248/1601/4yKCmEBo__17578.1659099627.jpg?c=1",
+   "bcProductId": 14248
+  },
+  "953-0088": {
+   "pn": "953-0088",
+   "name": "SUB: 2-3/8\" REG Pin x 1.69-6 DW Pipe Pin (1720/1720M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0088",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14249/525/953-0088_Standard__91653.1642706185.jpg?c=1",
+   "bcProductId": 14249
+  },
+  "953-0089": {
+   "pn": "953-0089",
+   "name": "SUB: 2-3/8\" REG Pin x 1.94-4 DW Pipe Pin (2020M1/2720)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0089",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14250/526/953-0089_Standard__52571.1642706212.jpg?c=1",
+   "bcProductId": 14250
+  },
+  "953-0090": {
+   "pn": "953-0090",
+   "name": "SUB: 2-3/8\" REG Pin x 2.11 DW Pipe Pin (2720M1/3020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0090",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14251/1602/n-4QsXO4__05785.1659099645.jpg?c=1",
+   "bcProductId": 14251
+  },
+  "953-0092": {
+   "pn": "953-0092",
+   "name": "SUB: 2-3/8\" REG Pin x 2.59 DW Pipe Pin (4020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0092",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14253/529/953-0092_Standard__80080.1642706291.jpg?c=1",
+   "bcProductId": 14253
+  },
+  "953-0093": {
+   "pn": "953-0093",
+   "name": "SUB: 2-3/8\" REG Pin x 2.0 DW EZ2 Box(1720/2020/2720)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0093",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14254/530/953-0093_Standard__20635.1642706318.jpg?c=1",
+   "bcProductId": 14254
+  },
+  "953-0094": {
+   "pn": "953-0094",
+   "name": "SUB: 2-3/8\" REG Pin x 2.25 DW EZ2 Box (2720M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0094",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14255/531/953-0094_Standard__63757.1642706344.jpg?c=1",
+   "bcProductId": 14255
+  },
+  "953-0095": {
+   "pn": "953-0095",
+   "name": "SUB: 2-3/8\" REG Pin x 2.25 DW EZ3 Box (3020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0095",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14256/1604/dQcgDOAU__09544.1659099686.jpg?c=1",
+   "bcProductId": 14256
+  },
+  "953-0096": {
+   "pn": "953-0096",
+   "name": "SUB: 2-3/8\" REG Pin x 2.63 DW EZ2 Box (4020 4020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0096",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14257/1294/t1dOrlBg__94421.1659025590.jpg?c=1",
+   "bcProductId": 14257
+  },
+  "953-0097": {
+   "pn": "953-0097",
+   "name": "SUB: 2-7/8\" REG Pin x 2.11 DW Pipe Pin (2720M1/3020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0097",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14258/1605/KfNRYasY__31924.1659099711.jpg?c=1",
+   "bcProductId": 14258
+  },
+  "953-0098": {
+   "pn": "953-0098",
+   "name": "SUB: 2-7/8\" REG Pin x 2.40 DW Pipe Pin (4020)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0098",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14259/534/953-0098_Standard__57691.1642706421.jpg?c=1",
+   "bcProductId": 14259
+  },
+  "953-0099": {
+   "pn": "953-0099",
+   "name": "SUB: 2-7/8\" REG Pin x 2.59 DW Pipe Pin (4020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0099",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14260/1606/Kq37dRvs__29259.1659099731.jpg?c=1",
+   "bcProductId": 14260
+  },
+  "953-0100": {
+   "pn": "953-0100",
+   "name": "SUB: 2-7/8\" REG Pin x 3.27 DW Pipe Pin (7020/8020/JT100)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT100"
+   ],
+   "url": "https://www.radiushdd.com/953-0100",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14261/1607/rzqAn4KE__28516.1659099750.jpg?c=1",
+   "bcProductId": 14261
+  },
+  "953-0101": {
+   "pn": "953-0101",
+   "name": "SUB: 2-7/8\" REG Pin x 2.25 DW EZ2 Box (2720M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0101",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14262/537/953-0101_Standard__27533.1642706542.jpg?c=1",
+   "bcProductId": 14262
+  },
+  "953-0102": {
+   "pn": "953-0102",
+   "name": "SUB: 2-7/8\" REG Pin x 2.25 DW EZ3 Box (3020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0102",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14263/1608/YnFVXz-o__56162.1659100029.jpg?c=1",
+   "bcProductId": 14263
+  },
+  "953-0103": {
+   "pn": "953-0103",
+   "name": "SUB: 2-7/8\" REG Pin x 2.63 DW EZ2 Box (4020 4020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0103",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14264/1610/PQ2CUvi0__36763.1659100223.jpg?c=1",
+   "bcProductId": 14264
+  },
+  "953-0104": {
+   "pn": "953-0104",
+   "name": "SUB: 3-1/2\" IF Pin x 3.27 DW Pipe Pin (7020/8020/JT100)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT100"
+   ],
+   "url": "https://www.radiushdd.com/953-0104",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14265/1611/W6w7ZdvM__47482.1659100252.jpg?c=1",
+   "bcProductId": 14265
+  },
+  "953-0131": {
+   "pn": "953-0131",
+   "name": "Radius Sub - 3.0\" R-Box - 2-3/8\" REG Box",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0131",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14291/1623/t8BzdOAE__16841.1659100528.jpg?c=1",
+   "bcProductId": 14291
+  },
+  "953-0151": {
+   "pn": "953-0151",
+   "name": "Radius Sub - 3.0\" R-Box - Ditch Witch 2.0 EZ2 Box(1720/2020/2720)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0151",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14304/1694/WroYfLXk__35789__59338.1659390216.jpg?c=1",
+   "bcProductId": 14304
+  },
+  "953-0153": {
+   "pn": "953-0153",
+   "name": "Radius Sub - 3.0\" R-Box - Ditch Witch 1.94-4 Pin (2720/2020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0153",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14306/572/953-0153_Standard__59429.1642707586.jpg?c=1",
+   "bcProductId": 14306
+  },
+  "953-0154": {
+   "pn": "953-0154",
+   "name": "Radius Sub - 3.5\" R-Box - Ditch Witch 2.25-6 EZ2 Box (2720M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0154",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14307/1695/VXCuC3hY__99422__14983.1659390349.jpg?c=1",
+   "bcProductId": 14307
+  },
+  "953-0155": {
+   "pn": "953-0155",
+   "name": "Radius Sub - 3.5\" R-Box - Ditch Witch 2.63-6 EZ2 Box (4020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0155",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14308/1629/xk2URFeg__87523.1659100642.jpg?c=1",
+   "bcProductId": 14308
+  },
+  "953-0156": {
+   "pn": "953-0156",
+   "name": "Radius Sub - 3.5\" R-Box - Ditch Witch 1.94-4 Pin (JT2720)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720"
+   ],
+   "url": "https://www.radiushdd.com/953-0156",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14309/573/953-0156_Standard__83538.1642707615.jpg?c=1",
+   "bcProductId": 14309
+  },
+  "953-0157": {
+   "pn": "953-0157",
+   "name": "Radius Sub - 3.5\" R-Box - Ditch Witch 2.11-4 Pin(2720M1/3020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0157",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14310/1630/2HTTYFkg__30307.1659100660.jpg?c=1",
+   "bcProductId": 14310
+  },
+  "953-0158": {
+   "pn": "953-0158",
+   "name": "Radius Sub - 3.5\" R-Box - Ditch Witch 2.0-6 EZ2 Box (Ditch Witch2720)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT24",
+    "Ditch Witch JT2720"
+   ],
+   "url": "https://www.radiushdd.com/953-0158",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14311/575/953-0158_Standard__84136.1642707669.jpg?c=1",
+   "bcProductId": 14311
+  },
+  "953-0160": {
+   "pn": "953-0160",
+   "name": "Radius Sub - 3.5\" R-Box - Ditch Witch 2.25-6 EZ3 Box (JT3020M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT3020M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0160",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14313/1631/VXCuC3hY__99422.1659100677.jpg?c=1",
+   "bcProductId": 14313
+  },
+  "953-0162": {
+   "pn": "953-0162",
+   "name": "Radius Sub - 3.5\" R-Box - Ditch Witch 2.77-4 Pin (2720AT/3020AT)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0162",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14315/1633/ET5wBtWY__65730.1659100709.jpg?c=1",
+   "bcProductId": 14315
+  },
+  "953-0168": {
+   "pn": "953-0168",
+   "name": "Radius Sub - 3.0\" R-Box - Vermeer 2-1/8\" LPT Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0168",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14321/583/953-0168_Standard__08739.1642708183.jpg?c=1",
+   "bcProductId": 14321
+  },
+  "953-0170": {
+   "pn": "953-0170",
+   "name": "Radius Sub - 3.0\" R-Box - Vermeer 2.06 Firestick Box (20x22/ 20x24)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0170",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14323/1635/qUQ98xlQ__88610.1659100741.jpg?c=1",
+   "bcProductId": 14323
+  },
+  "953-0185": {
+   "pn": "953-0185",
+   "name": "Radius Sub - 3.0\" R-Box - 1.69 Ditch Witch Pin (JT1720)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1720"
+   ],
+   "url": "https://www.radiushdd.com/953-0185",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14334/592/953-0185_Standard__79315.1642708512.jpg?c=1",
+   "bcProductId": 14334
+  },
+  "953-0187": {
+   "pn": "953-0187",
+   "name": "Radius Sub - 4.5\" R-Box - 3.25-4 Ditch Witch Pin (Ditch Witch4020AT)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0187",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14336/1638/6v6rd3MQ__04885.1659100798.jpg?c=1",
+   "bcProductId": 14336
+  },
+  "953-0193": {
+   "pn": "953-0193",
+   "name": "Radius Sub - 3.0\" R-Box - QuickFire 400 compatible RM14 Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0193",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14340/1642/BPD7prAI__66901.1659100901.jpg?c=1",
+   "bcProductId": 14340
+  },
+  "953-0214": {
+   "pn": "953-0214",
+   "name": "Ditch Witch JT2020 Drive Chuck 2-3/8\" Vermeer Firestick 1 Box /1pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2020"
+   ],
+   "url": "https://www.radiushdd.com/953-0214",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14356/1297/juOIDS00__27210.1659025764.jpg?c=1",
+   "bcProductId": 14356
+  },
+  "953-0216": {
+   "pn": "953-0216",
+   "name": "SUB: 2-3/8\" REG Pin x 1.88 DW EZ3 Box (1220M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0216",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14358/1298/OlPISGwI__21248.1659025820.jpg?c=1",
+   "bcProductId": 14358
+  },
+  "953-0218": {
+   "pn": "953-0218",
+   "name": "Ditch Witch Drive Chuck, JT922 1.41-6 Box /1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": "1.41-6 Box"
+   },
+   "machines": [
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0218",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14359/1299/afIqx2mo__87281.1659025843.jpg?c=1",
+   "specs": {
+    "Brand": "Ditch Witch",
+    "Product Type": "Drive chucks",
+    "Rig Type": "7-14K"
+   },
+   "jt9": "model",
+   "bcProductId": 14359
+  },
+  "953-0219": {
+   "pn": "953-0219",
+   "name": "SUB: 2-3/8\" REG Pin x 1.63\" DW EZ2 Box",
+   "type": "Connector",
+   "conn": {
+    "l": "1.63\" DW EZ2 Box",
+    "r": "2-3/8\" REG Pin"
+   },
+   "machines": [
+    "Ditch Witch JT920",
+    "Ditch Witch JT920L",
+    "Ditch Witch JT921",
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0219",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14360/1300/Q0ht9BRY__63424.1659025866.jpg?c=1",
+   "specs": {
+    "Threads": "1.63 EZ2 - Box - DW",
+    "Brand": "Ditch Witch",
+    "Product Type": "Adapters"
+   },
+   "jt9": "thread",
+   "bcProductId": 14360
+  },
+  "953-0220": {
+   "pn": "953-0220",
+   "name": "Ditch Witch Oct Collar EZ2 -w/Hard Facing - 2.75\" 2720M1",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0220",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14361/1230/953-0220-01__07725.1654202973.jpg?c=1",
+   "bcProductId": 14361
+  },
+  "953-0221": {
+   "pn": "953-0221",
+   "name": "Lead Rod 2-1/8' LPT Box 1.94-4 Ditch Witch Pin, 23\" oal",
+   "type": "Starter_Rod",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0221",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14362/751/953-0221-N__03180.1643058541.jpg?c=1",
+   "bcProductId": 14362
+  },
+  "953-0222": {
+   "pn": "953-0222",
+   "name": "SUB: 1.94-4 DW Pipe Pin x 2-1/8\" VM Lo Pro Pin (14\" OAL)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0222",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14363/1301/AijlUNk8__79401.1659025959.jpg?c=1",
+   "bcProductId": 14363
+  },
+  "953-0228": {
+   "pn": "953-0228",
+   "name": "SUB: 2\" IF Pin x 20K pulling eye",
+   "type": "Other",
+   "conn": {
+    "l": "2\" IF Pin",
+    "r": "20K pulling eye"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0228",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14366/1303/7_ha5kpU__64899.1659026009.jpg?c=1",
+   "specs": {
+    "Threads": "20 Ton - Pull Tab",
+    "Rig Class": "Standard",
+    "Product Type": "Adapters"
+   },
+   "jt9": "thread",
+   "bcProductId": 14366
+  },
+  "953-0229": {
+   "pn": "953-0229",
+   "name": "SUB: 2-3/8\" REG Pin x 1.47-4 DW Pipe Pin (1220M1)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0229",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14367/1304/BrWS9is8__51570.1659026029.jpg?c=1",
+   "bcProductId": 14367
+  },
+  "953-0241": {
+   "pn": "953-0241",
+   "name": "AT2720 / AT3020 Transition Sub 2.25-3 EZ3 Pin - 2.77-4 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch AT2720",
+    "Ditch Witch AT3020"
+   ],
+   "url": "https://www.radiushdd.com/953-0241",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14375/1648/DIOVmLAU__95847.1659101294.jpg?c=1",
+   "bcProductId": 14375
+  },
+  "953-0256": {
+   "pn": "953-0256",
+   "name": "Ditch Witch JT922 Drive Chuck 1PC, 1.66\" Vermeer Firestick 1 Pin",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": "1.66\" Vermeer Firestick 1 Pin"
+   },
+   "machines": [
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0256",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14386/1651/LDsI5zvQ__69562.1659101335.jpg?c=1",
+   "specs": {
+    "Brand": "Ditch Witch",
+    "Product Type": "Drive chucks",
+    "Rig Type": "7-14K"
+   },
+   "jt9": "model",
+   "bcProductId": 14386
+  },
+  "953-0258": {
+   "pn": "953-0258",
+   "name": "Ditch Witch Oct Collar EZ2 - w/Hard Facing - 4.25\" JT7020/JT8020/ and JT100",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT7020",
+    "Ditch Witch JT8020",
+    "Ditch Witch JT100"
+   ],
+   "url": "https://www.radiushdd.com/953-0258",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14388/1652/kO9m8GpA__89308.1659101357.jpg?c=1",
+   "bcProductId": 14388
+  },
+  "953-0259": {
+   "pn": "953-0259",
+   "name": "SUB: 1.94 DW Pipe Pin x 2.25 DW EZ3 Box",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0259",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14389/1313/FfQzDdM4__22642.1659026324.jpg?c=1",
+   "bcProductId": 14389
+  },
+  "953-0287": {
+   "pn": "953-0287",
+   "name": "JT7020/JT8020/JT100 Transition Sub 3.50-4 EZ2 Pin - 3.27-4 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT7020",
+    "Ditch Witch JT8020",
+    "Ditch Witch JT100"
+   ],
+   "url": "https://www.radiushdd.com/953-0287",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14413/772/953-0287__27348.1643059039.jpg?c=1",
+   "bcProductId": 14413
+  },
+  "953-0291": {
+   "pn": "953-0291",
+   "name": "SUB: 2-7/8\" Reg Pin x QuickFire 400 compatible",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0291",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14417/1321/Vs5OubEY__07797.1659026584.jpg?c=1",
+   "bcProductId": 14417
+  },
+  "953-0296": {
+   "pn": "953-0296",
+   "name": "SUB: 3-1/2\" Reg Pin x 3.27-4 DW Pipe Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0296",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14422/1325/IyXV_-_A__12601.1659026661.jpg?c=1",
+   "bcProductId": 14422
+  },
+  "953-0301": {
+   "pn": "953-0301",
+   "name": "SUB: 1.66 VM Firestick Pin x 1.30-5 DW Pipe Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": "1.30-5 DW Pipe Pin",
+    "r": "1.66 VM Firestick Pin"
+   },
+   "machines": [
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0301",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14427/1329/M5vqQbIk__92724.1659026770.jpg?c=1",
+   "specs": {
+    "Threads": "1.30 - Pin - DW",
+    "Brand": "Ditch Witch",
+    "Product Type": "Adapters"
+   },
+   "jt9": "thread",
+   "bcProductId": 14427
+  },
+  "953-0302": {
+   "pn": "953-0302",
+   "name": "SUB: 1.66 VM Firestick Pin x 1.31-6 DW EZ2 Box",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT520",
+    "Ditch Witch JT5"
+   ],
+   "url": "https://www.radiushdd.com/953-0302",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14428/1330/Lpeyr9vo__45146.1659026805.jpg?c=1",
+   "specs": {
+    "Threads": "1.31 EZ2 - Box - DW",
+    "Brand": "Ditch Witch",
+    "Product Type": "Adapters",
+    "Compatible Rigs": "Ditch Witch - JT5",
+    "Rig Type": "4-6K"
+   },
+   "bcProductId": 14428
+  },
+  "953-0304": {
+   "pn": "953-0304",
+   "name": "Radius Sub - 3.0\" R-Box - QuickFire 300 compatible RM13 Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0304",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14430/1958/7134d4c8319dc80a5aed8e324502__88624.1659460167.jpg?c=1",
+   "bcProductId": 14430
+  },
+  "953-0311": {
+   "pn": "953-0311",
+   "name": "SUB: 3-1/2\" Reg Pin x 2.25-6 DW EZ3 Box",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0311",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14434/1704/YnFVXz-o__56162__61882.1659391087.jpg?c=1",
+   "bcProductId": 14434
+  },
+  "953-0313": {
+   "pn": "953-0313",
+   "name": "SUB: 3-1/2\" Reg Pin x 3.25 DW AT Pipe Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0313",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14436/1331/QkPPLKiA__29567.1659026823.jpg?c=1",
+   "bcProductId": 14436
+  },
+  "953-0314": {
+   "pn": "953-0314",
+   "name": "SUB: 3-1/2\" Reg Pin x 3.44 DW AT Pipe Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0314",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14437/1332/64NSx4_I__51372.1659026841.jpg?c=1",
+   "bcProductId": 14437
+  },
+  "953-0315": {
+   "pn": "953-0315",
+   "name": "SUB: 3-1/2\" Reg Pin x 2.77 DW AT Pipe Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0315",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14438/1333/YuiT4bdg__91389.1659026861.jpg?c=1",
+   "bcProductId": 14438
+  },
+  "953-0316": {
+   "pn": "953-0316",
+   "name": "SUB: 2-7/8\" REG Pin x 3.25\" DW AT Pipe Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0316",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14439/803/953-0316-2__56325.1643730772.jpg?c=1",
+   "bcProductId": 14439
+  },
+  "953-0317": {
+   "pn": "953-0317",
+   "name": "SUB: 2-7/8\" REG Pin x 3.44\" DW AT Pipe Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0317",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14440/1334/XB4xYlqc__80119.1659026880.jpg?c=1",
+   "bcProductId": 14440
+  },
+  "953-0318": {
+   "pn": "953-0318",
+   "name": "SUB: 2-7/8\" REG Pin x 2.77\" DW AT Pipe Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0318",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14441/1335/NQrtCngE__33941.1659026902.jpg?c=1",
+   "bcProductId": 14441
+  },
+  "953-0319": {
+   "pn": "953-0319",
+   "name": "SUB: 2-3/8\" REG Pin x 2.77\" DW AT Pipe Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0319",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14442/1962/a09e77fca923e8b7c9161c158d1c__84995.1659460325.jpg?c=1",
+   "bcProductId": 14442
+  },
+  "953-0335": {
+   "pn": "953-0335",
+   "name": "Ditch Witch Drive Chuck, JT2720M1 (large) 2.11-4 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0335",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14447/1964/e15130a8842c1401ceec009285f9__10183.1659550465.jpg?c=1",
+   "bcProductId": 14447
+  },
+  "953-0353": {
+   "pn": "953-0353",
+   "name": "SUB: 1.94-4 DW Pipe Pin x 2.0 DW EZ2 Box(1720/2020/2720)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0353",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14461/1339/iF_w4kaQ__61849.1659027002.jpg?c=1",
+   "bcProductId": 14461
+  },
+  "953-0367": {
+   "pn": "953-0367",
+   "name": "Ditch Witch Drive Chuck, JT100 (New Gear Box) 3.27-4 Pipe Box / 1 pc",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT100"
+   ],
+   "url": "https://www.radiushdd.com/953-0367",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14475/1969/3369d9b83b235e2930f43a9cbf4d__13962.1659550735.jpg?c=1",
+   "bcProductId": 14475
+  },
+  "953-0368": {
+   "pn": "953-0368",
+   "name": "SUB: 3.27-4 DW Pipe Pin x 2-1/8\" VM LPT Pin, 15\"OAL",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0368",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14476/1346/vrUUVHjA__52889.1659027132.jpg?c=1",
+   "bcProductId": 14476
+  },
+  "953-0400": {
+   "pn": "953-0400",
+   "name": "Ditch Witch Oct Collar EZ2 - w/Teeth & Hard Facing - 3\" 4020/4020M1",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0400",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14506/1246/953-0400-01__52835.1654202975.jpg?c=1",
+   "bcProductId": 14506
+  },
+  "953-0401": {
+   "pn": "953-0401",
+   "name": "JT25 Transition Sub 2-3/8\" Firestick (600)Pin x 2.25-6 Ditch Witch EZ2 Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT25"
+   ],
+   "url": "https://www.radiushdd.com/953-0401",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14507/773/953-0401__38411.1643059061.jpg?c=1",
+   "bcProductId": 14507
+  },
+  "953-0403": {
+   "pn": "953-0403",
+   "name": "2020M1 Drive Chuck Assy. 2-3/8\" Firestick Pipe (Pin Down)",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0403",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14509/2866/9022934244804facb7a111616a74__37561.1660156362.jpg?c=1",
+   "bcProductId": 14509
+  },
+  "953-0405": {
+   "pn": "953-0405",
+   "name": "SUB: 2-3/8\" REG Pin x 2-3/8\" VM Firestick Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0405",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14510/1350/EJFnFM24__33426.1659027246.jpg?c=1",
+   "bcProductId": 14510
+  },
+  "953-0406": {
+   "pn": "953-0406",
+   "name": "JT5 Transition Sub 1.31-6 EZ2 Pin - 1.1-5 Ditch Witch Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT5"
+   ],
+   "url": "https://www.radiushdd.com/953-0406",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14511/1663/MOD6FOZY__97121.1659101509.jpg?c=1",
+   "bcProductId": 14511
+  },
+  "953-0407": {
+   "pn": "953-0407",
+   "name": "JT922 Conversion Drive Chuck 1.66 Firestick Box, 1PC 9.9\" OAL",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": "1.66 Firestick Box"
+   },
+   "machines": [
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0407",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14512/715/953-0407__46127.1643053202.jpg?c=1",
+   "specs": {
+    "Rig Class": "Standard",
+    "Product Type": "Drive chucks",
+    "Rig Type": "4-6K"
+   },
+   "jt9": "model",
+   "bcProductId": 14512
+  },
+  "953-0413": {
+   "pn": "953-0413",
+   "name": "JT1220/2020 Conversion DC 1PC,2.06 Firestick Box, OAL 10.25\"",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1220"
+   ],
+   "url": "https://www.radiushdd.com/953-0413",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14518/1351/1yjbnH5U__93250.1659027271.jpg?c=1",
+   "bcProductId": 14518
+  },
+  "953-0415": {
+   "pn": "953-0415",
+   "name": "JT1220/2020 Conversion Sub 2.06 Firestick Pin, 6.25\" OAL",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1220"
+   ],
+   "url": "https://www.radiushdd.com/953-0415",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14520/2875/2b3d19aaf920a7aa59242872be88__84005.1660158654.jpg?c=1",
+   "bcProductId": 14520
+  },
+  "953-0421": {
+   "pn": "953-0421",
+   "name": "JT2720M1/3020M1 Conversion Sub 2-3/8\"Firestick Pin x Pin(11.25\"OAL)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0421",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14524/719/953-0421__43412.1643053308.jpg?c=1",
+   "bcProductId": 14524
+  },
+  "953-0424": {
+   "pn": "953-0424",
+   "name": "2720M1 Conversion Drive Chuck 2PC, 2-3/8\" Firestick Pin (L-Flange)",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0424",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14527/720/953-0424__99271.1643053330.jpg?c=1",
+   "bcProductId": 14527
+  },
+  "953-0448": {
+   "pn": "953-0448",
+   "name": "Sub, 2-3/8\" Reg Box x Pin, 8.9\" OAL",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0448",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14548/813/953-0448-2__00907.1643730929.jpg?c=1",
+   "bcProductId": 14548
+  },
+  "953-0455": {
+   "pn": "953-0455",
+   "name": "JT922 Conversion Sub Saver 1.66 Firestick Pin, 7.0\" OAL",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": "1.66 Firestick Pin"
+   },
+   "machines": [
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0455",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14554/988/953-0455__50325.1643748923.jpg?c=1",
+   "specs": {
+    "Rig Class": "Standard",
+    "Product Type": "Adapters",
+    "Rig Type": "7-14K"
+   },
+   "jt9": "model",
+   "bcProductId": 14554
+  },
+  "953-0457": {
+   "pn": "953-0457",
+   "name": "JT922 Conversion Drive Chuck 1.66 Firestick Pin, 2PC 10.9\" OAL",
+   "type": "Saver_Sub",
+   "conn": {
+    "l": null,
+    "r": "1.66 Firestick Pin"
+   },
+   "machines": [
+    "Ditch Witch JT922"
+   ],
+   "url": "https://www.radiushdd.com/953-0457",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14556/2864/c405312bbfe1ff3ed7338e84ed5e__10781.1660156277.jpg?c=1",
+   "specs": {
+    "Rig Class": "Standard",
+    "Product Type": "Drive chucks",
+    "Rig Type": "7-14K"
+   },
+   "jt9": "model",
+   "bcProductId": 14556
+  },
+  "953-0458": {
+   "pn": "953-0458",
+   "name": "JT2720M1/3020M1 Conversion Sub 2-3/8\"Firestick Box, 11.25\" OAL",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1"
+   ],
+   "url": "https://www.radiushdd.com/953-0458",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14557/723/953-0458__45058.1643053425.jpg?c=1",
+   "bcProductId": 14557
+  },
+  "953-0459": {
+   "pn": "953-0459",
+   "name": "SUB: 2-3/8\" REG Pin x Pull Tab, 1.25\" Wide Tab",
+   "type": "Other",
+   "conn": {
+    "l": "2-3/8\" REG Pin",
+    "r": "Pull Tab, 1.25\" Wide Tab"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0459",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14558/1353/Vy4Nru88__19461.1659027309.jpg?c=1",
+   "specs": {
+    "Threads": "Pull Tab",
+    "Rig Class": "Standard",
+    "Product Type": "Adapters"
+   },
+   "jt9": "thread",
+   "bcProductId": 14558
+  },
+  "953-0469": {
+   "pn": "953-0469",
+   "name": "Sub, 3-1/2\" VM Firestick 1 (800)Pin x Ditch Witch 3.25-4 AT Pin, 13\" OAL",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0469",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14568/1356/_wNMXp_Y__32259.1659027366.jpg?c=1",
+   "bcProductId": 14568
+  },
+  "953-0470": {
+   "pn": "953-0470",
+   "name": "Sub, 3-1/2\" VM Firestick 1 (1000)Pin x Ditch Witch 2.77-4 AT Pin, 14\" OAL",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0470",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14569/1357/egTa5K8E__31166.1659027384.jpg?c=1",
+   "bcProductId": 14569
+  },
+  "953-0479": {
+   "pn": "953-0479",
+   "name": "DW SUB, 2\" IF Pin 1.30 DW Pipe Pin (922 Coarse)",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": "1.30 DW Pipe Pin",
+    "r": "2\" IF Pin"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0479",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14577/1358/M9rftypM__89195.1659027400.jpg?c=1",
+   "specs": {
+    "Threads": "1.30 - Pin - DW",
+    "Brand": "Ditch Witch",
+    "Product Type": "Adapters"
+   },
+   "jt9": "model",
+   "bcProductId": 14577
+  },
+  "953-0490": {
+   "pn": "953-0490",
+   "name": "DW Sub, 2-3/8\" Reg Pin x 2.95 DW Pipe Pin (AT40)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch AT40"
+   ],
+   "url": "https://www.radiushdd.com/953-0490",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14583/1359/rhedqiC8__41549.1659027416.jpg?c=1",
+   "bcProductId": 14583
+  },
+  "953-0491": {
+   "pn": "953-0491",
+   "name": "DW SUB 2-7/8\" REG PIN - 2.95 DW AT Pipe Pin (AT40)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch AT40"
+   ],
+   "url": "https://www.radiushdd.com/953-0491",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14584/1360/oaTscmTA__59445.1659027434.jpg?c=1",
+   "bcProductId": 14584
+  },
+  "953-0492": {
+   "pn": "953-0492",
+   "name": "DW Sub 3-1/2\" Reg Pin - 2.95 DW AT Pipe Pin (AT40)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch AT40"
+   ],
+   "url": "https://www.radiushdd.com/953-0492",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14585/1361/eWhYgNj0__27693.1659027470.jpg?c=1",
+   "bcProductId": 14585
+  },
+  "953-0507": {
+   "pn": "953-0507",
+   "name": "Sub, 2-7/8\" Reg Pin x 2.46-4 DW Pipe Pin",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT60"
+   ],
+   "url": "https://www.radiushdd.com/953-0507",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14598/1976/bd89e9b8b37fcf188539f241ab3b__35458.1659551355.jpg?c=1",
+   "bcProductId": 14598
+  },
+  "953-0520": {
+   "pn": "953-0520",
+   "name": "DW SUB, 2-3/8\" Reg Pin x 2.85 DW EZ2 Box",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0520",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14611/1371/8CgCFkKg__14446.1659032158.jpg?c=1",
+   "bcProductId": 14611
+  },
+  "953-0521": {
+   "pn": "953-0521",
+   "name": "DW SUB, 2-7/8\" Reg Pin x 3-1/2\" DW EZ2 Box",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0521",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14612/1372/y25izKos__68386.1659032204.jpg?c=1",
+   "bcProductId": 14612
+  },
+  "953-0529": {
+   "pn": "953-0529",
+   "name": "SUB: 2-3/8\" REG Pin x 2.46 DW Pipe Pin (JT60)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT60"
+   ],
+   "url": "https://www.radiushdd.com/953-0529",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14616/1375/QG5YhqH8__67024.1659032285.jpg?c=1",
+   "bcProductId": 14616
+  },
+  "953-0532": {
+   "pn": "953-0532",
+   "name": "SUB: 2-3/8\" REG Pin x 2.10 DW Pipe Pin (JT40)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT40"
+   ],
+   "url": "https://www.radiushdd.com/953-0532",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14618/712/953-0532-1__08237.1643038053.jpg?c=1",
+   "bcProductId": 14618
+  },
+  "953-0534": {
+   "pn": "953-0534",
+   "name": "DW Sub 2-7/8\" Reg Pin x 2.10 DW Pin (JT40)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT40"
+   ],
+   "url": "https://www.radiushdd.com/953-0534",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14620/1708/Kq37dRvs__29259__43385.1659391314.jpg?c=1",
+   "bcProductId": 14620
+  },
+  "953-0540": {
+   "pn": "953-0540",
+   "name": "DW Oct Collar- 2\", w/HF & CT JT920/920L/921/922",
+   "type": "Collar",
+   "conn": {
+    "l": "2\" Oct Collar",
+    "r": "2\" Oct Collar"
+   },
+   "machines": [
+    "Ditch Witch JT920"
+   ],
+   "url": "https://www.radiushdd.com/953-0540",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14626/1248/953-0540-01__12356.1654202975.jpg?c=1",
+   "specs": {
+    "Brand": "Ditch Witch",
+    "Product Type": "Collars"
+   },
+   "jt9": "model",
+   "bcProductId": 14626
+  },
+  "953-0541": {
+   "pn": "953-0541",
+   "name": "DW Oct Collar,-2.5\" W/ HF&CT 1720/1720M1/2020M1/2720/2720M1",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0541",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14627/1250/953-0541-01__21089.1654202976.jpg?c=1",
+   "bcProductId": 14627
+  },
+  "953-0552": {
+   "pn": "953-0552",
+   "name": "DW T-Sub, JT24 2.00-6 EZ2 Pin - 1.76 DW Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT24"
+   ],
+   "url": "https://www.radiushdd.com/953-0552",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14638/1376/72rHyhgI__27739.1659032304.jpg?c=1",
+   "bcProductId": 14638
+  },
+  "953-0553": {
+   "pn": "953-0553",
+   "name": "DW T-Sub, JT20-JT30 2.25-6 EZ3 Pin x 2-3/8\"FS1 Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT20",
+    "Ditch Witch JT30"
+   ],
+   "url": "https://www.radiushdd.com/953-0553",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14639/1709/953-0401__38411__08299.1659391419.jpg?c=1",
+   "bcProductId": 14639
+  },
+  "953-0554": {
+   "pn": "953-0554",
+   "name": "DW T-Sub, JT40 2.63-6 EZ2 Pin - 2.10 DW Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT40"
+   ],
+   "url": "https://www.radiushdd.com/953-0554",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14640/1377/799U39qU__12329.1659032321.jpg?c=1",
+   "bcProductId": 14640
+  },
+  "953-0555": {
+   "pn": "953-0555",
+   "name": "DW SUB, 2-7/8\" Reg Pin x 2.85 DW EZ2 Box",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/953-0555",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14641/1668/ojc0OjJ0__18138.1659101603.jpg?c=1",
+   "bcProductId": 14641
+  },
+  "953-0557": {
+   "pn": "953-0557",
+   "name": "DW Oct Collar EZ2,- w/HF- JT60",
+   "type": "Collar",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT60"
+   ],
+   "url": "https://www.radiushdd.com/953-0557",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14643/3226/95305572__76370.1681418006.png?c=1",
+   "bcProductId": 14643
+  },
+  "953-0565": {
+   "pn": "953-0565",
+   "name": "DW T-Sub, JT20-JT30 2.00-6 EZ2 Pin x 2-3/8\"FS1 Pin",
+   "type": "Transition_Sub",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT20",
+    "Ditch Witch JT30"
+   ],
+   "url": "https://www.radiushdd.com/953-0565",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14651/2651/c1fb57ee6ff2bb247bbde457eee1__85346.1660062709.jpg?c=1",
+   "bcProductId": 14651
+  },
+  "953-0584": {
+   "pn": "953-0584",
+   "name": "DW SUB 2-3/8\" REG PIN - 1.76-4 DW Pin (JT24)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT24"
+   ],
+   "url": "https://www.radiushdd.com/953-0584",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14669/1674/yYfiorac__34264.1659101688.jpg?c=1",
+   "bcProductId": 14669
+  },
+  "954-0001": {
+   "pn": "954-0001",
+   "name": "SHCS 3/8\"-16 x 3/8\" Pellet 2-3/4\"- 4.5\" RSH Secondary",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0001",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14670/606/954-0001_Standard__58954.1642713331.jpg?c=1",
+   "bcProductId": 14670
+  },
+  "954-0008": {
+   "pn": "954-0008",
+   "name": "1/2\"-13-1/2\" Door Blt 5-6\";\" Radius ROCK Housings",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0008",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14677/613/954-0008_Standard__16801.1642713689.jpg?c=1",
+   "bcProductId": 14677
+  },
+  "954-0009": {
+   "pn": "954-0009",
+   "name": "Radius Rock Housing Door for 3\" - 4.5\" R-SH",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0009",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14678/614/954-0009_Standard__64005.1642713815.jpg?c=1",
+   "bcProductId": 14678
+  },
+  "954-0026": {
+   "pn": "954-0026",
+   "name": "15 Ton - Swivel, 4-3/4\" OD Clevis x 2-3/8\" IF Box",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0026",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14695/958/954-0026__02878.1643746743.jpg?c=1",
+   "bcProductId": 14695
+  },
+  "954-0029": {
+   "pn": "954-0029",
+   "name": "30 Ton - Swivel Clevis x 2-7/8\" IF Box - 6\" OD",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0029",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14698/952/954-0029__11588.1679938865.jpg?c=1",
+   "bcProductId": 14698
+  },
+  "954-0030": {
+   "pn": "954-0030",
+   "name": "30 Ton - Swivel Clevis x 3-1/2\" IF Box -6\" OD",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0030",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14699/960/954-0030__51313.1679938865.jpg?c=1",
+   "bcProductId": 14699
+  },
+  "954-0031": {
+   "pn": "954-0031",
+   "name": "40 Ton - Swivel Clevis 3-1/2\" IF Box - 6.5\" OD",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0031",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14700/1979/5a06524ebb2be2bc5d198d39bbf5__30447.1659551929.jpg?c=1",
+   "bcProductId": 14700
+  },
+  "954-0032": {
+   "pn": "954-0032",
+   "name": "40 Ton - Swivel Clevis 4-1/2\" IF Box - 6.5\" OD",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0032",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14701/961/954-0032__23695.1679938866.jpg?c=1",
+   "bcProductId": 14701
+  },
+  "954-0033": {
+   "pn": "954-0033",
+   "name": "60 Ton - Swivel Clevis 4-1/2\" IF Box -7.5\" OD",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0033",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14702/2942/56883026c4a685903cb9d899752c__60528.1660235195.jpg?c=1",
+   "bcProductId": 14702
+  },
+  "954-0095": {
+   "pn": "954-0095",
+   "name": "Ditch Witch Vice Jaw Insert JT5 Insert",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT5"
+   ],
+   "url": "https://www.radiushdd.com/954-0095",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14752/3073/6fc1ba143bca8db91efbd83769d6__22795.1660245279.jpg?c=1",
+   "bcProductId": 14752
+  },
+  "954-0096": {
+   "pn": "954-0096",
+   "name": "Ditch Witch Vice Jaw Insert JT922, JT1220, JT2020 Insert",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT922",
+    "Ditch Witch JT1220",
+    "Ditch Witch JT2020"
+   ],
+   "url": "https://www.radiushdd.com/954-0096",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14753/3074/53a17da60298f40d8f08efbde094__01401.1660245291.jpg?c=1",
+   "bcProductId": 14753
+  },
+  "954-0097": {
+   "pn": "954-0097",
+   "name": "Ditch Witch Vice Jaw Insert JT30,3020M1 Insert",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT30"
+   ],
+   "url": "https://www.radiushdd.com/954-0097",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14754/3076/53a17da60298f40d8f08efbde094__28605.1660245313.jpg?c=1",
+   "bcProductId": 14754
+  },
+  "954-0098": {
+   "pn": "954-0098",
+   "name": "Ditch Witch Vice Jaw Insert JT2720M1",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1"
+   ],
+   "url": "https://www.radiushdd.com/954-0098",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14755/3075/a1e05b9f395aa4d0e785d426cbd9__32814.1660245303.jpg?c=1",
+   "bcProductId": 14755
+  },
+  "954-0099": {
+   "pn": "954-0099",
+   "name": "Ditch Witch Vice Jaw Insert JT4020M1",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT4020M1"
+   ],
+   "url": "https://www.radiushdd.com/954-0099",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14756/3077/a1e05b9f395aa4d0e785d426cbd9__77453.1660245323.jpg?c=1",
+   "bcProductId": 14756
+  },
+  "954-0100": {
+   "pn": "954-0100",
+   "name": "Ditch Witch Vice Jaw Insert JT100M1",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT100M1"
+   ],
+   "url": "https://www.radiushdd.com/954-0100",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14757/3079/a1e05b9f395aa4d0e785d426cbd9__45372.1660245378.jpg?c=1",
+   "bcProductId": 14757
+  },
+  "954-0116": {
+   "pn": "954-0116",
+   "name": "Premium Sleeved Puller 2-1/2\" Duct",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0116",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14773/653/954-0116_Standard__51983.1642716263.jpg?c=1",
+   "bcProductId": 14773
+  },
+  "954-0127": {
+   "pn": "954-0127",
+   "name": "Expandable Duct Puller 2-1/2\"",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0127",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14783/660/954-0127_Standard__80533.1642717649.jpg?c=1",
+   "bcProductId": 14783
+  },
+  "954-0140": {
+   "pn": "954-0140",
+   "name": "Stnd Mesh Pulling Grip 1/4\" - 1/2\" Duct, WL 1700lbs",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0140",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14796/1256/954-0140-01__14164.1654202976.jpg?c=1",
+   "bcProductId": 14796
+  },
+  "954-0142": {
+   "pn": "954-0142",
+   "name": "Stnd Mesh Pulling Grip 1/2\" to 3/4\" Duct, WL 2000lbs",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0142",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14797/1257/954-0142-01__01536.1654202977.jpg?c=1",
+   "bcProductId": 14797
+  },
+  "954-0143": {
+   "pn": "954-0143",
+   "name": "Stnd Mesh Pulling Grip 3/4\" - 1-1/4\" Duct, WL 2000lbs",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0143",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14798/1258/954-0143-01__17034.1654202977.jpg?c=1",
+   "bcProductId": 14798
+  },
+  "954-0286": {
+   "pn": "954-0286",
+   "name": "SHCS 20mm x 2.5 x 40mm Ditch Witch 6 bolt Pattern/4.25 Drt Hsng",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0286",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14825/679/954-0286_Standard__23798.1642776642.jpg?c=1",
+   "bcProductId": 14825
+  },
+  "954-0293": {
+   "pn": "954-0293",
+   "name": "SHCS M12x1.75 x 25mm Ditch Witch 3 & 5 Bolt Pattern",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0293",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14828/680/954-0293_Standard__33426.1642776671.jpg?c=1",
+   "bcProductId": 14828
+  },
+  "954-0301": {
+   "pn": "954-0301",
+   "name": "SHCS M16x2.0 x 35 mm Ditch Witch 6 Bolt Pattern",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0301",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14835/686/954-0301_Standard__02600.1642776897.jpg?c=1",
+   "bcProductId": 14835
+  },
+  "954-0413": {
+   "pn": "954-0413",
+   "name": "Radius Dirt Housing Door 2.75\" - 4.25\" Vermeer (Universal)",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0413",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/14917/2020/1d7c528eb3eab521745d5d3912fa__68081.1659618878.jpg?c=1",
+   "bcProductId": 14917
+  },
+  "954-0680": {
+   "pn": "954-0680",
+   "name": "2-1/8\" LPT Pin Thread Protector",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-0680",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15104/2061/2335b3829bd2042565feec42940b__87702.1659621150.jpg?c=1",
+   "bcProductId": 15104
+  },
+  "954-1090": {
+   "pn": "954-1090",
+   "name": "DW Dirt Housing Kit 2.25\" Subsite SH (952-0190)",
+   "type": "Connector",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-1090",
+   "img": null,
+   "specs": {
+    "Brand": "Ditch Witch",
+    "Product Type": "Parts"
+   },
+   "bcProductId": null
+  },
+  "954-1247": {
+   "pn": "954-1247",
+   "name": "Overshot Fishing Tools 2-3/8\" Reg Box, 3.125\" to 1.5\"",
+   "type": "Other",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/954-1247",
+   "img": null,
+   "bcProductId": null
+  },
+  "956-0001": {
+   "pn": "956-0001",
+   "name": "4.5\" Fluted Reamer 2\" IF Box x 12K Swivel",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "12K Swivel"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0001",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15543/2090/7dc9a110354f0c56a79f3f216f6d__61977.1659641251.jpg?c=1",
+   "specs": {
+    "Threads": "12K - Swivel",
+    "Reamer Type": "Fluted Reamer",
+    "Outside Width": "4.5",
+    "Brand": "Radius",
+    "Product Type": "Reamers",
+    "Ground Condition": "Sand"
+   },
+   "jt9": "thread",
+   "bcProductId": 15543
+  },
+  "956-0002": {
+   "pn": "956-0002",
+   "name": "6.5\" Fluted Reamer 2\" IF Box x 12K Swivel",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "12K Swivel"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0002",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15544/1421/C_BnxKxw__48271.1659039255.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15544
+  },
+  "956-0003": {
+   "pn": "956-0003",
+   "name": "6.5\" Fluted Reamer (Conical) 2\" IF Box x 10KSwivel",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "10KSwivel"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0003",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15545/2094/1505cf0c6c07744817f5f5b53585__09716.1659641294.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15545
+  },
+  "956-0008": {
+   "pn": "956-0008",
+   "name": "4.5\" Fluted Reamer (Conical) 2\" IF Box x 10K Swivel",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "10K Swivel"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0008",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15548/2101/126e58e3205b43a5a376d88992d3__97684.1659641441.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15548
+  },
+  "956-0048": {
+   "pn": "956-0048",
+   "name": "6\" Paddle Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0048",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15582/2212/5be4d09e3df3f133f09c8532b585__16757.1659644397.jpg?c=1",
+   "specs": {
+    "Threads": "2 IF - Box - API",
+    "Reamer Type": "Paddle Reamer",
+    "Outside Width": "6",
+    "Brand": "Radius",
+    "Product Type": "Reamers",
+    "Ground Condition": "Light Clay"
+   },
+   "jt9": "thread",
+   "bcProductId": 15582
+  },
+  "956-0049": {
+   "pn": "956-0049",
+   "name": "8\" Paddle Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0049",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15583/2213/5be4d09e3df3f133f09c8532b585__47288.1659644406.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15583
+  },
+  "956-0050": {
+   "pn": "956-0050",
+   "name": "10\" Paddle Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0050",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15584/1435/LPBRCMyg__97534.1659040360.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15584
+  },
+  "956-0051": {
+   "pn": "956-0051",
+   "name": "12\" Paddle Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0051",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15585/2214/5be4d09e3df3f133f09c8532b585__35767.1659644478.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15585
+  },
+  "956-0052": {
+   "pn": "956-0052",
+   "name": "14\" Paddle Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0052",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15586/2215/5be4d09e3df3f133f09c8532b585__63330.1659644487.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15586
+  },
+  "956-0053": {
+   "pn": "956-0053",
+   "name": "16\" Paddle Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0053",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15587/2216/5be4d09e3df3f133f09c8532b585__18166.1659644495.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15587
+  },
+  "956-0054": {
+   "pn": "956-0054",
+   "name": "18\" Paddle Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0054",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15588/2217/5be4d09e3df3f133f09c8532b585__74007.1659644502.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15588
+  },
+  "956-0055": {
+   "pn": "956-0055",
+   "name": "20\" Paddle Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0055",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15589/2218/0cf9cf3c76e9e9f4aa2d279256d3__04613.1659644564.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15589
+  },
+  "956-0056": {
+   "pn": "956-0056",
+   "name": "22\" Paddle Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0056",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15590/2219/0cf9cf3c76e9e9f4aa2d279256d3__23467.1659644573.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15590
+  },
+  "956-0081": {
+   "pn": "956-0081",
+   "name": "8\" Fly Cutter Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0081",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15614/2277/2bdef89955d3edaad0cc9f563c01__62052.1659646326.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15614
+  },
+  "956-0082": {
+   "pn": "956-0082",
+   "name": "10\" Fly Cutter Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0082",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15615/1444/qIw0AebQ__32979.1659040606.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15615
+  },
+  "956-0083": {
+   "pn": "956-0083",
+   "name": "12\" Fly Cutter Reamer 2\" IF Box x Box",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0083",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15616/900/956-0083__23404.1643744388.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15616
+  },
+  "956-0084": {
+   "pn": "956-0084",
+   "name": "14\" Fly Cutter Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0084",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15617/2297/41c00128fe63c2018cbbac5f0f85__60556.1659646655.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15617
+  },
+  "956-0085": {
+   "pn": "956-0085",
+   "name": "16\" Fly Cutter Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0085",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15618/2304/41c00128fe63c2018cbbac5f0f85__33815.1659646673.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15618
+  },
+  "956-0086": {
+   "pn": "956-0086",
+   "name": "18\" Fly Cutter Reamer 2\" IF Box x Box / 2.75\"Shaft",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0086",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15619/2294/41c00128fe63c2018cbbac5f0f85__18947.1659646637.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15619
+  },
+  "956-0418": {
+   "pn": "956-0418",
+   "name": "8\" Turbo Reamer 2\" IF Box x Box",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "Box"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0418",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15845/2484/e4f1d51c8b2c82df882b0551fd28__18164.1659705972.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15845
+  },
+  "956-0585": {
+   "pn": "956-0585",
+   "name": "8\" Fluted Reamer 2\" IF Box x 20K Swivel",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "20K Swivel"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0585",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15939/2537/2aabeafe20bb9d990393f0c4b089__54482.1659708512.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15939
+  },
+  "956-0586": {
+   "pn": "956-0586",
+   "name": "12\" Fluted Reamer 2\" IF Box x 20K Swivel",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "20K Swivel"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0586",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15940/2538/35311dad40daef7ea58b1d25224e__66853.1659708907.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15940
+  },
+  "956-0601": {
+   "pn": "956-0601",
+   "name": "10\" Fluted Reamer 2\" IF Box x 20K Swivel",
+   "type": "Backreamer",
+   "conn": {
+    "l": "2\" IF Box",
+    "r": "20K Swivel"
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/956-0601",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/15947/2549/5f712f56737abd596dfb871d5cd7__18479.1659709125.jpg?c=1",
+   "jt9": "thread",
+   "bcProductId": 15947
+  },
+  "PIP-0013": {
+   "pn": "PIP-0013",
+   "name": "Ditch Witch JT2720M1 / JT3020M1 - 2.11-6 DW x 10'",
+   "type": "Drill_Pipe",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1",
+    "Ditch Witch JT3020M1",
+    "Ditch Witch JT25",
+    "Ditch Witch JT30"
+   ],
+   "url": "https://www.radiushdd.com/PIP-0013",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/16008/735/PIP-0013__46804.1643056062.jpg?c=1",
+   "bcProductId": 16008
+  },
+  "PIP-0057": {
+   "pn": "PIP-0057",
+   "name": "Ditch Witch JT1720 - 1.69-6 DW x 10'",
+   "type": "Drill_Pipe",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT1720"
+   ],
+   "url": "https://www.radiushdd.com/PIP-0057",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/16003/2878/54449a27def4d93de766b8954c19__81584.1660159959.jpg?c=1",
+   "bcProductId": 16003
+  },
+  "PIP-0058": {
+   "pn": "PIP-0058",
+   "name": "Ditch Witch JT2020 - 1.94-4 DW x 10'",
+   "type": "Drill_Pipe",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2020",
+    "Ditch Witch JT20"
+   ],
+   "url": "https://www.radiushdd.com/PIP-0058",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/16005/734/PIP-0010__42575.1643056032.jpg?c=1",
+   "bcProductId": 16005
+  },
+  "PIP-0059": {
+   "pn": "PIP-0059",
+   "name": "Ditch Witch JT 2720 - 1.94-4 DW x 10'",
+   "type": "Drill_Pipe",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720"
+   ],
+   "url": "https://www.radiushdd.com/PIP-0059",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/16007/2879/04731834a068ce713d9ae6a3058a__11860.1660160071.jpg?c=1",
+   "bcProductId": 16007
+  },
+  "PIP-0066": {
+   "pn": "PIP-0066",
+   "name": "JT2720M1 / 3020M1 (TR400-1031) 2.11-4 DW Pipe x 10' x 3\"upset",
+   "type": "Drill_Pipe",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [
+    "Ditch Witch JT2720M1"
+   ],
+   "url": "https://www.radiushdd.com/PIP-0066",
+   "img": null,
+   "bcProductId": null
+  },
+  "radius-tci-tricone-5-5": {
+   "pn": "radius-tci-tricone-5-5",
+   "name": "Radius TCI Tricone - Ø5.5\"",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/radius-tci-tricone-5-5/",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/18880/3342/tricone3__27310.1746020379.jpg?c=1",
+   "bcProductId": 18880
+  },
+  "radius-tci-tricone-5-5-sb637s": {
+   "pn": "radius-tci-tricone-5-5-sb637s",
+   "name": "Radius TCI Tricone - Ø5.5\" SB637S",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/radius-tci-tricone-5-5-sb637s/",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/18881/3344/tricone3__32893.1746020949.jpg?c=1",
+   "bcProductId": 18881
+  },
+  "radius-tci-tricone-6": {
+   "pn": "radius-tci-tricone-6",
+   "name": "Radius TCI Tricone - Ø6\"",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/radius-tci-tricone-6/",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/18882/3346/tricone3__19478.1746021453.jpg?c=1",
+   "bcProductId": 18882
+  },
+  "radius-tci-tricone-6-125": {
+   "pn": "radius-tci-tricone-6-125",
+   "name": "Radius TCI Tricone - Ø6.125\"",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/radius-tci-tricone-6-125/",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/18878/3338/tricone3__96237.1746018911.jpg?c=1",
+   "bcProductId": 18878
+  },
+  "radius-tci-tricone-6-5": {
+   "pn": "radius-tci-tricone-6-5",
+   "name": "Radius TCI Tricone - Ø6.5\"",
+   "type": "Bit",
+   "conn": {
+    "l": null,
+    "r": null
+   },
+   "machines": [],
+   "url": "https://www.radiushdd.com/radius-tci-tricone-6-5/",
+   "img": "https://cdn11.bigcommerce.com/s-uwymjpsd0i/images/stencil/500x659/products/18879/3340/tricone3__20079.1746019166.jpg?c=1",
+   "bcProductId": 18879
+  }
+ }
+}

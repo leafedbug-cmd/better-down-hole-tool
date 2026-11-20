@@ -6,6 +6,7 @@ import { canAddSignupMachine, equipmentCopy, signupMachineCap, signupMachineLimi
 import { friendlyAuthError } from './signup-errors.mjs';
 import { normalizeConfig, quantity } from './config.mjs';
 import { compute, lineItems, isLoadoutReady } from './compatibility.mjs';
+import { normalizeRadius, alternatesFor, slotOthers, fallbackImg, altLineItems, altKey, toggleAlt, MATCH_LABEL, RADIUS_BRAND } from './radius.mjs';
 
 const IMG_HOST = 'https://www.hddadvisor.com';
 
@@ -13,21 +14,66 @@ const IMG_HOST = 'https://www.hddadvisor.com';
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const img = (id, w = 400, h = 200) => (id ? `${IMG_HOST}/Image/Thumbnail/${id}?width=${w}&height=${h}` : 'img/placeholder.svg');
-// small profile thumbnails are mirrored locally (tools/fetch_images.py); fall back to hddadvisor.com, then a placeholder
-const imgTag = (id, w, h, alt = '', cls = '') => !id ? `<img src="img/placeholder.svg" alt="">` :
-  `<img ${cls ? `class="${cls}"` : ''} src="img/parts/${id}.png" data-remote="${img(id, w, h)}" alt="${esc(alt)}" loading="lazy" decoding="async" onerror="imgFallback(this)">`;
-const photoTag = (id, alt = '') =>
-  `<img src="${img(id, 800, 800)}" alt="${esc(alt)}" decoding="async" onerror="this.onerror=null;this.src='img/parts/${id}.png'">`;
+const validImgId = (id) => (typeof id === 'number' || typeof id === 'string') && /^\d+$/.test(String(id))
+  && Number.isSafeInteger(Number(id)) && Number(id) > 0 ? Number(id) : 0;
+function safeHttpUrl(u) {
+  if (typeof u !== 'string') return null;
+  const trimmed = u.trim();
+  if (!/^https?:\/\//i.test(trimmed)) return null;
+  try {
+    if (typeof URL === 'function') {
+      const parsed = new URL(trimmed);
+      return (parsed.protocol === 'https:' || parsed.protocol === 'http:') ? parsed.href : null;
+    }
+    return trimmed;
+  } catch { return null; }
+}
+function safeStripeUrl(u) {
+  const href = safeHttpUrl(u);
+  if (!href) return null;
+  try {
+    if (typeof URL === 'function') {
+      const parsed = new URL(href);
+      if (parsed.protocol !== 'https:') return null;
+      return (parsed.hostname === 'checkout.stripe.com' || parsed.hostname === 'billing.stripe.com' || parsed.hostname.endsWith('.stripe.com'))
+        ? parsed.href
+        : null;
+    }
+    return /^https:\/\/([a-z0-9-]+\.)*stripe\.com(\/|$)/i.test(href) ? href : null;
+  } catch { return null; }
+}
+const img = (id, w = 400, h = 200) => {
+  const safeId = validImgId(id);
+  return safeId ? `${IMG_HOST}/Image/Thumbnail/${safeId}?width=${w}&height=${h}` : 'img/placeholder.svg';
+};
+// small profile thumbnails are mirrored locally (tools/fetch_images.py); fall back to hddadvisor.com,
+// then (optional `fb`) a cross-referenced Radius photo, then a placeholder
+const fbAttr = (fb) => (fb ? ` data-altimg="${esc(fb)}"` : '');
+const imgTag = (id, w, h, alt = '', cls = '', fb = null) => {
+  const safeId = validImgId(id);
+  return !safeId ? (fb ? `<img src="${esc(fb)}" alt="${esc(alt)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">` : `<img src="img/placeholder.svg" alt="">`) :
+    `<img ${cls ? `class="${esc(cls)}"` : ''} src="img/parts/${safeId}.png" data-remote="${img(safeId, w, h)}"${fbAttr(fb)} alt="${esc(alt)}" loading="lazy" decoding="async">`;
+};
+const photoTag = (id, alt = '', fb = null) => {
+  const safeId = validImgId(id);
+  return !safeId ? (fb ? `<img src="${esc(fb)}" alt="${esc(alt)}" decoding="async" referrerpolicy="no-referrer">` : `<img src="img/placeholder.svg" alt="">`) :
+    `<img src="${img(safeId, 800, 800)}" data-local="img/parts/${safeId}.png"${fbAttr(fb)} alt="${esc(alt)}" decoding="async">`;
+};
 // List cards and the string rail use the mirrored catalog file in img/parts/, not a shared glyph.
 function catalogPhoto(id, alt) {
-  const inner = id ? imgTag(id, 360, 140, alt) : `<img src="img/placeholder.svg" alt="">`;
+  const inner = validImgId(id) ? imgTag(id, 360, 140, alt) : `<img src="img/placeholder.svg" alt="">`;
   return `<div class="c-photo">${inner}</div>`;
 }
 window.imgFallback = (el) => {
-  if (el.dataset.remote) { const r = el.dataset.remote; delete el.dataset.remote; el.src = r; }
-  else { el.onerror = null; el.src = 'img/placeholder.svg'; }
+  if (!el) return;
+  if (el.dataset?.remote) { const r = el.dataset.remote; delete el.dataset.remote; el.src = r; }
+  else if (el.dataset?.local) { const l = el.dataset.local; delete el.dataset.local; el.src = l; }
+  else if (el.dataset?.altimg) { const a = el.dataset.altimg; delete el.dataset.altimg; el.referrerPolicy = 'no-referrer'; el.src = a; }
+  else { el.onerror = null; if (el.src !== 'img/placeholder.svg' && !String(el.src).endsWith('/img/placeholder.svg')) el.src = 'img/placeholder.svg'; }
 };
+document.addEventListener('error', (e) => {
+  if (e.target?.tagName === 'IMG') window.imgFallback(e.target);
+}, true);
 const ICON = {
   chev: '<svg class="chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7-1.4-1.4L13.2 12 7.6 6.4z"/></svg>',
   info: '<svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16z"/></svg>',
@@ -57,7 +103,10 @@ function updateSavedBadge() {
 
 /* ---------- config <-> URL ---------- */
 const b64e = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const b64d = (s) => { try { return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))))); } catch { return null; } };
+const b64d = (s) => {
+  if (typeof s !== 'string' || s.length > 16384) return null;
+  try { return JSON.parse(decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))))); } catch { return null; }
+};
 const newCfg = (m, p, r) => ({ m, p, r, mode: 'Bit', sel: {}, acc: {}, q: {} });
 function cfgFromQuery(q) {
   const c = q.get('c') && b64d(q.get('c'));
@@ -76,13 +125,34 @@ async function loadCatalog() {
   return CATALOG;
 }
 async function loadRoadmap(id) {
-  if (!RM_CACHE.has(id)) {
-    const r = await fetch(`data/roadmaps/${id}.json`);
+  const safeId = validImgId(id);
+  if (!safeId) throw new Error('Tooling data not available for this drill/pipe yet.');
+  if (!RM_CACHE.has(safeId)) {
+    const r = await fetch(`data/roadmaps/${safeId}.json`);
     if (!r.ok) throw new Error('Tooling data not available for this drill/pipe yet.');
-    RM_CACHE.set(id, await r.json());
+    RM_CACHE.set(safeId, await r.json());
   }
-  return RM_CACHE.get(id);
+  return RM_CACHE.get(safeId);
 }
+/* Radius HDD alternates: loaded lazily once; any failure just hides the feature. Never fed to compute(). */
+let RADIUS = null, RADIUS_P = null;
+const OTHER_BRANDS_KEY = 'bdht.otherBrands.v1';
+function loadRadius() {
+  if (!RADIUS_P) {
+    RADIUS_P = Promise.all(['data/radius/parts.json', 'data/radius/crossref.json'].map(async (u) => {
+      const r = await fetch(u);
+      if (!r.ok) throw new Error(u);
+      return r.json();
+    })).then(([parts, xref]) => {
+      const d = normalizeRadius(parts, xref);
+      RADIUS = Object.keys(d.parts).length ? d : null;
+      return RADIUS;
+    }).catch(() => (RADIUS = null));
+  }
+  return RADIUS_P;
+}
+const showOther = () => !!RADIUS && store.get(OTHER_BRANDS_KEY, true) !== false;
+const dwFallback = (p) => (showOther() && p?.pn ? fallbackImg(RADIUS, p.pn) : null);
 const machine = (id) => CATALOG.machines.find((m) => m.id === +id);
 const pipeOf = (m, pid) => m?.pipes.find((p) => p.id === +pid);
 
@@ -198,7 +268,7 @@ function savedRow(s, { del = false } = {}) {
       <div class="small muted">${esc(s.title)} · ${new Date(s.ts).toLocaleDateString()}</div>
     </div>
     ${del
-      ? `<button class="iconbtn" data-del="${s.id}" aria-label="Delete ${esc(s.name)}">${ICON.trash}</button>`
+      ? `<button class="iconbtn" data-del="${esc(s.id)}" aria-label="Delete ${esc(s.name)}">${ICON.trash}</button>`
       : `<a class="iconbtn" href="#/build?c=${c}" aria-label="Edit ${esc(s.name)}">${ICON.chev}</a>`}
     </div>
     <div class="lo-actions">
@@ -258,7 +328,7 @@ async function viewPipe(mid, isCurrent = () => true) {
   const ctx = loCtx.for({ m: m.id });
   app.innerHTML = `
     ${ctx ? loBanner(ctx, 'NEW LOADOUT · LOCK PIPE') : ''}
-    ${ctx ? `<a class="linkbtn" href="#/rig/${ctx.machine.id}">‹ Back to ${esc(rigName(ctx.machine))}</a>` : '<a class="linkbtn" href="#/drill">‹ Change drill</a>'}
+    ${ctx ? `<a class="linkbtn" href="#/rig/${esc(ctx.machine.id)}">‹ Back to ${esc(rigName(ctx.machine))}</a>` : '<a class="linkbtn" href="#/drill">‹ Change drill</a>'}
     ${pageHead('Step 02 · Pipe', `${esc(m.brand)} ${esc(m.model)}`, `Lock the pipe for this drill. Only pipe that fits the ${esc(m.model)} can be equipped.`)}
     <div class="stack">${m.pipes.map((p) => p.roadmap ? `
       <a class="choice" href="#/build?c=${b64e(newCfg(m.id, p.id, p.roadmap))}">
@@ -283,7 +353,8 @@ async function viewBuild(q, isCurrent = () => true) {
   if (!cfg || pipeOf(machine(cfg.m), cfg.p)?.roadmap !== cfg.r) return viewNotFound();
   let rm;
   app.innerHTML = '<div class="stack"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>';
-  try { rm = await loadRoadmap(cfg.r); } catch (e) { if (isCurrent()) app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  const radiusP = loadRadius();
+  try { rm = await loadRoadmap(cfg.r); await radiusP; } catch (e) { if (isCurrent()) app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
   if (!isCurrent()) return;
   buildCfg = cfg;
   renderBuild(rm);
@@ -302,7 +373,7 @@ function persistBuild(replace = true) {
 function partRow(p, { selected, multi, sel = true, compact } = {}) {
   const stamp = selected || !sel ? 'Equipped' : 'Equip';
   return `<div class="part ${selected ? 'sel' : ''} ${multi ? 'multi' : ''}" ${sel ? `role="button" tabindex="0" data-pick="${p.id}" aria-pressed="${!!selected}"` : ''}>
-    <div class="thumb">${imgTag(p.img, 240, 120, p.name)}</div>
+    <div class="thumb">${imgTag(p.img, 240, 120, p.name, '', dwFallback(p))}</div>
     <div class="p-main"><div class="p-name">${esc(p.name)}</div>
       <div class="p-pn">${p.pn ? `#${esc(p.pn)}` : '<span class="muted">Part # not listed</span>'}</div>
       ${connStr(p) ? `<div class="p-conn">${esc(connStr(p))}</div>` : ''}
@@ -313,6 +384,36 @@ function partRow(p, { selected, multi, sel = true, compact } = {}) {
       ${sel ? `<span class="check" aria-hidden="true">${selected ? ICON.check : ''}</span>` : ''}
     </div></div>`;
 }
+/* Radius alternates (view + optional list line). Third-party strings always go through esc(). */
+const radiusThumb = (p) => (p.imgUrl
+  ? `<img src="${esc(p.imgUrl)}" alt="${esc(p.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
+  : '<img src="img/placeholder.svg" alt="">');
+function altRow(a, sid, cfg) {
+  const p = a.part, added = (cfg.alt?.[sid] || []).includes(p.pn);
+  return `<div class="alt-part">
+    <div class="thumb">${radiusThumb(p)}</div>
+    <div class="p-main"><div class="alt-meta"><span class="brand-chip">${esc(RADIUS_BRAND)}</span>${a.match ? `<span class="alt-match">${esc(MATCH_LABEL[a.match] || '')}</span>` : ''}</div>
+      <div class="p-name">${esc(p.name)}</div><div class="p-pn">#${esc(p.pn)}</div>
+      ${a.note ? `<div class="p-short">${esc(a.note)}</div>` : ''}</div>
+    <div class="p-act">
+      ${p.url ? `<a class="iconbtn" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(p.name)} on the Radius site">${ICON.link}</a>` : ''}
+      <button type="button" class="chip alt-add" data-altadd="${esc(sid)}" data-altpn="${esc(p.pn)}" aria-pressed="${added}">${added ? 'On list' : 'Add to list'}</button>
+    </div></div>`;
+}
+function altsFor(p, sid, cfg) {
+  if (!showOther() || !p?.pn) return '';
+  const list = alternatesFor(RADIUS, p.pn);
+  return list.length ? `<div class="alts" role="group" aria-label="Radius equivalents for ${esc(p.name)}">${list.map((a) => altRow(a, sid, cfg)).join('')}</div>` : '';
+}
+function othersGroup(rm, sec, cfg, shownPns) {
+  if (!showOther()) return '';
+  const P = rm.parts, m = machine(cfg.m);
+  const types = [...new Set(sec.opts.map((o) => P[o.id]?.type).filter(Boolean))];
+  const list = slotOthers(RADIUS, { types, machine: m ? `${m.brand} ${m.model}` : '', dwPns: shownPns });
+  return list.length ? `<details class="others"><summary>Other brands <span class="muted">· ${list.length} Radius part${list.length > 1 ? 's' : ''} for this drill</span></summary>
+    ${list.map((part) => altRow({ part }, sec.id, cfg)).join('')}
+    <p class="small muted">Not checked by the fit solver. Confirm threads with Radius before ordering.</p></details>` : '';
+}
 function slotCell(r, i, P) {
   const n = String(i + 1).padStart(2, '0');
   const name = esc(r.sec.name);
@@ -322,7 +423,7 @@ function slotCell(r, i, P) {
     state = 'filled'; tag = 'Equipped';
     const count = r.sel.length > 1 ? `<span class="slot-count">×${r.sel.length}</span>` : '';
     const addon = r.acc[r.sel[0]] ? `<span class="slot-addon">+add</span>` : '';
-    plate = `<span class="slot-plate">${imgTag(pp.img, 340, 100, pp.name)}${count}${addon}<span class="visually-hidden">${esc(pp.name)}</span></span>`;
+    plate = `<span class="slot-plate">${imgTag(pp.img, 340, 100, pp.name, '', dwFallback(pp))}${count}${addon}<span class="visually-hidden">${esc(pp.name)}</span></span>`;
   } else if (r.status === 'pending') {
     state = 'open'; tag = 'Open';
     plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">+</span></span>`;
@@ -341,6 +442,7 @@ function renderBuild(rm, focusNext) {
   const cfg = buildCfg, P = rm.parts, m = machine(cfg.m), p = pipeOf(m, cfg.p);
   const rows = compute(rm, cfg);
   const items = lineItems(rm, cfg, rows);
+  const altItems = altLineItems(RADIUS, cfg, rows);
   const pending = rows.find((r) => r.status === 'pending');
   const ready = isLoadoutReady(rows);
   persistBuild();
@@ -353,7 +455,7 @@ function renderBuild(rm, focusNext) {
     let body = '', chip = '';
     if (r.status === 'blocked') {
       chip = '<span class="pill pill-warn">Needs changes</span>';
-      body = '<p class="sec-note">No compatible end tool fits. Change an earlier slot to complete this loadout.</p>';
+      body = '<p class="sec-note">No compatible end tool fits. Change an earlier slot to complete this loadout.</p>' + othersGroup(rm, s, cfg, []);
     } else if (r.status === 'skip') {
       chip = '<span class="pill">Skipped</span>';
       body = `<p class="sec-note">Nothing fits the slot before this one, so this slot stays empty.</p>`;
@@ -364,8 +466,9 @@ function renderBuild(rm, focusNext) {
       chip = `<span class="pill pill-orange">${multi ? 'Equip one or more' : 'Open slot'}</span>`;
       const shown = r.cands.slice(0, 5);
       body = `<p class="sec-note">${r.cands.length} option${r.cands.length > 1 ? 's' : ''} fit the slot before this one${r.hidden ? ` (${r.hidden} more hidden because nothing downstream fits them)` : ''}.</p>
-        ${shown.map((o) => partRow(P[o.id], { multi })).join('')}
-        ${r.cands.length > shown.length ? `<button class="btn btn-outline btn-block more" data-browse="${s.id}">See all ${r.cands.length} options</button>` : ''}`;
+        ${shown.map((o) => partRow(P[o.id], { multi }) + altsFor(P[o.id], s.id, cfg)).join('')}
+        ${r.cands.length > shown.length ? `<button class="btn btn-outline btn-block more" data-browse="${s.id}">See all ${r.cands.length} options</button>` : ''}
+        ${othersGroup(rm, s, cfg, shown.map((o) => P[o.id].pn))}`;
     } else {
       chip = r.status === 'auto' ? '<span class="pill pill-ok">Auto-matched</span>' : `<span class="pill pill-dark">Equipped${r.sel.length > 1 ? ` · ${r.sel.length}` : ''}</span>`;
       body = r.sel.map((id) => {
@@ -375,8 +478,9 @@ function renderBuild(rm, focusNext) {
             <button class="chip" data-acc="${s.id}.${id}" data-accid="0" aria-pressed="${!a}">None</button>
             ${accs.map((aid) => `<button class="chip" data-acc="${s.id}.${id}" data-accid="${aid}" aria-pressed="${a?.id === aid}">${esc(P[aid].name)}${P[aid].pn ? `<small>#${esc(P[aid].pn)}</small>` : ''}</button>`).join('')}
           </div></div>` : '';
-        return partRow(P[id], { selected: true, multi, sel: false }) + accHtml;
-      }).join('') + (r.cands.length > 1 ? `<button class="linkbtn" data-browse="${s.id}">${multi ? 'Add or remove' : `Swap (${r.cands.length} fit this slot)`}</button>` : '');
+        return partRow(P[id], { selected: true, multi, sel: false }) + altsFor(P[id], s.id, cfg) + accHtml;
+      }).join('') + (r.cands.length > 1 ? `<button class="linkbtn" data-browse="${s.id}">${multi ? 'Add or remove' : `Swap (${r.cands.length} fit this slot)`}</button>` : '')
+        + othersGroup(rm, s, cfg, r.sel.map((id) => P[id].pn));
     }
     const dot = r.status === 'done' || r.status === 'auto' ? '✓' : n;
     const cls = { done: 'done', auto: 'done', pending: 'pending', blocked: 'pending', skip: 'skip', locked: 'locked' }[r.status];
@@ -397,6 +501,7 @@ function renderBuild(rm, focusNext) {
         <button data-mode="Bit" aria-pressed="${cfg.mode === 'Bit'}">Pilot<small>Bit config</small></button>
         <button data-mode="Backreamer" aria-pressed="${cfg.mode === 'Backreamer'}">Pullback<small>Backreamer config</small></button>
       </div>
+      ${RADIUS ? `<label class="brand-toggle"><input type="checkbox" id="other-brands" ${showOther() ? 'checked' : ''}><span>Show other brands<small>Radius HDD alternates next to Ditch Witch parts</small></span></label>` : ''}
       <div class="preview"><div class="preview-head"><span>Slot rail</span><span>${endLabel} →</span></div>
         <div class="meter" role="img" aria-label="${donePct} of ${rows.length} slots settled"><span style="width:${pct}%"></span></div>
         <div class="strip"><span class="rig">${esc(m?.model || 'RIG')}</span>${strip || '<span class="small muted">Slots appear here</span>'}</div></div>
@@ -405,7 +510,7 @@ function renderBuild(rm, focusNext) {
     </div>
     <aside class="build-aside">
       <div class="aside-card"><h3>Equipped</h3>
-        <ul class="mini-list">${items.map((l) => `<li><span>${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}</ul>
+        <ul class="mini-list">${items.map((l) => `<li><span>${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}${altItems.map((l) => `<li><span><span class="brand-chip">${esc(l.brand)}</span> ${esc(l.part.name)}</span><span class="pn">${esc(l.part.pn)}</span></li>`).join('')}</ul>
         <a class="btn btn-primary btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">${ready ? 'Confirm class' : 'Review loadout'}</a>
         <button class="btn btn-ghost btn-block" style="margin-top:8px" data-save>${ICON.save} Save loadout</button>
       </div>
@@ -442,6 +547,8 @@ function renderBuild(rm, focusNext) {
   $$('[data-info]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); showPart(rm, +b.dataset.info); }));
   $$('[data-browse]').forEach((b) => b.addEventListener('click', () => browseSheet(rm, +b.dataset.browse)));
   $$('[data-acc]').forEach((b) => b.addEventListener('click', () => { cfg.acc[b.dataset.acc] = +b.dataset.accid; renderBuild(rm); }));
+  $$('[data-altadd]', app).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); toggleAlt(cfg, b.dataset.altadd, b.dataset.altpn); renderBuild(rm); }));
+  $('#other-brands')?.addEventListener('change', (e) => { store.set(OTHER_BRANDS_KEY, !!e.target.checked); renderBuild(rm); });
   $$('[data-jump]').forEach((b) => b.addEventListener('click', () => $(`#sec-${b.dataset.jump}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })));
   $$('[data-save]').forEach((b) => b.addEventListener('click', () => saveSheet(cfg)));
   $$('[data-equip-next]').forEach((b) => b.addEventListener('click', () => {
@@ -471,7 +578,9 @@ function browseSheet(rm, sid) {
     const draw = () => {
       const t = q.toLowerCase();
       const list = row.cands.filter((o) => { const pp = P[o.id]; return (!t || `${pp.name} ${pp.pn} ${pp.short || ''}`.toLowerCase().includes(t)) && (!soil || (pp.soil || '').includes(soil)); });
-      $('#blist', sh).innerHTML = list.map((o) => partRow(P[o.id], { selected: chosen.has(o.id), multi })).join('') || '<div class="empty">No matches</div>';
+      $('#blist', sh).innerHTML = (list.map((o) => partRow(P[o.id], { selected: chosen.has(o.id), multi }) + altsFor(P[o.id], sid, cfg)).join('') || '<div class="empty">No matches</div>')
+        + othersGroup(rm, s, cfg, list.map((o) => P[o.id].pn));
+      $$('[data-altadd]', sh).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); toggleAlt(cfg, b.dataset.altadd, b.dataset.altpn); renderBuild(rm); draw(); }));
       $$('[data-pick]', sh).forEach((el) => el.addEventListener('click', (e) => {
         if (e.target.closest('[data-info]')) return;
         const id = +el.dataset.pick;
@@ -494,11 +603,11 @@ function showPart(rm, id, stacked) {
   openSheet(`<div class="sheet-top"><div><div class="small muted" style="font-weight:800;letter-spacing:.06em">${esc((p.type || '').replace(/_/g, ' ').toUpperCase())}</div><h2>${esc(p.name)}</h2></div>
       <button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body">
-      <div class="gallery ${photos.length < 2 ? 'single' : ''}">${photos.map((i) => photoTag(i, p.name)).join('') || '<img src="img/placeholder.svg" alt="">'}</div>
+      <div class="gallery ${photos.length < 2 ? 'single' : ''}">${photos.map((i) => photoTag(i, p.name, dwFallback(p))).join('') || photoTag(0, p.name, dwFallback(p))}</div>
       ${p.short ? `<p style="font-weight:700;margin:12px 0 0">${esc(p.short)}</p>` : ''}
       <dl class="specs">${specs.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
       ${p.desc?.length ? `<ul class="bullets">${p.desc.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>` : ''}
-      ${(p.docs || []).filter((d) => d.url).map((d) => `<a class="btn btn-ghost btn-block" href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.name)}</a>`).join('')}
+      ${(p.docs || []).map((d) => ({ name: d.name, url: safeHttpUrl(d.url) })).filter((d) => d.url).map((d) => `<a class="btn btn-ghost btn-block" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">${esc(d.name)}</a>`).join('')}
       <p class="small muted">Photos and specs from public manufacturer references.</p>
     </div>
     <div class="sheet-foot">${p.pn ? `<button class="btn btn-ghost" id="cpn">Copy part #</button>` : ''}<button class="btn btn-primary" style="flex:1" ${stacked ? 'id="back"' : 'data-close'}>${stacked ? '‹ Back to list' : 'Close'}</button></div>`, (sh) => {
@@ -530,7 +639,7 @@ let skipLeaveGuard = false;
 let builderHref = '';
 function cfgFp(cfg) {
   if (!cfg?.r) return '';
-  return b64e({ m: cfg.m, p: cfg.p, r: cfg.r, mode: cfg.mode, sel: cfg.sel || {}, acc: cfg.acc || {}, q: cfg.q || {} });
+  return b64e({ m: cfg.m, p: cfg.p, r: cfg.r, mode: cfg.mode, sel: cfg.sel || {}, acc: cfg.acc || {}, q: cfg.q || {}, ...(cfg.alt && Object.keys(cfg.alt).length ? { alt: cfg.alt } : {}) });
 }
 function onBuilder(hash = location.hash) {
   return /^#\/(build|summary)(\?|$)/.test(hash);
@@ -612,7 +721,7 @@ async function openDoneSheet(cfg) {
       <label class="field"><span>Loadout name</span><input id="lname" value="${esc(def)}" maxlength="60"></label>
       <div class="chips">${['Rock setup', 'Sand pilot', 'Clay pilot', 'Backream 12in'].map((s) => `<button type="button" class="chip" data-sug="${s}">${s}</button>`).join('')}</div>
       ${list.length ? `<div class="form-sub"><b>Machine</b><span class="small muted">Where it shows in My rigs</span></div>
-        <div class="stack">${list.map((mc) => `<button type="button" class="choice" data-mc="${mc.id}" aria-pressed="${mc.id === pre}"><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div></button>`).join('')}</div>`
+        <div class="stack">${list.map((mc) => `<button type="button" class="choice" data-mc="${esc(mc.id)}" aria-pressed="${mc.id === pre}"><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div></button>`).join('')}</div>`
         : `<p>This drill is not in My rigs yet. Saving adds it as a machine.</p>
            <label class="field"><span>Unit name (optional)</span><input id="an" maxlength="60" placeholder="Unit 12"></label>`}
       <p class="small muted">Everyone at ${esc(ME.company.name)} will see it.</p>
@@ -646,22 +755,32 @@ async function openDoneSheet(cfg) {
 }
 async function consumePendingSave() {
   const p = store.get(PENDING_SAVE_KEY, null);
-  if (!p?.cfg?.r || !ME.member) return null;
+  if (!p?.cfg || !ME.member) return null;
+  if (p.ts && Date.now() - Number(p.ts) > 24 * 60 * 60 * 1000) {
+    store.set(PENDING_SAVE_KEY, null);
+    return null;
+  }
+  const cfg = normalizeConfig(p.cfg);
+  if (!cfg || pipeOf(machine(cfg.m), cfg.p)?.roadmap !== cfg.r) {
+    store.set(PENDING_SAVE_KEY, null);
+    return null;
+  }
+  p.cfg = cfg;
   const c = await sb();
-  const { data, error } = await c.from('bdht_machines').select('*').eq('machine_type_id', p.cfg.m).order('created_at');
+  const { data, error } = await c.from('bdht_machines').select('*').eq('machine_type_id', cfg.m).order('created_at');
   if (error) throw error;
   const list = data || [];
   if (list.length > 1) return { pending: p, machines: list };
   let mc = list[0];
   if (!mc) {
-    const mm = machine(p.cfg.m);
-    const ins = await c.from('bdht_machines').insert({ company_id: ME.company.id, machine_type_id: +p.cfg.m, brand: mm?.brand, model: mm?.model || String(p.cfg.m), nickname: null }).select().single();
+    const mm = machine(cfg.m);
+    const ins = await c.from('bdht_machines').insert({ company_id: ME.company.id, machine_type_id: +cfg.m, brand: mm?.brand, model: mm?.model || String(cfg.m), nickname: null }).select().single();
     if (ins.error) throw ins.error;
     mc = ins.data;
   }
-  const saved = await saveLoadout(p.cfg, mc.id, null, p.name || titleOf(p.cfg));
+  const saved = await saveLoadout(cfg, mc.id, null, p.name || titleOf(cfg));
   store.set(PENDING_SAVE_KEY, null);
-  markGarageSaved(p.cfg);
+  markGarageSaved(cfg);
   toast(`Saved “${saved.name}” to My rigs`);
   return { saved };
 }
@@ -669,7 +788,7 @@ async function consumePendingSave() {
 /* Step 4 – summary */
 function listText(cfg, items, withLink = true) {
   const lines = [`HDD loadout: ${titleOf(cfg)}`, 'Built with The Better Down Hole Tool', ''];
-  items.forEach((l, i) => lines.push(`${i + 1}. ${l.part.name}: PN ${pnTxt(l.part)}, qty ${l.qty}${l.acc ? ' (add-on)' : ''}`));
+  items.forEach((l, i) => lines.push(`${i + 1}. ${l.brand ? `${l.brand} ` : ''}${l.part.name}: PN ${pnTxt(l.part)}, qty ${l.qty}${l.acc ? ' (add-on)' : ''}${l.alt ? ' (alternate)' : ''}`));
   if (withLink) lines.push('', `Open it: ${shareUrl(cfg)}`);
   return lines.join('\n');
 }
@@ -679,11 +798,13 @@ async function viewSummary(q, isCurrent = () => true) {
   if (!isCurrent()) return;
   if (!cfg || pipeOf(machine(cfg.m), cfg.p)?.roadmap !== cfg.r) return viewNotFound();
   let rm;
-  try { rm = await loadRoadmap(cfg.r); } catch (e) { if (isCurrent()) app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  const radiusP = loadRadius();
+  try { rm = await loadRoadmap(cfg.r); await radiusP; } catch (e) { if (isCurrent()) app.innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
   if (!isCurrent()) return;
   buildCfg = cfg;
   const draw = () => {
     const rows = compute(rm, cfg), items = lineItems(rm, cfg, rows);
+    const allItems = [...items, ...altLineItems(RADIUS, cfg, rows)];
     const pending = rows.filter((r) => ['pending', 'locked', 'blocked'].includes(r.status));
     const ready = isLoadoutReady(rows);
     history.replaceState(null, '', `#/summary?c=${b64e(cfg)}`);
@@ -699,9 +820,9 @@ async function viewSummary(q, isCurrent = () => true) {
         <p class="small" style="margin:8px 0 0;color:#d5deea">${needsGarageSave(cfg) ? 'Not in My rigs yet. Saving puts it on this drill.' : 'Saved to My rigs.'}</p></div>
       ${rows.length && rows[rows.length - 1].status === 'blocked' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
       ${pending.length ? `<div class="note no-print"><span><b>${pending.length} slot${pending.length > 1 ? 's' : ''} still open</b> (${esc(pending.map((r) => r.sec.name).join(', '))}). <a href="#/build?c=${b64e(cfg)}">Finish equipping</a></span></div>` : ''}
-      <div class="card"><ul class="lines">${items.map((l) => `
-        <li class="line ${l.acc ? 'acc-line' : ''}"><div class="thumb">${imgTag(l.part.img, 200, 100, l.part.name)}</div>
-          <div><div class="l-sec">${esc(l.sec)}${l.auto ? ' · auto' : ''}</div><div class="l-name">${esc(l.part.name)}</div>
+      <div class="card"><ul class="lines">${allItems.map((l) => `
+        <li class="line ${l.acc ? 'acc-line' : ''} ${l.alt ? 'alt-line' : ''}"><div class="thumb">${l.alt ? radiusThumb(l.part) : imgTag(l.part.img, 200, 100, l.part.name, '', dwFallback(l.part))}</div>
+          <div><div class="l-sec">${l.brand ? `<span class="brand-chip">${esc(l.brand)}</span> ` : ''}${esc(l.sec)}${l.auto ? ' · auto' : ''}${l.alt ? ` <button type="button" class="linkbtn no-print alt-rm" data-altrm="${esc(l.key.split('.')[0])}" data-altpn="${esc(l.part.pn)}">Remove</button>` : ''}</div><div class="l-name">${esc(l.part.name)}</div>
             <div class="l-row"><span class="l-pn">${l.part.pn ? '#' + esc(l.part.pn) : '<span class="muted">Part # not listed</span>'}</span>
               <span class="print-qty">Qty: ${l.qty}</span><span class="qty no-print"><button data-dq="${l.key}" data-d="-1" aria-label="Less">−</button><input inputmode="numeric" data-qk="${l.key}" value="${esc(l.qty)}" aria-label="Quantity"><button data-dq="${l.key}" data-d="1" aria-label="More">+</button></span>
             </div></div></li>`).join('') || '<li class="empty">No parts selected yet.</li>'}</ul></div>
@@ -730,14 +851,14 @@ async function viewSummary(q, isCurrent = () => true) {
     setActionbar(`<div class="ab-info"><strong>${needsGarageSave(cfg) ? 'Not saved' : 'Saved'}</strong><span class="ab-line">${items.length} equipped${ready ? ' · class ready' : ` · ${pending.length} incomplete`}</span></div>
       <button class="btn btn-ghost btn-sm" id="ab-copy">Copy</button>
       <button class="btn btn-primary" data-done>${ICON.save} Save loadout</button>`);
-    const text = listText(cfg, items);
+    const text = listText(cfg, allItems);
     const subj = `HDD loadout: ${titleOf(cfg)}`;
     const mailHref = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}`;
     $('#sh-sms').href = `sms:?&body=${encodeURIComponent(text)}`;
     $('#sh-mail').href = mailHref;
     $('#q-mail').href = mailHref;
     const share = async () => {
-      if (navigator.share) { try { await navigator.share({ title: subj, text: listText(cfg, items, false), url: shareUrl(cfg) }); } catch {} }
+      if (navigator.share) { try { await navigator.share({ title: subj, text: listText(cfg, allItems, false), url: shareUrl(cfg) }); } catch {} }
       else { await copyText(text); toast('Parts list copied'); }
     };
     $('#sh-share').addEventListener('click', share);
@@ -752,6 +873,7 @@ async function viewSummary(q, isCurrent = () => true) {
     $$('[data-done]').forEach((b) => b.addEventListener('click', () => openDoneSheet(cfg)));
     $$('[data-dq]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.dq; cfg.q[k] = quantity(quantity(cfg.q[k]) + +b.dataset.d); draw(); }));
     $$('[data-qk]').forEach((i) => i.addEventListener('change', () => { cfg.q[i.dataset.qk] = quantity(i.value); draw(); }));
+    $$('[data-altrm]').forEach((b) => b.addEventListener('click', () => { toggleAlt(cfg, b.dataset.altrm, b.dataset.altpn); delete cfg.q[altKey(b.dataset.altrm, b.dataset.altpn)]; draw(); }));
   };
   draw();
 }
@@ -783,7 +905,17 @@ async function sb() {
   if (!SB) {
     const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm');
     SB = createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'bdht.auth', flowType: 'pkce', detectSessionInUrl: true } });
-    SB.auth.onAuthStateChange((ev) => { if (ev === 'PASSWORD_RECOVERY') setTimeout(() => { location.hash = '#/account?m=reset'; }, 0); if (ev === 'SIGNED_OUT') { ME.user = ME.member = ME.company = ME.billing = null; updateAcctNav(); } });
+    SB.auth.onAuthStateChange((ev) => {
+      if (ev === 'PASSWORD_RECOVERY') setTimeout(() => { location.hash = '#/account?m=reset'; }, 0);
+      if (ev === 'SIGNED_OUT') {
+        ME.user = ME.member = ME.company = ME.billing = null;
+        store.set(PENDING_KEY, null);
+        store.set(PENDING_SAVE_KEY, null);
+        loCtx.set(null);
+        sessionStorage.removeItem(GARAGE_FP_KEY);
+        updateAcctNav();
+      }
+    });
   }
   return SB;
 }
@@ -1016,7 +1148,7 @@ async function fetchFleet() {
   return { machines: m.data, loadouts: l.data };
 }
 const loImgs = (lo, n = 6) => (lo?.items || []).filter((i) => i.img).slice(0, n);
-const loKey = (lo) => (lo.items || []).slice().reverse().find((i) => /^(Bit|Backreamer)$/i.test(i.type || '') || /^(Bit|Backreamer)\b/i.test(i.sec || ''));
+const loKey = (lo) => (lo.items || []).slice().reverse().find((i) => !i.alt && (/^(Bit|Backreamer)$/i.test(i.type || '') || /^(Bit|Backreamer)\b/i.test(i.sec || '')));
 function stripHtml(lo, cls = 'lo-strip') {
   const im = loImgs(lo);
   return `<div class="${cls}">${im.map((i) => imgTag(i.img, 200, 100, i.name)).join('') || '<span class="small muted">No parts yet</span>'}</div>`;
@@ -1104,8 +1236,9 @@ async function startCheckout(btn) {
     const c = await sb();
     const { data, error } = await c.functions.invoke('bdht-create-checkout', { body: {} });
     if (error) throw await functionError(error);
-    if (!data?.url) throw new Error('Checkout did not return a link.');
-    location.href = data.url;
+    const targetUrl = safeStripeUrl(data?.url);
+    if (!targetUrl) throw new Error('Checkout did not return a valid Stripe link.');
+    location.href = targetUrl;
   } catch (e) {
     busy(btn, false);
     const msg = errMsg(e);
@@ -1120,8 +1253,9 @@ async function startPortal(btn) {
     const c = await sb();
     const { data, error } = await c.functions.invoke('bdht-create-portal', { body: {} });
     if (error) throw await functionError(error);
-    if (!data?.url) throw new Error('Billing portal did not return a link.');
-    location.href = data.url;
+    const targetUrl = safeStripeUrl(data?.url);
+    if (!targetUrl) throw new Error('Billing portal did not return a valid Stripe link.');
+    location.href = targetUrl;
   } catch (e) { busy(btn, false); toast(errMsg(e)); }
 }
 function wirePlanActions(root = document) {
@@ -1198,15 +1332,15 @@ async function viewGarage(isCurrent = () => true) {
     <div class="section-head"><h2>Equipment · ${count}</h2><button class="linkbtn" id="addm">${atLimit ? 'Upgrade for unlimited' : '+ Add machine'}</button></div>
     <div class="rig-grid">${fleet.machines.map((mc) => {
       const los = byM(mc.id), def = los.find((l) => l.is_default) || los[0];
-      return `<a class="rig-card" href="#/rig/${mc.id}">
+      return `<a class="rig-card" href="#/rig/${esc(mc.id)}">
         <div class="rig-top"><div><div class="t-brand">Machine · ${esc(mc.brand || '')} ${esc(mc.model)}</div><div class="rig-name">${esc(rigName(mc))}</div></div>
           <span class="pill ${los.length ? 'pill-orange' : ''}">${los.length} loadout${los.length === 1 ? '' : 's'}</span></div>
         ${stripHtml(def)}
-        <ul class="lo-name-list">${los.map((lo) => `<li><b>${lo.is_default ? '★ ' : ''}${esc(lo.name)}</b><span>${lo.mode === 'Bit' ? 'Pilot' : 'Pullback'} · ${lo.part_count}</span></li>`).join('') || '<li class="muted">No loadouts yet</li>'}</ul>
+        <ul class="lo-name-list">${los.map((lo) => `<li><b>${lo.is_default ? '★ ' : ''}${esc(lo.name)}</b><span>${lo.mode === 'Bit' ? 'Pilot' : 'Pullback'} · ${esc(lo.part_count)}</span></li>`).join('') || '<li class="muted">No loadouts yet</li>'}</ul>
         <div class="rig-foot">${def ? `<span><b>${los.length} loadout${los.length === 1 ? '' : 's'}</b></span>` : '<span class="muted">No loadouts yet. Tap to build a class.</span>'}${ICON.chev}</div></a>`;
     }).join('') || `<div class="card empty"><h2>No machines yet</h2><p>Add a machine to start a loadout.</p><button class="btn btn-primary" id="addm2">+ Add machine</button></div>`}</div>
     ${finish?.pending ? `<div class="note" style="margin-top:12px"><span><b>Finish saving “${esc(finish.pending.name)}”.</b> Pick the machine.
-      <span class="chips" style="margin-top:8px">${finish.machines.map((mc) => `<button type="button" class="chip" data-finish="${mc.id}">${esc(rigName(mc))}</button>`).join('')}</span></span></div>` : ''}`;
+      <span class="chips" style="margin-top:8px">${finish.machines.map((mc) => `<button type="button" class="chip" data-finish="${esc(mc.id)}">${esc(rigName(mc))}</button>`).join('')}</span></span></div>` : ''}`;
   const openAdd = () => requestAddOperator(count);
   $('#addm').addEventListener('click', openAdd);
   $$('[data-finish]').forEach((b) => b.addEventListener('click', async () => {
@@ -1264,7 +1398,7 @@ async function accountSheet(machineCount) {
       const { error } = await c.from('bdht_companies').update({ name }).eq('id', ME.company.id);
       if (error) return toast(error.message); ME.company.name = name; closeSheet(); toast('Company renamed'); route();
     });
-    $('#out', sh).addEventListener('click', async () => { await c.auth.signOut(); ME.user = ME.member = ME.company = ME.billing = null; loCtx.set(null); sessionStorage.removeItem(GARAGE_FP_KEY); updateAcctNav(); closeSheet(); toast('Signed out'); goHash('#/'); });
+    $('#out', sh).addEventListener('click', async () => { await c.auth.signOut(); ME.user = ME.member = ME.company = ME.billing = null; store.set(PENDING_KEY, null); store.set(PENDING_SAVE_KEY, null); loCtx.set(null); sessionStorage.removeItem(GARAGE_FP_KEY); updateAcctNav(); closeSheet(); toast('Signed out'); goHash('#/'); });
   });
 }
 
@@ -1295,11 +1429,11 @@ async function viewRig(id, isCurrent = () => true) {
       const pipe = pipeOf(cat, lo.pipe_id), key = loKey(lo);
       return `<article class="lo-card ${lo.is_default ? 'is-default' : ''}">
         <div class="lo-top"><div style="min-width:0"><div class="lo-name">${esc(lo.name)}${lo.is_default ? `<span class="pill pill-dark">${ICON_STAR}Primary</span>` : ''}</div>
-          <div class="small muted">${esc(pipe?.name || 'Pipe')} · ${lo.mode === 'Bit' ? 'Pilot' : 'Pullback'} · ${lo.part_count} equipped</div></div>
-          <button class="iconbtn" data-lomenu="${lo.id}" aria-label="Options for ${esc(lo.name)}">${ICON_MORE}</button></div>
+          <div class="small muted">${esc(pipe?.name || 'Pipe')} · ${lo.mode === 'Bit' ? 'Pilot' : 'Pullback'} · ${esc(lo.part_count)} equipped</div></div>
+          <button class="iconbtn" data-lomenu="${esc(lo.id)}" aria-label="Options for ${esc(lo.name)}">${ICON_MORE}</button></div>
         ${stripHtml(lo)}
         ${key ? `<div class="lo-key"><span>${lo.mode === 'Bit' ? 'Bit' : 'Reamer'}</span><b>${esc(key.name)}</b>${key.pn ? `<code>#${esc(key.pn)}</code>` : ''}</div>` : ''}
-        <div class="lo-actions"><button class="btn btn-outline" data-loedit="${lo.id}">Edit</button><a class="btn btn-primary" href="#/summary?c=${b64e(lo.config)}">Open brief</a></div>
+        <div class="lo-actions"><button class="btn btn-outline" data-loedit="${esc(lo.id)}">Edit</button><a class="btn btn-primary" href="#/summary?c=${b64e(lo.config)}">Open brief</a></div>
       </article>`;
     }).join('') || `<div class="card empty"><h2>No loadouts yet</h2><p>Build one: lock the pipe, then equip each slot from the rig out to the bit.</p></div>`}</div>`;
   const ctxFor = (lo) => ({ machine: { id: mc.id, machine_type_id: mc.machine_type_id, model: mc.model, brand: mc.brand, nickname: mc.nickname }, loadout: lo ? { id: lo.id, name: lo.name } : null });
@@ -1322,18 +1456,18 @@ function loMenu(lo, mc, los) {
       <button class="btn btn-ghost btn-block danger" id="ldel">${ICON.trash} Delete loadout</button></div>`, async (sh) => {
     const c = await sb(), done = (m) => { closeSheet(); toast(m); setTimeout(route, 240); };
     const fail = (e) => toast(errMsg(e));
-    $('#lrn', sh).addEventListener('click', async () => { const name = $('#lr', sh).value.trim(); if (!name) return; const { error } = await c.from('bdht_loadouts').update({ name, updated_at: new Date().toISOString() }).eq('id', lo.id); error ? fail(error) : done('Renamed'); });
+    $('#lrn', sh).addEventListener('click', async () => { const name = $('#lr', sh).value.trim(); if (!name) return; const { error } = await c.from('bdht_loadouts').update({ name, updated_at: new Date().toISOString() }).eq('id', lo.id).eq('company_id', ME.company.id); error ? fail(error) : done('Renamed'); });
     $('#ldef', sh).addEventListener('click', async () => { const { error } = await c.rpc('bdht_set_default_loadout', { p_loadout: lo.id }); error ? fail(error) : done(`${lo.name} is now primary`); });
     $('#ldup', sh).addEventListener('click', async () => {
       let name = `${lo.name} copy`, n = 2; while (los.some((x) => x.name === name)) name = `${lo.name} copy ${n++}`;
       const { id, created_at, updated_at, is_default, created_by, ...rest } = lo;
-      const { error } = await c.from('bdht_loadouts').insert({ ...rest, name: name.slice(0, 60), is_default: false }); error ? fail(error) : done('Duplicated');
+      const { error } = await c.from('bdht_loadouts').insert({ ...rest, company_id: ME.company.id, name: name.slice(0, 60), is_default: false }); error ? fail(error) : done('Duplicated');
     });
     $('#lshare', sh).addEventListener('click', async () => {
       const url = shareUrl(lo.config), title = `${lo.name} · ${rigName(mc)}`;
       if (navigator.share) { try { await navigator.share({ title, text: `${title} loadout (The Better Down Hole Tool)`, url }); } catch {} } else { await copyText(url); toast('Link copied'); }
     });
-    $('#ldel', sh).addEventListener('click', async () => { if (!confirm(`Delete “${lo.name}”?`)) return; const { error } = await c.from('bdht_loadouts').delete().eq('id', lo.id); error ? fail(error) : done('Deleted'); });
+    $('#ldel', sh).addEventListener('click', async () => { if (!confirm(`Delete “${lo.name}”?`)) return; const { error } = await c.from('bdht_loadouts').delete().eq('id', lo.id).eq('company_id', ME.company.id); error ? fail(error) : done('Deleted'); });
   });
 }
 function machineMenu(mc, nLo) {
@@ -1343,8 +1477,8 @@ function machineMenu(mc, nLo) {
       <button class="btn btn-ghost btn-block" id="mns">Save name</button>
       <button class="btn btn-ghost btn-block danger" id="mdel">${ICON.trash} Remove machine${nLo ? ` and its ${nLo} loadout${nLo > 1 ? 's' : ''}` : ''}</button></div>`, async (sh) => {
     const c = await sb();
-    $('#mns', sh).addEventListener('click', async () => { const { error } = await c.from('bdht_machines').update({ nickname: $('#mn', sh).value.trim() || null }).eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Saved'); setTimeout(route, 240); });
-    $('#mdel', sh).addEventListener('click', async () => { if (!confirm(`Remove ${rigName(mc)}${nLo ? ' and its loadouts' : ''}?`)) return; const { error } = await c.from('bdht_machines').delete().eq('id', mc.id); closeSheet(); toast(error ? error.message : 'Machine removed'); if (!error) location.hash = '#/garage'; });
+    $('#mns', sh).addEventListener('click', async () => { const { error } = await c.from('bdht_machines').update({ nickname: $('#mn', sh).value.trim() || null }).eq('id', mc.id).eq('company_id', ME.company.id); closeSheet(); toast(error ? error.message : 'Saved'); setTimeout(route, 240); });
+    $('#mdel', sh).addEventListener('click', async () => { if (!confirm(`Remove ${rigName(mc)}${nLo ? ' and its loadouts' : ''}?`)) return; const { error } = await c.from('bdht_machines').delete().eq('id', mc.id).eq('company_id', ME.company.id); closeSheet(); toast(error ? error.message : 'Machine removed'); if (!error) location.hash = '#/garage'; });
   });
 }
 
@@ -1381,13 +1515,17 @@ function loSaveSheet(cfg, ctx) {
     });
   });
 }
-async function saveLoadout(cfg, machineId, id, name) {
-  const rm = await loadRoadmap(cfg.r), items = lineItems(rm, cfg, compute(rm, cfg)), c = await sb();
-  const payload = { company_id: ME.company.id, machine_id: machineId, name: name.slice(0, 60), pipe_id: cfg.p, roadmap_id: cfg.r, mode: cfg.mode,
+async function saveLoadout(rawCfg, machineId, id, name) {
+  const cfg = normalizeConfig(rawCfg);
+  if (!cfg || pipeOf(machine(cfg.m), cfg.p)?.roadmap !== cfg.r) throw new Error('Invalid loadout configuration.');
+  const rm = await loadRoadmap(cfg.r), rows = compute(rm, cfg);
+  await loadRadius();
+  const items = [...lineItems(rm, cfg, rows), ...altLineItems(RADIUS, cfg, rows)], c = await sb();
+  const payload = { company_id: ME.company.id, machine_id: machineId, name: String(name || '').slice(0, 60), pipe_id: cfg.p, roadmap_id: cfg.r, mode: cfg.mode,
     config: JSON.parse(JSON.stringify(cfg)), part_count: items.length, updated_at: new Date().toISOString(),
-    items: items.map((l) => ({ sec: l.sec, type: l.part.type || null, name: l.part.name, pn: l.part.pn || null, img: l.part.img || null, qty: l.qty, acc: !!l.acc })) };
+    items: items.map((l) => ({ sec: l.sec, type: l.part.type || null, name: l.part.name, pn: l.part.pn || null, img: validImgId(l.part.img) || null, qty: l.qty, acc: !!l.acc, ...(l.brand ? { brand: l.brand, alt: true } : {}) })) };
   if (!id) { const { count } = await c.from('bdht_loadouts').select('id', { count: 'exact', head: true }).eq('machine_id', machineId); payload.is_default = !count; }
-  const { data, error } = await (id ? c.from('bdht_loadouts').update(payload).eq('id', id) : c.from('bdht_loadouts').insert(payload)).select().single();
+  const { data, error } = await (id ? c.from('bdht_loadouts').update(payload).eq('id', id).eq('company_id', ME.company.id) : c.from('bdht_loadouts').insert(payload)).select().single();
   if (error) throw error; return data;
 }
 async function saveToRigSection(cfg, sh) {
@@ -1403,7 +1541,7 @@ async function saveToRigSection(cfg, sh) {
   const atLimit = !canAddMachine(counted.count || 0, isEntitled());
   const addLabel = atLimit ? 'Upgrade for another machine' : `+ Add a ${mm?.model || 'drill'}`;
   box.innerHTML = `<div class="form-sub"><b>Save on a machine</b><span class="small muted">Shared with ${esc(ME.company.name)}</span></div>
-    <div class="stack" style="margin-top:8px">${(data || []).map((mc) => `<button class="choice" data-rig="${mc.id}"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div>${ICON.chev}</button>`).join('') ||
+    <div class="stack" style="margin-top:8px">${(data || []).map((mc) => `<button class="choice" data-rig="${esc(mc.id)}"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div>${ICON.chev}</button>`).join('') ||
       `<p class="small muted">No ${esc(mm?.model || '')} in your machines yet.</p><button class="btn ${atLimit ? 'btn-primary' : 'btn-ghost'} btn-block" id="addthis">${esc(addLabel)}</button>`}</div>`;
   $$('[data-rig]', box).forEach((b) => b.addEventListener('click', () => {
     const mc = data.find((x) => x.id === b.dataset.rig);

@@ -336,6 +336,30 @@ h3{font-size:16px;font-weight:800}
 .chip{min-height:44px;border-radius:999px;border:2px solid var(--line-strong);background:#0c1117;color:var(--ink);padding:4px 12px;font-size:13px;font-weight:800;cursor:pointer;text-align:left;line-height:1.15}
 .chip small{display:block;font-weight:700;font-family:var(--mono);color:var(--amber-2);font-size:11px}
 .chip[aria-pressed="true"]{border-color:var(--amber);background:#2a2416;color:var(--amber-2)}
+/* Radius HDD alternates (other brands) */
+.brand-toggle{display:flex;align-items:center;gap:10px;min-height:44px;margin:0 0 14px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--panel);cursor:pointer;font-weight:800;font-size:14px}
+.brand-toggle input{width:22px;height:22px;accent-color:var(--amber);flex:none}
+.brand-toggle small{display:block;font-weight:600;font-size:12px;color:var(--mute)}
+.brand-chip{display:inline-block;padding:1px 7px;border-radius:999px;background:#12263a;border:1px solid #2d5b86;color:#9fd0ff;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;vertical-align:middle}
+.alts{margin:6px 0 0 14px;padding-left:10px;border-left:2px dashed #2d5b86}
+.alts+.part{margin-top:8px}
+.alt-part{display:flex;gap:10px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg-2)}
+.alt-part+.alt-part{margin-top:6px}
+.alt-part .thumb{flex:none;width:72px;height:48px;background:#e7eef5;border-radius:8px;display:grid;place-items:center;overflow:hidden}
+.alt-part .thumb img{max-width:68px;max-height:44px;width:auto;height:auto;object-fit:contain;display:block}
+.alt-part .p-main{flex:1;min-width:0}
+.alt-part .p-name{font-weight:800;font-size:14px;line-height:1.2;margin-top:2px}
+.alt-part .p-pn{font-family:var(--mono);font-size:12px;font-weight:800;color:var(--amber-2)}
+.alt-part .p-short{font-size:12px;color:var(--mute)}
+.alt-part .p-act{flex:none;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.alt-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.alt-match{font-size:11px;font-weight:800;color:var(--ink-2)}
+.alt-add{min-height:44px;padding:4px 10px;font-size:12px}
+.others{margin-top:10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--bg-2);padding:0 10px}
+.others summary{min-height:44px;display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:900;font-size:14px}
+.others[open]{padding-bottom:10px}
+.line.alt-line{background:#0d1620}
+@media(max-width:420px){.alts{margin-left:6px}.alt-part .thumb{width:56px;height:40px}.alt-part .thumb img{max-width:52px;max-height:36px}}
 .filters{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;-webkit-overflow-scrolling:touch}
 .filters .chip{flex:none}
 .more{margin-top:8px}

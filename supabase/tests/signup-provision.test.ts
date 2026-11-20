@@ -160,6 +160,12 @@ Deno.test('signup migration provisions companies, enforces the machine cap, and 
     )).rows[0].state;
     assert(serviceAttempt === 'ok', 'service_role can record a signup attempt');
     await db.exec('reset role');
+    const def = (await db.query<{ def: string }>(
+      "select pg_get_functiondef('public.bdht_provision_signup(uuid,text,text,text,text,text,jsonb)'::regprocedure) as def",
+    )).rows[0].def.toLowerCase();
+    const lockAt = def.indexOf('for update;');
+    const memberInsert = def.lastIndexOf("'member'");
+    assert(lockAt !== -1 && memberInsert !== -1 && lockAt < memberInsert, 'a join locks the company before inserting the member');
   } finally {
     await db.close();
   }

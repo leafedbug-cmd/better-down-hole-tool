@@ -6,6 +6,7 @@ import {
   INTEGRATION_IDENTIFIER,
   SUCCESS_URL,
   corsHeaders,
+  isAllowedOrigin,
   json,
   priceId,
 } from '../_shared/http.ts';
@@ -15,6 +16,7 @@ import { withBillingLock } from '../_shared/billing_lock.ts';
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(req) });
   if (req.method !== 'POST') return json(req, 405, { error: 'POST only' });
+  if (!isAllowedOrigin(req)) return json(req, 403, { error: 'Origin not allowed' });
 
   try {
     const admin = adminClient();
@@ -176,10 +178,14 @@ async function ensureCustomer(
 }
 
 function fail(req: Request, error: unknown): Response {
-  const status = typeof error === 'object' && error && 'status' in error
-    ? Number((error as { status: number }).status) || 500
-    : 500;
-  const message = error instanceof Error ? error.message : 'Checkout failed';
-  console.error('bdht-create-checkout', message);
-  return json(req, status >= 400 && status < 600 ? status : 500, { error: message });
+  const explicitStatus = typeof error === 'object' && error && 'status' in error
+    ? Number((error as { status: number }).status) || 0
+    : 0;
+  const status = explicitStatus >= 400 && explicitStatus < 600 ? explicitStatus : 500;
+  const rawMessage = error instanceof Error ? error.message : 'Checkout failed';
+  console.error('bdht-create-checkout', rawMessage);
+  const clientMessage = explicitStatus >= 400 && explicitStatus < 600
+    ? rawMessage
+    : 'Checkout is temporarily unavailable. Please try again.';
+  return json(req, status, { error: clientMessage });
 }

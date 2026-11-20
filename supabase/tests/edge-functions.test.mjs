@@ -228,3 +228,73 @@ test('a delayed invoice failure cannot replace a newer invoice or a paid status'
   assert.equal(table('bdht_billing')[0].latest_invoice_status, 'paid');
   assert.equal(table('bdht_billing')[0].payment_failed_at, null);
 });
+
+test('billing endpoints reject untrusted cross-origin POST requests and sanitize unexpected 500 errors', async () => {
+  const { handlers, state, checkout } = setup();
+  const evilReq = new Request('https://edge.invalid', {
+    method: 'POST',
+    headers: { Origin: 'https://evil.invalid' },
+  });
+  for (const handler of handlers.slice(0, 2)) {
+    const res = await handler(evilReq);
+    assert.equal(res.status, 403);
+  }
+  assert.equal(state.creates.length, 0);
+
+  state.failSave = true;
+  const failed = await checkout();
+  assert.equal(failed.status, 500);
+  const body = await failed.json();
+  assert.doesNotMatch(body.error, /session save failed/);
+});
+
+test('webhook rejects metadata company spoofing from a different Stripe customer when a customer is already bound', async () => {
+  const { webhook, state, table } = setup();
+  const spoofedSub = {
+    id: 'sub_spoof',
+    customer: 'cus_attacker',
+    status: 'active',
+    metadata: { company_id: 'company' },
+    items: { data: [{ price: 'price_expected' }] },
+  };
+  state.subscription = spoofedSub;
+  state.event = { id: 'evt_spoof', type: 'customer.subscription.created', data: { object: spoofedSub } };
+  assert.equal((await webhook()).status, 200);
+  assert.equal(table('bdht_billing')[0].stripe_customer_id, 'cus_1');
+  assert.equal(table('bdht_billing')[0].entitled, false);
+});
+
+test('an invoice failure for an older replaced subscription cannot overwrite an active newer subscription', async () => {
+  const { webhook, state, table } = setup();
+  Object.assign(table('bdht_billing')[0], {
+    stripe_customer_id: 'cus_1',
+    stripe_subscription_id: 'sub_new',
+    subscription_status: 'active',
+    entitled: true,
+    latest_invoice_id: 'in_new_paid',
+    latest_invoice_status: 'paid',
+    payment_failed_at: null,
+  });
+  const oldSub = {
+    id: 'sub_old',
+    customer: 'cus_1',
+    status: 'canceled',
+    latest_invoice: 'in_old_failed',
+    metadata: { company_id: 'company' },
+    items: { data: [{ price: 'price_expected' }] },
+  };
+  const oldInvoice = {
+    id: 'in_old_failed',
+    status: 'open',
+    customer: 'cus_1',
+    parent: { type: 'subscription_details', subscription_details: { subscription: 'sub_old' } },
+  };
+  state.subscription = oldSub;
+  state.invoice = oldInvoice;
+  state.event = { id: 'evt_old_sub_inv_fail', type: 'invoice.payment_failed', data: { object: oldInvoice } };
+  assert.equal((await webhook()).status, 200);
+  assert.equal(table('bdht_billing')[0].stripe_subscription_id, 'sub_new');
+  assert.equal(table('bdht_billing')[0].latest_invoice_id, 'in_new_paid');
+  assert.equal(table('bdht_billing')[0].latest_invoice_status, 'paid');
+  assert.equal(table('bdht_billing')[0].payment_failed_at, null);
+});

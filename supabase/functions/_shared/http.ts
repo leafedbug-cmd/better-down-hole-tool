@@ -11,6 +11,12 @@ export const INTEGRATION_IDENTIFIER = 'bdht_unlimited_hkwqzmpl';
 
 const ALLOWED_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 
+export function isAllowedOrigin(req: Request): boolean {
+  const origin = req.headers.get('Origin');
+  if (!origin) return true;
+  return origin === PAGES_ORIGIN || ALLOWED_ORIGIN.test(origin);
+}
+
 export function corsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get('Origin') ?? '';
   const allow = origin === PAGES_ORIGIN || ALLOWED_ORIGIN.test(origin)

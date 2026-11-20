@@ -75,20 +75,32 @@ Deno.serve(async (req) => {
 async function eventCompany(stripe: Stripe, admin: SupabaseClient, event: Stripe.Event): Promise<string | null> {
   const object = event.data.object as unknown as Record<string, unknown>;
   let customerId = idOf(object.customer);
-  const chargeId = idOf(object.charge);
-  if (!customerId && chargeId) customerId = idOf((await stripe.charges.retrieve(chargeId)).customer);
-  const mapped = await companyIdForCustomer(admin, customerId);
-  if (mapped) return mapped;
+  let paymentIntentId = idOf(object.payment_intent);
+  const chargeId = idOf(object.charge) ?? (event.type.startsWith('charge.') ? idOf(object.id) : null);
+  if ((!customerId || !paymentIntentId) && chargeId && event.type !== 'charge.refunded') {
+    const charge = await stripe.charges.retrieve(chargeId);
+    customerId ??= idOf(charge.customer);
+    paymentIntentId ??= idOf(charge.payment_intent);
+  }
   const metadata = object.metadata as Record<string, string> | undefined;
-  const fromMetadata = await companyIdFromMetadata(admin, metadata?.company_id);
-  if (fromMetadata) return fromMetadata;
+  const direct = await resolveCompanyId(admin, customerId, metadata?.company_id);
+  if (direct) return direct;
   const subscriptionId = event.type.startsWith('invoice.')
     ? subscriptionIdFromInvoice(event.data.object as Stripe.Invoice)
     : idOf(object.subscription);
-  if (!subscriptionId) return null;
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-  return await companyIdForCustomer(admin, idOf(subscription.customer))
-    ?? await companyIdFromMetadata(admin, subscription.metadata?.company_id);
+  if (subscriptionId) {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    return await resolveCompanyId(admin, idOf(subscription.customer), subscription.metadata?.company_id);
+  }
+  if (paymentIntentId) {
+    const subscriptionIds = await subscriptionIdsForPaymentIntent(stripe, paymentIntentId);
+    for (const subId of subscriptionIds) {
+      const subscription = await stripe.subscriptions.retrieve(subId);
+      const companyId = await resolveCompanyId(admin, idOf(subscription.customer), subscription.metadata?.company_id);
+      if (companyId) return companyId;
+    }
+  }
+  return null;
 }
 
 async function dispatch(stripe: Stripe, admin: SupabaseClient, event: Stripe.Event): Promise<string | null> {
@@ -144,6 +156,15 @@ async function syncInvoice(
   const subscription = await stripe.subscriptions.retrieve(subscriptionId);
   const companyId = await applySubscription(admin, subscription);
   if (!companyId) return null;
+  const { data: stored, error: storedError } = await admin
+    .from('bdht_billing')
+    .select('stripe_subscription_id')
+    .eq('company_id', companyId)
+    .maybeSingle();
+  if (storedError) throw storedError;
+  if (stored?.stripe_subscription_id && stored.stripe_subscription_id !== subscription.id) {
+    return companyId;
+  }
   if (idOf(subscription.latest_invoice) !== invoice.id) return companyId;
   invoice = await stripe.invoices.retrieve(invoice.id);
   const patch: Record<string, unknown> = {
@@ -153,7 +174,9 @@ async function syncInvoice(
   };
   if (failed && invoice.status !== 'paid') patch.payment_failed_at = new Date().toISOString();
   else if (invoice.status === 'paid') patch.payment_failed_at = null;
-  const { error } = await admin.from('bdht_billing').update(patch).eq('company_id', companyId);
+  const { error } = await admin.from('bdht_billing').update(patch)
+    .eq('company_id', companyId)
+    .eq('stripe_subscription_id', subscription.id);
   if (error) throw error;
   return companyId;
 }
@@ -170,16 +193,18 @@ async function applySubscription(admin: SupabaseClient, subscription: Stripe.Sub
   const item = subscription.items?.data?.[0];
   const incomingPrice = idOf(item?.price);
   const incomingEntitled = entitledFor(subscription.status, incomingPrice, expected);
-  const companyId = await companyIdForCustomer(admin, customerId)
-    ?? await companyIdFromMetadata(admin, subscription.metadata?.company_id);
+  const companyId = await resolveCompanyId(admin, customerId, subscription.metadata?.company_id);
   if (!companyId) return null;
 
   const { data: stored, error: readError } = await admin
     .from('bdht_billing')
-    .select('stripe_subscription_id, entitled')
+    .select('stripe_customer_id, stripe_subscription_id, entitled')
     .eq('company_id', companyId)
     .maybeSingle();
   if (readError) throw readError;
+  if (stored?.stripe_customer_id && customerId && stored.stripe_customer_id !== customerId) {
+    return null;
+  }
   if (keepStoredSubscription(stored?.stripe_subscription_id, stored?.entitled === true, subscription.id, incomingEntitled)) {
     return companyId;
   }
@@ -187,7 +212,7 @@ async function applySubscription(admin: SupabaseClient, subscription: Stripe.Sub
   const periodEnd = item?.current_period_end
     ? new Date(item.current_period_end * 1000).toISOString()
     : null;
-  const { error } = await admin.from('bdht_billing').upsert({
+  const upsertRow: Record<string, unknown> = {
     company_id: companyId,
     stripe_customer_id: customerId,
     stripe_subscription_id: subscription.id,
@@ -197,7 +222,11 @@ async function applySubscription(admin: SupabaseClient, subscription: Stripe.Sub
     current_period_end: periodEnd,
     cancel_at_period_end: subscription.cancel_at_period_end === true,
     updated_at: new Date().toISOString(),
-  }, { onConflict: 'company_id' });
+  };
+  if (incomingEntitled && stored?.stripe_subscription_id !== subscription.id) {
+    upsertRow.payment_failed_at = null;
+  }
+  const { error } = await admin.from('bdht_billing').upsert(upsertRow, { onConflict: 'company_id' });
   if (error) throw error;
   return companyId;
 }
@@ -266,19 +295,7 @@ async function flagFraud(
   return first;
 }
 
-async function companiesForPayment(
-  stripe: Stripe,
-  admin: SupabaseClient,
-  paymentIntentId: string | null,
-  chargeId: string | null,
-): Promise<string[]> {
-  let intentId = paymentIntentId;
-  if (!intentId && chargeId) {
-    const charge = await stripe.charges.retrieve(chargeId);
-    intentId = idOf(charge.payment_intent);
-  }
-  if (!intentId) return [];
-
+async function subscriptionIdsForPaymentIntent(stripe: Stripe, intentId: string): Promise<Set<string>> {
   const subscriptionIds = new Set<string>();
   let startingAfter: string | undefined;
   for (let page = 0; page < 10; page++) {
@@ -298,7 +315,23 @@ async function companiesForPayment(
     if (!list.has_more || list.data.length === 0) break;
     startingAfter = list.data[list.data.length - 1]?.id;
   }
+  return subscriptionIds;
+}
 
+async function companiesForPayment(
+  stripe: Stripe,
+  admin: SupabaseClient,
+  paymentIntentId: string | null,
+  chargeId: string | null,
+): Promise<string[]> {
+  let intentId = paymentIntentId;
+  if (!intentId && chargeId) {
+    const charge = await stripe.charges.retrieve(chargeId);
+    intentId = idOf(charge.payment_intent);
+  }
+  if (!intentId) return [];
+
+  const subscriptionIds = await subscriptionIdsForPaymentIntent(stripe, intentId);
   const companyIds: string[] = [];
   for (const subscriptionId of subscriptionIds) {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId);
@@ -306,6 +339,29 @@ async function companiesForPayment(
     if (companyId) companyIds.push(companyId);
   }
   return companyIds;
+}
+
+async function resolveCompanyId(
+  admin: SupabaseClient,
+  customerId: string | null,
+  metadataCompanyId: string | undefined,
+): Promise<string | null> {
+  const mapped = await companyIdForCustomer(admin, customerId);
+  if (mapped) return mapped;
+  const fromMetadata = await companyIdFromMetadata(admin, metadataCompanyId);
+  if (!fromMetadata) return null;
+  if (customerId) {
+    const { data: billing, error } = await admin
+      .from('bdht_billing')
+      .select('stripe_customer_id')
+      .eq('company_id', fromMetadata)
+      .maybeSingle();
+    if (error) throw error;
+    if (billing?.stripe_customer_id && billing.stripe_customer_id !== customerId) {
+      return null;
+    }
+  }
+  return fromMetadata;
 }
 
 async function companyIdForCustomer(admin: SupabaseClient, customerId: string | null): Promise<string | null> {

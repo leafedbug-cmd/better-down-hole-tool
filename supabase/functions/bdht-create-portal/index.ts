@@ -1,11 +1,12 @@
 import { adminClient } from '../_shared/supabase_admin.ts';
 import { stripeClient } from '../_shared/stripe.ts';
 import { requireOwner } from '../_shared/owner.ts';
-import { PORTAL_RETURN_URL, corsHeaders, json } from '../_shared/http.ts';
+import { PORTAL_RETURN_URL, corsHeaders, isAllowedOrigin, json } from '../_shared/http.ts';
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(req) });
   if (req.method !== 'POST') return json(req, 405, { error: 'POST only' });
+  if (!isAllowedOrigin(req)) return json(req, 403, { error: 'Origin not allowed' });
 
   try {
     const admin = adminClient();
@@ -27,11 +28,15 @@ Deno.serve(async (req) => {
     });
     return json(req, 200, { url: session.url });
   } catch (error) {
-    const status = typeof error === 'object' && error && 'status' in error
-      ? Number((error as { status: number }).status) || 500
-      : 500;
-    const message = error instanceof Error ? error.message : 'Portal failed';
-    console.error('bdht-create-portal', message);
-    return json(req, status >= 400 && status < 600 ? status : 500, { error: message });
+    const explicitStatus = typeof error === 'object' && error && 'status' in error
+      ? Number((error as { status: number }).status) || 0
+      : 0;
+    const status = explicitStatus >= 400 && explicitStatus < 600 ? explicitStatus : 500;
+    const rawMessage = error instanceof Error ? error.message : 'Portal failed';
+    console.error('bdht-create-portal', rawMessage);
+    const clientMessage = explicitStatus >= 400 && explicitStatus < 600
+      ? rawMessage
+      : 'Billing portal is temporarily unavailable. Please try again.';
+    return json(req, status, { error: clientMessage });
   }
 });

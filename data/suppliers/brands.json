@@ -1,0 +1,243 @@
+{
+ "source": "Manufacturer websites listed per brand",
+ "fetched": "2026-11-23",
+ "brands": [
+  {
+   "id": "melfred-borzall",
+   "name": "Melfred Borzall",
+   "url": "https://www.melfredborzall.com",
+   "itemCount": 15
+  },
+  {
+   "id": "railhead",
+   "name": "Railhead Underground Products",
+   "url": "https://railhead.com",
+   "itemCount": 11
+  },
+  {
+   "id": "sharewell-hdd",
+   "name": "Sharewell HDD (Smith Gemini)",
+   "url": "https://sharewellhdd.com",
+   "itemCount": 51
+  },
+  {
+   "id": "vermeer-borestore",
+   "name": "Vermeer BORESTORE",
+   "url": "https://borestore.com",
+   "itemCount": 14
+  },
+  {
+   "id": "hole-products",
+   "name": "Hole Products",
+   "url": "https://www.holeproducts.com",
+   "itemCount": 4
+  },
+  {
+   "id": "straightline-hdd",
+   "name": "StraightLine HDD",
+   "url": "https://straightlinehdd.com",
+   "itemCount": 24
+  },
+  {
+   "id": "infinity-tool",
+   "name": "Infinity Tool MFG",
+   "url": "https://infinitytoolmfg.com",
+   "itemCount": 111
+  },
+  {
+   "id": "inrock",
+   "name": "INROCK",
+   "url": "https://www.inrock.com",
+   "itemCount": 12
+  },
+  {
+   "id": "hunting-trenchless",
+   "name": "Hunting Trenchless",
+   "url": "https://huntingplc.com/products-services/trenchless-mwd/trenchless/",
+   "itemCount": 2
+  },
+  {
+   "id": "underground-tools",
+   "name": "Underground Tools (UTI)",
+   "url": "https://undergroundtools.com",
+   "itemCount": 0,
+   "note": "Site returned HTTP 403 to automated requests, so no products could be read."
+  },
+  {
+   "id": "tuffrod",
+   "name": "TuffRod Pipe",
+   "url": "https://tuffrod.com",
+   "itemCount": 5
+  },
+  {
+   "id": "horizontal-technology",
+   "name": "Horizontal Technology (HTI)",
+   "url": "https://horizontaltech.com",
+   "itemCount": 12
+  },
+  {
+   "id": "american-manufacturing-hdd",
+   "name": "American Manufacturing HDD",
+   "url": "https://americanmfghdd.com",
+   "itemCount": 0,
+   "note": "Site lists categories only (bits, reamers, hole openers, subs, swivels). No product pages, names or specs."
+  },
+  {
+   "id": "premium-rock-bit",
+   "name": "Premium Rock Bit",
+   "url": "https://www.premiumrockbit.com",
+   "itemCount": 0,
+   "note": "TLS certificate error on the site, so no products could be read."
+  },
+  {
+   "id": "bit-brokers",
+   "name": "Bit Brokers International",
+   "url": "https://bitbrokers.com",
+   "itemCount": 9
+  },
+  {
+   "id": "kondex",
+   "name": "Kondex (Drill Defender)",
+   "url": "https://kondexparts.com/hdd/",
+   "itemCount": 5
+  },
+  {
+   "id": "universal-hdd",
+   "name": "Universal HDD",
+   "url": "https://unihdd.com",
+   "itemCount": 0,
+   "note": "Rate limited (HTTP 429) on product collections. Only the homepage could be read."
+  },
+  {
+   "id": "drillhead",
+   "name": "DrillHead",
+   "url": "http://www.drillhead.net",
+   "itemCount": 0,
+   "note": "TLS certificate error on the site, so no products could be read."
+  },
+  {
+   "id": "adtech-motors",
+   "name": "ADTECH Motors",
+   "url": "https://adtechmotors.com",
+   "itemCount": 3
+  },
+  {
+   "id": "slimdril",
+   "name": "SlimDril",
+   "url": "https://www.slimdril.com",
+   "itemCount": 1
+  },
+  {
+   "id": "hdd-drilling-tools",
+   "name": "HDD Drilling Tools B.V.",
+   "url": "https://hdddrillingtools.com",
+   "itemCount": 10
+  },
+  {
+   "id": "ids-uk",
+   "name": "IDS UK",
+   "url": "https://idsuk.com",
+   "itemCount": 0,
+   "note": "Homepage renders no content without JavaScript. No product links could be read."
+  },
+  {
+   "id": "drillnova",
+   "name": "Drillnova (FIRMTECH)",
+   "url": "https://drillnova.com",
+   "itemCount": 24
+  },
+  {
+   "id": "herrenknecht",
+   "name": "Herrenknecht",
+   "url": "https://www.herrenknecht.com",
+   "itemCount": 3
+  },
+  {
+   "id": "numa",
+   "name": "Numa",
+   "url": "https://www.numahammers.com",
+   "itemCount": 5
+  },
+  {
+   "id": "century-products",
+   "name": "Century Products",
+   "url": "https://centuryproducts.net",
+   "itemCount": 1
+  },
+  {
+   "id": "drill-pipe-inc",
+   "name": "Drill Pipe Inc. (DPI)",
+   "url": "https://drillpipeinc.com",
+   "itemCount": 0,
+   "note": "TLS certificate on the site has expired, so no products could be read."
+  },
+  {
+   "id": "prime-horizontal",
+   "name": "Prime Horizontal",
+   "url": "https://primehorizontal.com",
+   "itemCount": 16
+  }
+ ],
+ "skipped": [
+  {
+   "id": "digital-control",
+   "name": "Digital Control Inc (DigiTrak)",
+   "url": "https://www.digital-control.com",
+   "reason": "Locator-only maker. Its site had no sonde housing or thread-connected product the configurator can slot. The page read was a placeholder."
+  },
+  {
+   "id": "underground-magnetics",
+   "name": "Underground Magnetics",
+   "url": "https://undergroundmagnetics.com",
+   "reason": "Locator-only maker. Its transmitters and sondes are electronics, not threaded string parts. The configurator has no slot for them."
+  },
+  {
+   "id": "tracto",
+   "name": "TRACTO",
+   "url": "https://tracto.com",
+   "reason": "Rigs, hammers and bursting systems only. No downhole tooling or drill pipe listed."
+  },
+  {
+   "id": "prime-drilling",
+   "name": "Prime Drilling",
+   "url": "https://www.prime-drilling.de",
+   "reason": "Rigs, compact units, pipe pushers and pump units only."
+  },
+  {
+   "id": "barbco",
+   "name": "Barbco",
+   "url": "https://www.barbco.com",
+   "reason": "Auger-boring and guided-boring heads. Its pages do not describe them as HDD tooling and give no thread or size data."
+  },
+  {
+   "id": "byrne-group",
+   "name": "Byrne Group",
+   "url": "https://byrnegroup.com",
+   "reason": "Distributor. Its HDD page names product lines (drill pipe, sonde housings, pilot bits, back reamers, transition subs) but has no product pages or specs, so nothing could be added without guessing."
+  },
+  {
+   "id": "tt-technologies",
+   "name": "TT Technologies",
+   "url": "https://www.tttechnologies.com",
+   "reason": "Only HDD products are complete rigs (Grundodrill 5X, Grundopit). No downhole tooling or stand-alone drill pipe."
+  },
+  {
+   "id": "egw-utility-solutions",
+   "name": "EGW Utility Solutions",
+   "url": "https://www.egwutilitysolutions.com",
+   "reason": "Its only HDD listing is a complete machine. No tooling."
+  },
+  {
+   "id": "downhole-direct-supply",
+   "name": "Downhole Direct Supply",
+   "url": "https://downholedirectsupply.com",
+   "reason": "Mud pump liners, cups and rebuild kits. Not downhole tooling."
+  },
+  {
+   "id": "brownline-drillguide",
+   "name": "Brownline (Drillguide)",
+   "url": "https://drillguide.com",
+   "reason": "Gyro and wireless guidance electronics. No threaded string parts or specs."
+  }
+ ]
+}

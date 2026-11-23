@@ -1,0 +1,255 @@
+[
+ {
+  "model": "LT2",
+  "minPilot": "2.5”",
+  "cutters": 3,
+  "wt": 16.0,
+  "len": 24.0,
+  "conn": "2 IF B x P",
+  "range": [
+   "6”"
+  ],
+  "family": "LT"
+ },
+ {
+  "model": "LT4",
+  "minPilot": "4.5”",
+  "cutters": 3,
+  "wt": 160.0,
+  "len": 37.5,
+  "conn": "2 7/8 IF B x P",
+  "range": [
+   "8”",
+   "10”",
+   "12”"
+  ],
+  "family": "LT"
+ },
+ {
+  "model": "LT6",
+  "minPilot": "6.5”",
+  "cutters": 3,
+  "wt": 304.0,
+  "len": 44.0,
+  "conn": "3 1/2 IF B x P",
+  "range": [
+   "12”",
+   "14”",
+   "16”"
+  ],
+  "family": "LT"
+ },
+ {
+  "model": "LT8",
+  "minPilot": "8.5”",
+  "cutters": 3,
+  "wt": 628.0,
+  "len": 48.5,
+  "conn": "4 1/2 IF B x P",
+  "range": [
+   "16”",
+   "18”",
+   "20”",
+   "22”",
+   "24”"
+  ],
+  "family": "LT"
+ },
+ {
+  "model": "LT16",
+  "minPilot": "18”",
+  "cutters": 3,
+  "wt": 1194.0,
+  "len": 48.5,
+  "conn": "7 5/8 reg B x P",
+  "range": [
+   "24”",
+   "26”",
+   "28\"",
+   "30\"",
+   "32\""
+  ],
+  "family": "LT"
+ },
+ {
+  "model": "LT16-4",
+  "minPilot": "18”",
+  "cutters": 4,
+  "wt": 1252.0,
+  "len": 48.5,
+  "conn": "7 5/8 reg B x P",
+  "range": [
+   "24”",
+   "26”",
+   "28\"",
+   "30\"",
+   "32\""
+  ],
+  "family": "LT"
+ },
+ {
+  "model": "LTX10",
+  "minPilot": "10.5”",
+  "cutters": 3,
+  "wt": 850.0,
+  "len": 61.0,
+  "conn": "6 5/8 reg B x B",
+  "range": [
+   "22”",
+   "24\"",
+   "26\"",
+   "28\""
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX12",
+  "minPilot": "12.25”",
+  "cutters": 3,
+  "wt": 1462.0,
+  "len": 61.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "24”",
+   "26”",
+   "28\"",
+   "30\""
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX18",
+  "minPilot": "20”",
+  "cutters": 3,
+  "wt": 1915.0,
+  "len": 58.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "30”",
+   "32”",
+   "34”",
+   "36\""
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX18-4",
+  "minPilot": "20”",
+  "cutters": 4,
+  "wt": 1960.0,
+  "len": 58.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "30”",
+   "32”",
+   "34”",
+   "36”"
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX24-5",
+  "minPilot": "26”",
+  "cutters": 5,
+  "wt": 2055.0,
+  "len": 58.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "36”",
+   "38”",
+   "40\"",
+   "42\""
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX30-5",
+  "minPilot": "32”",
+  "cutters": 5,
+  "wt": 2570.0,
+  "len": 58.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "42”",
+   "44”",
+   "46\"",
+   "48\""
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX36-6",
+  "minPilot": "38\"",
+  "cutters": 6,
+  "wt": 3175.0,
+  "len": 58.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "48\"",
+   "50\"",
+   "52\"",
+   "54\""
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX42-6",
+  "minPilot": "44\"",
+  "cutters": 6,
+  "wt": 3390.0,
+  "len": 58.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "54\"",
+   "56\"",
+   "58\"",
+   "60\""
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX48-6",
+  "minPilot": "50\"",
+  "cutters": 6,
+  "wt": 3900.0,
+  "len": 58.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "60\"",
+   "62\"",
+   "64\"",
+   "66\""
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX48-7",
+  "minPilot": "50\"",
+  "cutters": 7,
+  "wt": 3955.0,
+  "len": 58.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "60\"",
+   "62\"",
+   "64\"",
+   "66\""
+  ],
+  "family": "LTX"
+ },
+ {
+  "model": "LTX54-7",
+  "minPilot": "56\"",
+  "cutters": 7,
+  "wt": 4250.0,
+  "len": 58.0,
+  "conn": "7 5/8 reg B x B",
+  "range": [
+   "66\"",
+   "68\"",
+   "70\"",
+   "72\""
+  ],
+  "family": "LTX"
+ }
+]

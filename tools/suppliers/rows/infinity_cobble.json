@@ -1,0 +1,58 @@
+[
+ {
+  "title": "Cobble Buster HDD PDC Bits - 4 3/4\", 120.7, 5 Blades, Cobble Buster HDD, 2 7/8\" API REG PIN Connection, Back Out Cutters",
+  "diaIn": 4.75,
+  "diaMm": 120.7,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260884"
+ },
+ {
+  "title": "Cobble Buster HDD PDC Bits - 5 1/2\", 139.7, 5 Blades, Cobble Buster HDD, 2 7/8\" API REG PIN Connection, Back Out Cutters",
+  "diaIn": 5.5,
+  "diaMm": 139.7,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260880"
+ },
+ {
+  "title": "Cobble Buster HDD PDC Bits - 5 5/8\", 142.9, 5 Blades, Cobble Buster HDD, 2 7/8\" API REG PIN Connection, Back Out Cutters",
+  "diaIn": 5.625,
+  "diaMm": 142.9,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260890"
+ },
+ {
+  "title": "Cobble Buster HDD PDC Bits - 6 1/2”, 165.1, 5 Blades, Cobble Buster HDD, 2 7/8\" API REG PIN Connection, Back Out Cutters",
+  "diaIn": 6.5,
+  "diaMm": 165.1,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260901"
+ },
+ {
+  "title": "Cobble Buster HDD PDC Bits - 6 1/2”, 165.1, 5 Blades, Cobble Buster HDD, 3 1/2\" API REG PIN Connection, Back Out Cutters",
+  "diaIn": 6.5,
+  "diaMm": 165.1,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260913"
+ },
+ {
+  "title": "Cobble Buster HDD PDC Bits - 8 1/2\", 215.9, 5 Blades, Cobble Buster HDD, 4 1/2\" API REG PIN Connection, Back Out Cutters",
+  "diaIn": 8.5,
+  "diaMm": 215.9,
+  "face": "5 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260918"
+ },
+ {
+  "title": "Cobble Buster HDD PDC Bits - 12 1/4\", 311.2, 6 Blades, Cobble Buster HDD, 6 5/8\" API REG PIN Connection, Back Out Cutters",
+  "diaIn": 12.25,
+  "diaMm": 311.2,
+  "face": "6 Blades",
+  "conn": "6-5/8\" API REG PIN Connection",
+  "sku": "ITM260919"
+ }
+]

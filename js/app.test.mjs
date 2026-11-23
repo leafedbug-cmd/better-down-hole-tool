@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import { normalizeConfig, quantity } from './config.mjs';
 import { compute, lineItems, isLoadoutReady } from './compatibility.mjs';
 import * as radius from './radius.mjs';
+import * as suppliers from './suppliers.mjs';
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), 'utf8');
 const catalog = JSON.parse(read('../data/catalog.json'));

@@ -76,7 +76,7 @@ export function compute(rm, cfg) {
 export function lineItems(rm, cfg, rows) {
   const P = rm.parts, out = [];
   for (const r of rows) for (const id of r.sel) {
-    out.push({ key: `${r.sec.id}.${id}`, sec: r.sec.name, part: P[id], auto: r.status === 'auto' });
+    out.push({ key: `${r.sec.id}.${id}`, sec: r.sec.name, part: P[id], auto: r.status === 'auto', ...(P[id].brand ? { brand: P[id].brand } : {}) });
     const a = r.acc[id];
     if (a) out.push({ key: `${r.sec.id}.${id}.a${a.id}`, sec: `${r.sec.name} add-on`, part: P[a.id], acc: true, auto: a.auto });
   }

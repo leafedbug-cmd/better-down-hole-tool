@@ -9,6 +9,33 @@ Mobile-first HDD drill-string builder: pick a drill and pipe, build a compatible
 
 See [FIX_HANDOFF.md](FIX_HANDOFF.md) for the earlier bug fixes. Sign-up on the shared Supabase project is below. Public email sign-ups stay off.
 
+## Supplier catalog
+
+Aftermarket HDD tooling from independent suppliers lives in `data/suppliers/`:
+
+| File | What it holds |
+| --- | --- |
+| `brands.json` | Listed supplier brands (with an item count and a note when a brand has none), plus `skipped` suppliers and why |
+| `connections.json` | Thread codes used by supplier parts (`status`: `existing` in a roadmap already, or `new`), and the raw thread wording that is not wired |
+| `parts.json` | One row per product or table row: `url` (manufacturer product page), `pn`, `diameterIn`, `lengthIn`, `weightLb`, `rigClass`, `conn`, `specs`, `source`, `configurator`, `unverified` |
+
+Rules for this data:
+
+- A value is stored only if the manufacturer page states it. Everything else is `null` and named in the part's `unverified` list. Unit conversions are limited to fractions to decimals, kg to lb and ft to in, and are noted in `specs`.
+- `conn.wired` is true only when the page says box or pin for the thread end. Only wired Bit, hole opener and reamer parts reach the fit solver. Everything else stays in the catalog.
+- `url` is the plain product page. No affiliate tags or tracking parameters (the build fails if it finds one). Add referral links later by transforming `url` at render time, not in this data.
+- No prices are stored.
+
+How it reaches the builder: `loadRoadmap()` merges wired parts into each roadmap's Bit and Backreamer slots (`js/suppliers.mjs`). `compute()` in `js/compatibility.mjs` then shows a supplier part only when the part before it threads onto it, so the existing subs and adapters in each roadmap do the bridging. Supplier ids start at 900001 and are never reused.
+
+Rebuild after editing the curated tables or `tools/suppliers/rows/*.json`:
+
+```sh
+node tools/suppliers_build.mjs          # writes data/suppliers/*.json
+node tools/suppliers_build.mjs --check  # validates only
+node --test js/*.test.mjs
+```
+
 ## Account sign-up
 
 `bdht_machines` is the equipment list: one row is one machine (a drill model plus a unit name). People are `bdht_members`. The free plan is 3 machines, then Unlimited at $2.99/month. The sign-up form and My rigs both add machines. They do not add people.

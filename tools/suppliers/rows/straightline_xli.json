@@ -1,0 +1,110 @@
+[
+ {
+  "sku": "12.75INCH3MILLTOOTHCONE",
+  "diaIn": 12.75,
+  "cutter": "Mill Tooth",
+  "cones": 3,
+  "shaftOd": 4.25,
+  "ifSize": "2.87",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "12.75INCH3TCICONE",
+  "diaIn": 12.75,
+  "cutter": "TCI",
+  "cones": 3,
+  "shaftOd": 4.25,
+  "ifSize": "2.87",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "12.75INCH4MILLTOOTHCONE",
+  "diaIn": 12.75,
+  "cutter": "Mill Tooth",
+  "cones": 4,
+  "shaftOd": 4.25,
+  "ifSize": "2.87",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "12.75INCH4TCICONE",
+  "diaIn": 12.75,
+  "cutter": "TCI",
+  "cones": 4,
+  "shaftOd": 4.25,
+  "ifSize": "2.87",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "15INCH4MILLTOOTHCONE",
+  "diaIn": 15.0,
+  "cutter": "Mill Tooth",
+  "cones": 4,
+  "shaftOd": 4.625,
+  "ifSize": "3.5",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "15INCH4TCICONE",
+  "diaIn": 15.0,
+  "cutter": "TCI",
+  "cones": 4,
+  "shaftOd": 4.625,
+  "ifSize": "3.5",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "18INCH4MILLTOOTHCONE",
+  "diaIn": 18.0,
+  "cutter": "Mill Tooth",
+  "cones": 5,
+  "shaftOd": 4.75,
+  "ifSize": "3.5",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "18INCH5TCICONE",
+  "diaIn": 18.0,
+  "cutter": "TCI",
+  "cones": 5,
+  "shaftOd": 4.75,
+  "ifSize": "3.5",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "20INCH4MILLTOOTHCONE",
+  "diaIn": 20.0,
+  "cutter": "Mill Tooth",
+  "cones": 5,
+  "shaftOd": 4.75,
+  "ifSize": "3.5",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "20INCH5TCICONE",
+  "diaIn": 20.0,
+  "cutter": "TCI",
+  "cones": 5,
+  "shaftOd": 4.75,
+  "ifSize": "3.5",
+  "shaftLen": 44.25
+ },
+ {
+  "sku": "24INCH4MILLTOOTHCONE",
+  "diaIn": 24.0,
+  "cutter": "Mill Tooth",
+  "cones": 5,
+  "shaftOd": 4.75,
+  "ifSize": "3.5",
+  "shaftLen": 66.5
+ },
+ {
+  "sku": "24INCH5TCICONE",
+  "diaIn": 24.0,
+  "cutter": "TCI",
+  "cones": 5,
+  "shaftOd": 4.75,
+  "ifSize": "3.5",
+  "shaftLen": 66.5
+ }
+]

@@ -197,16 +197,17 @@ function setStepper(step, cfg, ready = false) {
   }
   if (!step) { el.hidden = true; return; }
   const steps = [
-    ['Drill', m ? m.model : '', '#/drill'],
-    ['Pipe', p ? p.name : '', m ? `#/pipe/${m.id}` : null],
-    ['Equip', cfg?.r ? cfg.mode : '', cfg?.r ? `#/build?c=${b64e(cfg)}` : null],
-    [ready ? 'Confirm' : 'Review', '', cfg?.r ? `#/summary?c=${b64e(cfg)}` : null],
+    ['Drill', m ? m.model : 'Choose rig', '#/drill'],
+    ['Pipe', p ? p.name : 'Lock pipe', m ? `#/pipe/${m.id}` : null],
+    ['Build', cfg?.r ? (cfg.mode === 'Bit' ? 'Pilot (Bit)' : 'Pullback') : 'Equip slots', cfg?.r ? `#/build?c=${b64e(cfg)}` : null],
+    [ready ? 'Confirm' : 'Brief', cfg?.r ? (ready ? 'Ready' : 'Draft') : 'Dispatch', cfg?.r ? `#/summary?c=${b64e(cfg)}` : null],
   ];
   el.innerHTML = `<ol>${steps.map(([t, sub, href], i) => {
     const done = i + 1 < step && (i !== 2 || ready);
-    const cls = done ? 'done' : i + 1 === step ? 'cur' : '';
-    const inner = `<i class="n">${done ? '✓' : i + 1}</i>${t}${sub ? `<em class="lbl-sub">${esc(sub)}</em>` : ''}`;
-    return `<li class="${cls}">${href && i + 1 !== step ? `<a href="${href}">${inner}</a>` : `<span aria-current="${i + 1 === step ? 'step' : 'false'}">${inner}</span>`}</li>`;
+    const cur = i + 1 === step;
+    const cls = done ? 'done' : cur ? 'cur' : !href ? 'is-disabled' : '';
+    const inner = `<i class="n">${done ? '✓' : i + 1}</i><span class="rd-step-text"><span class="rd-step-title">${esc(t)}</span>${sub ? `<em class="lbl-sub">${esc(sub)}</em>` : ''}</span>`;
+    return `<li class="${cls}">${href && !cur ? `<a class="rd-step-item" href="${href}">${inner}</a>` : `<span class="rd-step-item" aria-current="${cur ? 'step' : 'false'}">${inner}</span>`}</li>`;
   }).join('')}</ol>`;
   el.hidden = false;
 }
@@ -309,35 +310,62 @@ function savedRow(s, { del = false } = {}) {
   </article>`;
 }
 /* Step 1 – drill */
-let drillFilter = { brand: 'all', q: '' };
+let drillFilter = { brand: 'all', size: 'all', q: '' };
 async function viewDrill(isCurrent = () => true) {
   await loadCatalog();
   if (!isCurrent()) return;
   setStepper(1, null); setActionbar('');
+  const machines = CATALOG.machines || [];
+  const counts = {
+    all: machines.length,
+    'Ditch Witch': machines.filter((m) => m.brand === 'Ditch Witch').length,
+    Vermeer: machines.filter((m) => m.brand === 'Vermeer').length,
+  };
   app.innerHTML = `
-    ${pageHead('Step 01 · Drill class', 'Choose your drill', `This is the machine you are building for. Tap a ${brandText('Ditch Witch', 'Ditch Witch®')} or ${brandText('Vermeer', 'Vermeer®')} model, or search “JT25” or “D24”.`)}
-    <div class="stack">
-      <div class="searchbox">${ICON.search}<input id="q" type="search" inputmode="search" autocomplete="off" placeholder="Search drill model" value="${esc(drillFilter.q)}" aria-label="Search drill model"><button class="clear" id="clear" aria-label="Clear" ${drillFilter.q ? '' : 'hidden'}>×</button></div>
-      <div class="seg" role="group" aria-label="Brand">
-        ${[['all', 'All'], ['Ditch Witch', 'Ditch Witch®'], ['Vermeer', 'Vermeer®']].map(([v, l]) => `<button data-brand="${v}"${v === 'all' ? '' : brandAttr(v)} aria-pressed="${drillFilter.brand === v}">${l}</button>`).join('')}
+    <div class="view-head">
+      <div>
+        <div class="view-kicker">Step 01 · Rig matrix</div>
+        <h1>Select drill rig</h1>
+        <p class="view-sub">Pick the ${brandText('Ditch Witch', 'Ditch Witch®')} or ${brandText('Vermeer', 'Vermeer®')} rig you are rigging up. Only pipe and tooling compatible with that drill are unlocked downstream.</p>
+      </div>
+    </div>
+    <div class="drill-controls">
+      <div class="searchbox">${ICON.search}<input id="q" type="search" inputmode="search" autocomplete="off" placeholder="Search rig model (e.g. D24, JT25, AT120)" value="${esc(drillFilter.q)}" aria-label="Search drill model"><button class="clear" id="clear" aria-label="Clear" ${drillFilter.q ? '' : 'hidden'}>×</button></div>
+      <div class="drill-filter-group" role="group" aria-label="Brand">
+        <span class="drill-filter-label">Make</span>
+        ${[['all', 'All', counts.all], ['Ditch Witch', 'Ditch Witch®', counts['Ditch Witch']], ['Vermeer', 'Vermeer®', counts.Vermeer]].map(([v, l, cnt]) => `<button type="button" class="filter-chip" data-brand="${v}"${v === 'all' ? '' : brandAttr(v)} aria-pressed="${drillFilter.brand === v}">${l} <span class="cnt">(${cnt})</span></button>`).join('')}
+      </div>
+      <div class="drill-filter-group" role="group" aria-label="Size class">
+        <span class="drill-filter-label">Class</span>
+        ${['all', 'Compact', 'Mid-size', 'Large'].map((sz) => `<button type="button" class="filter-chip" data-size="${sz}" aria-pressed="${drillFilter.size === sz}">${sz === 'all' ? 'All sizes' : sz}</button>`).join('')}
       </div>
     </div>
     <div id="drills"></div>`;
   const draw = () => {
     const q = drillFilter.q.trim().toLowerCase().replace(/\s+/g, '');
-    const list = CATALOG.machines.filter((m) => (drillFilter.brand === 'all' || m.brand === drillFilter.brand) && (!q || `${m.brand}${m.model}`.toLowerCase().replace(/\s+/g, '').includes(q)));
+    const list = machines.filter((m) => (drillFilter.brand === 'all' || m.brand === drillFilter.brand)
+      && (drillFilter.size === 'all' || m.size === drillFilter.size)
+      && (!q || `${m.brand}${m.model}${m.size}`.toLowerCase().replace(/\s+/g, '').includes(q)));
     const groups = ['Compact', 'Mid-size', 'Large'].map((g) => [g, list.filter((m) => m.size === g)]).filter(([, l]) => l.length);
-    const sub = { Compact: 'up to ~10k lb class', 'Mid-size': '~12k–40k lb class', Large: '60k lb class and up' };
-    $('#drills').innerHTML = !list.length ? `<div class="empty">No drill matches “${esc(drillFilter.q)}”.</div>` :
-      groups.map(([g, l]) => `<div class="section-head"><h2>${g}</h2><span class="small muted">${sub[g]}</span></div>
-        <div class="tiles">${l.map((m) => {
-          const n = m.pipes.length;
-          return `<a class="tile"${brandAttr(m.brand)} href="#/pipe/${m.id}">
-            <div><div class="t-brand">${esc(m.brand)}</div><div class="t-model">${esc(m.model)}</div></div>
-            <div class="t-meta">${n ? `${n} pipe option${n === 1 ? '' : 's'}` : 'No pipe listed'}</div>
-            <div class="t-act">Select</div></a>`;
-        }).join('')}</div>`).join('') +
-      (drillFilter.brand !== 'Ditch Witch' ? `<div class="note" style="margin-top:16px">${ICON.info}<span>Running a ${brandText('Vermeer', 'Vermeer®')}? ${brandText('Ditch Witch')} drill pipe HIWS1® and HXT® is compatible with all ${brandText('Vermeer', 'Vermeer®')} Firestick® threads.</span></div>` : '');
+    const sub = { Compact: 'up to ~10k lb class', 'Mid-size': '~12k–40k lb class', Large: '60k lb class & maxi rigs' };
+    $('#drills').innerHTML = !list.length
+      ? `<div class="empty-box"><p>No drill matches “${esc(drillFilter.q)}”.</p><button type="button" class="btn btn-outline btn-sm" id="drill-reset">Reset filters</button></div>`
+      : groups.map(([g, l]) => `<div class="drill-group-head"><h2>${g}</h2><span>${sub[g]} · ${l.length} rig${l.length === 1 ? '' : 's'}</span></div>
+          <div class="drill-matrix">${l.map((m) => {
+            const n = m.pipes.length;
+            return `<a class="drill-card"${brandAttr(m.brand)} href="#/pipe/${m.id}">
+              <div class="drill-card-top">${brandChip(m.brand)}<span class="drill-size">${esc(m.size)}</span></div>
+              <div class="drill-model">${esc(m.model)}</div>
+              <div class="drill-card-foot"><span class="drill-pipes">${n ? `${n} pipe${n === 1 ? '' : 's'}` : 'No pipe listed'}</span><span class="drill-go">Select →</span></div></a>`;
+          }).join('')}</div>`).join('') +
+        (drillFilter.brand !== 'Ditch Witch' ? `<div class="note" style="margin-top:14px">${ICON.info}<span>Running a ${brandText('Vermeer', 'Vermeer®')}? ${brandText('Ditch Witch')} drill pipe HIWS1® and HXT® is compatible with all ${brandText('Vermeer', 'Vermeer®')} Firestick® threads.</span></div>` : '');
+    $('#drill-reset')?.addEventListener('click', () => {
+      drillFilter = { brand: 'all', size: 'all', q: '' };
+      $('#q').value = ''; $('#clear').hidden = true;
+      $$('[data-brand]').forEach((x) => x.setAttribute('aria-pressed', x.dataset.brand === 'all'));
+      $$('[data-size]').forEach((x) => x.setAttribute('aria-pressed', x.dataset.size === 'all'));
+      draw();
+    });
   };
   draw();
   const q = $('#q');
@@ -346,6 +374,10 @@ async function viewDrill(isCurrent = () => true) {
   $$('[data-brand]').forEach((b) => b.addEventListener('click', () => {
     drillFilter.brand = b.dataset.brand;
     $$('[data-brand]').forEach((x) => x.setAttribute('aria-pressed', x === b)); draw();
+  }));
+  $$('[data-size]').forEach((b) => b.addEventListener('click', () => {
+    drillFilter.size = b.dataset.size;
+    $$('[data-size]').forEach((x) => x.setAttribute('aria-pressed', x === b)); draw();
   }));
 }
 
@@ -357,26 +389,44 @@ async function viewPipe(mid, isCurrent = () => true) {
   if (!m) return viewNotFound();
   setStepper(2, { m: m.id }); setActionbar('');
   const ctx = loCtx.for({ m: m.id });
+  const pipes = m.pipes || [];
   app.innerHTML = `
     ${ctx ? loBanner(ctx, 'NEW LOADOUT · LOCK PIPE') : ''}
-    ${ctx ? `<a class="linkbtn" href="#/rig/${esc(ctx.machine.id)}">‹ Back to ${esc(rigName(ctx.machine))}</a>` : '<a class="linkbtn" href="#/drill">‹ Change drill</a>'}
-    ${pageHead('Step 02 · Pipe', `${esc(m.brand)} ${esc(m.model)}`, `Lock the pipe for this drill. Only pipe that fits the ${esc(m.model)} can be equipped.`)}
-    <div class="stack">${m.pipes.map((p) => p.roadmap ? `
-      <a class="choice"${brandAttr(partTheme(p))} href="#/build?c=${b64e(newCfg(m.id, p.id, p.roadmap))}">
+    ${ctx ? `<a class="link-back" href="#/rig/${esc(ctx.machine.id)}">‹ Back to ${esc(rigName(ctx.machine))}</a>` : '<a class="link-back" href="#/drill">‹ Back to drill matrix</a>'}
+    <section class="rig-header-bar"${brandAttr(m.brand)}>
+      <div>
+        <div class="view-kicker">Step 02 · Lock drill pipe</div>
+        <h1>${esc(m.brand)} ${esc(m.model)}</h1>
+      </div>
+      <div class="rig-header-meta">
+        ${brandChip(m.brand)}
+        <span class="status-pill">${esc(m.size)} Class</span>
+        <span class="status-pill">${pipes.length} Pipe Option${pipes.length === 1 ? '' : 's'}</span>
+      </div>
+    </section>
+    <div class="pipe-table">${pipes.map((p) => p.roadmap ? `
+      <a class="pipe-row"${brandAttr(partTheme(p))} href="#/build?c=${b64e(newCfg(m.id, p.id, p.roadmap))}">
         ${catalogPhoto(p.img, p.name)}
-        <div class="c-main"><div class="c-title">${esc(p.name)}</div>
-          <div class="c-sub">${partChip(p)} ${p.pn ? `Part # <b class="pn">${esc(p.pn)}</b>` : ''}</div></div>${ICON.chev}</a>` : `
-      <div class="choice"${brandAttr(partTheme(p))} aria-disabled="true">
+        <div class="pipe-info"><div>${partChip(p)}</div><div class="pipe-name">${esc(p.name)}</div>
+          <div class="pipe-meta"><span>${p.pn ? `#${esc(p.pn)}` : 'PN unlisted'}</span><span class="muted">Roadmap #${esc(p.roadmap)}</span></div></div>
+        <div class="pipe-action"><span class="btn btn-primary btn-sm">Lock Pipe →</span></div></a>` : `
+      <div class="pipe-row"${brandAttr(partTheme(p))} aria-disabled="true">
         ${catalogPhoto(p.img, p.name)}
-        <div class="c-main"><div class="c-title">${esc(p.name)}</div><div class="c-sub">${partChip(p)} ${p.pn ? `Part # ${esc(p.pn)} · ` : ''}Tooling data not loaded yet</div></div></div>`).join('') ||
-      `<div class="empty">No pipe is listed for this drill.</div>`}
+        <div class="pipe-info"><div>${partChip(p)}</div><div class="pipe-name">${esc(p.name)}</div>
+          <div class="pipe-meta"><span>${p.pn ? `#${esc(p.pn)}` : 'PN unlisted'}</span><span class="muted">Tooling data not loaded yet</span></div></div>
+        <div class="pipe-action"><button type="button" class="btn btn-ghost btn-sm" disabled>Unavailable</button></div></div>`).join('') ||
+      `<div class="empty-box">No pipe is listed for this drill.</div>`}
     </div>
-    ${m.brand === 'Vermeer' ? `<div class="note" style="margin-top:16px"><span>${brandText('Ditch Witch')} drill pipe HIWS1® and HXT® is compatible with all ${brandText('Vermeer', 'Vermeer®')} Firestick® threads.</span></div>` : ''}`;
+    ${m.brand === 'Vermeer' ? `<div class="note" style="margin-top:14px">${ICON.info}<span>${brandText('Ditch Witch')} drill pipe HIWS1® and HXT® is compatible with all ${brandText('Vermeer', 'Vermeer®')} Firestick® threads.</span></div>` : ''}`;
   mountLoBanner();
 }
 
-/* Step 3 – build */
+/* Step 3 – build (Rig Dashboard 3-Column Workbench) */
 let buildCfg = null;
+let activeSlotId = null;
+let activeSlotRmKey = '';
+const slotFilters = new Map();
+
 async function viewBuild(q, isCurrent = () => true) {
   await loadCatalog();
   const cfg = cfgFromQuery(q);
@@ -400,34 +450,97 @@ function persistBuild(replace = true) {
   store.set(LAST_KEY, { cfg: buildCfg, title: titleOf(buildCfg) });
   rememberBuilder();
 }
-function partRow(p, { selected, multi, sel = true, compact } = {}) {
-  const stamp = selected || !sel ? 'Equipped' : 'Equip';
-  return `<div class="part ${selected ? 'sel' : ''} ${multi ? 'multi' : ''}"${brandAttr(partTheme(p))} ${sel ? `role="button" tabindex="0" data-pick="${p.id}" aria-pressed="${!!selected}"` : ''}>
-    <div class="thumb">${imgTag(p.img, 240, 120, p.name, '', dwFallback(p))}</div>
-    <div class="p-main"><div class="p-name">${partChip(p)} ${esc(p.name)}</div>
-      <div class="p-pn">${p.pn ? `#${esc(p.pn)}` : '<span class="muted">Part # not listed</span>'}</div>
-      ${connStr(p) ? `<div class="p-conn">${esc(connStr(p))}</div>` : ''}
-      ${!compact && p.short ? `<div class="p-short">${esc(p.short)}</div>` : ''}</div>
-    <div class="p-act">
-      <button class="iconbtn" data-info="${p.id}" aria-label="Details for ${esc(p.name)}">${ICON.info}</button>
-      ${p.supplier && p.url ? `<a class="iconbtn" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(p.name)} on the ${esc(p.brand)} site">${ICON.link}</a>` : ''}
-      <span class="equip-stamp">${stamp}</span>
-      ${sel ? `<span class="check" aria-hidden="true">${selected ? ICON.check : ''}</span>` : ''}
+function getSlotFilter(secId) {
+  if (!slotFilters.has(secId)) slotFilters.set(secId, { q: '', brand: 'all', soil: '' });
+  return slotFilters.get(secId);
+}
+function orderedBomItems(rm, cfg, rows) {
+  const items = lineItems(rm, cfg, rows);
+  const alts = altLineItems(RADIUS, cfg, rows);
+  const bySec = new Map();
+  for (const r of rows) bySec.set(String(r.sec.id), []);
+  for (const l of items) {
+    const sid = l.key.split('.')[0];
+    if (!bySec.has(sid)) bySec.set(sid, []);
+    bySec.get(sid).push(l);
+  }
+  for (const l of alts) {
+    const sid = l.key.split('.')[0];
+    if (!bySec.has(sid)) bySec.set(sid, []);
+    bySec.get(sid).push(l);
+  }
+  const out = [];
+  for (const list of bySec.values()) out.push(...list);
+  return out;
+}
+function upstreamThreadForSlot(rows, idx, P) {
+  for (let i = idx - 1; i >= 0; i--) {
+    const prev = rows[i];
+    if (!prev.sel.length) continue;
+    const parts = prev.sel.map((id) => {
+      const acc = prev.acc[id];
+      return acc ? P[acc.id] : P[id];
+    }).filter(Boolean);
+    if (parts.length && parts.every((p) => p.type === 'Collar')) continue;
+    const threads = [...new Set(parts.flatMap((p) => [p.cr, p.cr2].filter(Boolean)))];
+    if (threads.length) return threads.join(' / ');
+  }
+  return '';
+}
+function slotStatusMeta(row) {
+  switch (row.status) {
+    case 'auto': return { cls: 'is-auto', text: 'AUTO' };
+    case 'done': return { cls: 'is-equipped', text: row.sel.length > 1 ? `EQUIPPED ×${row.sel.length}` : 'EQUIPPED' };
+    case 'pending': return { cls: 'is-open', text: 'OPEN' };
+    case 'blocked': return { cls: 'is-blocked', text: 'BLOCKED' };
+    case 'skip': return { cls: '', text: 'SKIP' };
+    default: return { cls: '', text: 'LOCKED' };
+  }
+}
+function partRow(p, { selected, multi, sel = true, compact, isPipe = false } = {}) {
+  const extUrl = p.supplier ? safeHttpUrl(p.url) : null;
+  const conn = connStr(p);
+  const isDisc = /\bdiscontinued\b/i.test(p.name);
+  return `<div class="part part-row ${selected ? 'sel is-equipped' : ''} ${multi ? 'multi' : ''}"${brandAttr(partTheme(p))}>
+    <div class="thumb part-thumb">${imgTag(p.img, 240, 120, p.name, '', dwFallback(p))}</div>
+    <div class="p-main part-main">
+      <div class="part-title-line p-name">${partChip(p)} <span class="part-name">${esc(p.name)}</span>${isDisc ? ' <span class="status-pill is-draft">Discontinued</span>' : ''}</div>
+      <div class="part-specs-line">
+        <span class="p-pn part-pn">${p.pn ? `#${esc(p.pn)}` : '<span class="muted">Part # not listed</span>'}</span>
+        ${conn ? `<span class="p-conn part-conn">${esc(conn)}</span>` : ''}
+        ${p.soil ? `<span class="part-soil">${esc(p.soil)}</span>` : ''}
+      </div>
+      ${!compact && p.short ? `<div class="p-short part-short">${esc(p.short)}</div>` : ''}
+    </div>
+    <div class="p-act part-actions">
+      ${extUrl ? `<a class="btn btn-ghost btn-sm" href="${esc(extUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(p.name)} on the ${esc(p.brand)} site">Site ↗</a>` : ''}
+      <button type="button" class="btn btn-ghost btn-sm" data-info="${p.id}" aria-label="Details for ${esc(p.name)}">Details</button>
+      ${isPipe
+        ? '<span class="status-pill is-equipped">Locked</span>'
+        : sel
+          ? `<button type="button" class="btn btn-sm ${selected ? 'btn-primary' : 'btn-outline'}" data-pick="${p.id}" aria-pressed="${!!selected}">${selected ? 'Equipped ✓' : 'Equip'}</button>`
+          : '<span class="status-pill is-equipped">Equipped</span>'}
     </div></div>`;
 }
 /* Radius alternates (view + optional list line). Third-party strings always go through esc(). */
 const radiusThumb = (p) => (p.imgUrl
   ? `<img src="${esc(p.imgUrl)}" alt="${esc(p.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer">`
   : '<img src="img/placeholder.svg" alt="">');
+const radiusConn = (p) => [p?.conn?.l, p?.conn?.r].filter(Boolean).join(' → ');
 function altRow(a, sid, cfg) {
   const p = a.part, added = (cfg.alt?.[sid] || []).includes(p.pn);
+  const extUrl = safeHttpUrl(p.url);
+  const conn = radiusConn(p);
   return `<div class="alt-part"${brandAttr(RADIUS_BRAND)}>
     <div class="thumb">${radiusThumb(p)}</div>
-    <div class="p-main"><div class="alt-meta">${brandChip(RADIUS_BRAND)}${a.match ? `<span class="alt-match">${esc(MATCH_LABEL[a.match] || '')}</span>` : ''}</div>
-      <div class="p-name">${esc(p.name)}</div><div class="p-pn">#${esc(p.pn)}</div>
-      ${a.note ? `<div class="p-short">${esc(a.note)}</div>` : ''}</div>
-    <div class="p-act">
-      ${p.url ? `<a class="iconbtn" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(p.name)} on the Radius site">${ICON.link}</a>` : ''}
+    <div class="p-main part-main">
+      <div class="alt-meta">${brandChip(RADIUS_BRAND)}${a.match ? `<span class="alt-match">${esc(MATCH_LABEL[a.match] || '')}</span>` : ''}</div>
+      <div class="p-name part-name">${esc(p.name)}</div>
+      <div class="part-specs-line"><span class="p-pn part-pn">#${esc(p.pn)}</span>${conn ? `<span class="part-conn">${esc(conn)}</span>` : ''}</div>
+      ${a.note ? `<div class="p-short part-short">${esc(a.note)}</div>` : ''}
+    </div>
+    <div class="p-act part-actions">
+      ${extUrl ? `<a class="btn btn-ghost btn-sm" href="${esc(extUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(p.name)} on the Radius site">Site ↗</a>` : ''}
       <button type="button" class="chip alt-add" data-altadd="${esc(sid)}" data-altpn="${esc(p.pn)}" aria-pressed="${added}">${added ? 'On list' : 'Add to list'}</button>
     </div></div>`;
 }
@@ -441,125 +554,252 @@ function othersGroup(rm, row, cfg, shownPns) {
   const P = rm.parts, m = machine(cfg.m);
   const slotParts = row.cands.map((o) => P[o.id]);
   const list = slotOthers(RADIUS, { slotParts, pipe: P[cfg.p], machine: m ? `${m.brand} ${m.model}` : '', dwPns: shownPns });
-  return list.length ? `<details class="others"${brandAttr(RADIUS_BRAND)}><summary>Other brands <span class="muted">· ${list.length} ${brandText(RADIUS_BRAND)} part${list.length > 1 ? 's' : ''}</span></summary>
-    ${list.map((part) => altRow({ part }, row.sec.id, cfg)).join('')}
-    <p class="small muted">Radius parts are shopping-list alternates. Confirm fit with Radius before ordering.</p></details>` : '';
+  return list.length ? `<details class="others"${brandAttr(RADIUS_BRAND)}><summary><span>Other brands <span class="muted">· ${list.length} ${brandText(RADIUS_BRAND)} part${list.length > 1 ? 's' : ''}</span></span>${brandChip(RADIUS_BRAND)}</summary>
+    <div class="radius-others-list">${list.map((part) => altRow({ part }, row.sec.id, cfg)).join('')}
+    <p class="small muted">Radius parts are shopping-list alternates. Confirm fit with Radius before ordering.</p></div></details>` : '';
 }
-function slotCell(r, i, P) {
-  const n = String(i + 1).padStart(2, '0');
-  const name = esc(r.sec.name);
-  let state = 'locked', tag = 'Locked', plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">·</span></span>`;
-  if (r.sel.length) {
-    const pp = P[r.sel[0]];
-    state = 'filled'; tag = 'Equipped';
-    const count = r.sel.length > 1 ? `<span class="slot-count">×${r.sel.length}</span>` : '';
-    const addon = r.acc[r.sel[0]] ? `<span class="slot-addon">+add</span>` : '';
-    plate = `<span class="slot-plate">${imgTag(pp.img, 340, 100, pp.name, '', dwFallback(pp))}${count}${addon}<span class="visually-hidden">${esc(pp.name)}</span></span>`;
-  } else if (r.status === 'pending') {
-    state = 'open'; tag = 'Open';
-    plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">+</span></span>`;
-  } else if (r.status === 'blocked') {
-    state = 'open'; tag = 'Needs changes';
-    plate = '<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">!</span></span>';
-  } else if (r.status === 'skip') {
-    state = 'skip'; tag = 'Skipped';
-    plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">–</span></span>`;
-  }
-  return `<button type="button" class="slot slot-${state}"${r.sel.length ? brandAttr(partTheme(P[r.sel[0]])) : ''} data-jump="${r.sec.id}">
-    <span class="slot-idx" aria-hidden="true">${n}</span>${plate}
-    <span class="slot-name">${name}</span><span class="slot-tag">${tag}</span></button>`;
+function renderBomItemHtml(l) {
+  const isAlt = Boolean(l.alt), isAcc = Boolean(l.acc);
+  const tag = isAlt ? 'RADIUS ALT' : isAcc ? 'ADD-ON' : l.auto ? 'AUTO' : 'EQUIPPED';
+  const slotId = l.key.split('.')[0];
+  return `<li class="bom-item ${isAlt ? 'is-alt' : ''}"${brandAttr(partTheme(l.part))}>
+    <div class="bom-item-top">
+      <button type="button" class="bom-slot-link" data-jump-slot="${esc(slotId)}">${esc(l.sec)} · ${tag}</button>
+      <span class="bom-pn">#${esc(pnTxt(l.part))}</span>
+    </div>
+    <div class="bom-item-name">${partChip(l.part)} ${esc(l.part.name)}</div>
+    <div class="bom-item-foot">
+      <div>${isAlt
+        ? `<button type="button" class="btn btn-ghost btn-sm" style="min-height:26px;padding:0 6px;font-size:10px" data-altrm="${esc(slotId)}" data-altpn="${esc(l.part.pn)}" aria-label="Remove alternate ${esc(l.part.name)}">Remove</button>`
+        : l.part.id
+          ? `<button type="button" class="btn btn-ghost btn-sm" style="min-height:26px;padding:0 6px;font-size:10px" data-info="${l.part.id}" aria-label="Details for ${esc(l.part.name)}">Info</button>`
+          : ''}</div>
+      <span class="qty-step" role="group" aria-label="Quantity for ${esc(l.part.name)}">
+        <button type="button" data-dq="${esc(l.key)}" data-d="-1" aria-label="Decrease quantity"${l.qty <= 0 ? ' disabled' : ''}>−</button>
+        <span>${esc(l.qty)}</span>
+        <button type="button" data-dq="${esc(l.key)}" data-d="1" aria-label="Increase quantity">+</button>
+      </span>
+    </div></li>`;
+}
+function renderRailSlot(r, i, P, cfg, activeId, rows) {
+  const st = slotStatusMeta(r);
+  const isAct = r.sec.id === activeId;
+  const firstPart = r.sel.length ? P[r.sel[0]] : null;
+  const bAttr = firstPart ? brandAttr(partTheme(firstPart)) : '';
+  const stateCls = r.sel.length ? 'slot-filled' : (r.status === 'pending' || r.status === 'blocked') ? 'slot-open' : r.status === 'skip' ? 'slot-skip' : 'slot-locked';
+  const altCount = (cfg.alt?.[r.sec.id] || []).length;
+  const handoff = i > 0 ? upstreamThreadForSlot(rows, i, P) : '';
+  const handoffLine = i > 0 ? `<div class="rail-handoff"><span>↓ ${esc(handoff || (r.status === 'locked' ? 'Awaiting upstream' : 'Direct fit'))}</span></div>` : '';
+  const eqHtml = r.sel.length
+    ? `<div class="rail-equipped-list">${r.sel.map((id) => {
+        const ep = P[id], acc = r.acc[id]?.id ? P[r.acc[id].id] : null;
+        return `<div class="rail-eq-item"${brandAttr(partTheme(ep))}><span class="rail-eq-name">${esc(ep.name)}</span><span class="rail-eq-pn">#${esc(pnTxt(ep))}</span></div>`
+          + (acc ? `<div class="rail-eq-item"${brandAttr(partTheme(acc))}><span class="rail-eq-name">+ ${esc(acc.name)}</span><span class="rail-eq-pn">#${esc(pnTxt(acc))}</span></div>` : '');
+      }).join('')}</div>`
+    : `<div class="rail-empty-msg">${r.status === 'pending' ? `${r.cands.length} candidate${r.cands.length === 1 ? '' : 's'} ready` : r.status === 'skip' ? 'Optional slot skipped' : r.status === 'blocked' ? 'No compatible tool' : 'Locked until upstream picked'}</div>`;
+  return `${handoffLine}<button type="button" class="rail-node slot ${r.status === 'pending' ? 'is-open' : ''} is-${esc(r.status)} ${isAct ? 'is-active' : ''} ${stateCls}"${bAttr} data-slot="${r.sec.id}" aria-current="${isAct ? 'true' : 'false'}">
+    <div class="rail-node-top"><span class="rail-slot-idx">SLOT ${String(i + 1).padStart(2, '0')}</span><span class="status-pill ${st.cls}">${st.text}</span></div>
+    <div class="rail-slot-name">${esc(r.sec.name)}</div>${eqHtml}
+    ${altCount ? `<div class="rail-alt-note">+${altCount} Radius alternate${altCount > 1 ? 's' : ''}</div>` : ''}</button>`;
+}
+function renderActiveSlotCandidates(rm, rows, activeRow, P, cfg) {
+  const s = activeRow.sec;
+  const filter = getSlotFilter(s.id);
+  const qLower = filter.q.trim().toLowerCase();
+  const isPipe = s.name === 'Drill Pipe';
+  const filtered = activeRow.cands.filter((o) => {
+    const p = P[o.id];
+    if (!p) return false;
+    if (filter.brand !== 'all' && partBrand(p) !== filter.brand) return false;
+    if (filter.soil && !(p.soil || '').includes(filter.soil)) return false;
+    if (qLower) {
+      const hay = `${p.name} ${p.pn || ''} ${p.short || ''} ${connStr(p)} ${partBrand(p)}`.toLowerCase();
+      if (!hay.includes(qLower)) return false;
+    }
+    return true;
+  });
+  const partsHtml = filtered.length
+    ? filtered.map((opt) => {
+        const p = P[opt.id], isEq = activeRow.sel.includes(p.id), accIds = opt.acc || [], activeAcc = activeRow.acc[p.id];
+        const accHtml = isEq && accIds.length
+          ? `<div class="acc"><div class="acc-title"><span>Add-on / adapter</span>${activeAcc?.auto ? '<span class="status-pill is-auto">Auto-added to fit</span>' : ''}</div>
+              <div class="chip-row"><button type="button" class="chip" data-acc="${s.id}.${p.id}" data-accid="0" aria-pressed="${!activeAcc}">None</button>
+              ${accIds.map((aid) => {
+                const ap = P[aid];
+                return ap ? `<button type="button" class="chip"${brandAttr(partTheme(ap))} data-acc="${s.id}.${p.id}" data-accid="${aid}" aria-pressed="${activeAcc?.id === aid}">${esc(ap.name)}${ap.pn ? `<small>#${esc(ap.pn)}</small>` : ''}</button>` : '';
+              }).join('')}</div></div>`
+          : '';
+        return `<div class="part-block">${partRow(p, { selected: isEq, multi: s.multi, sel: !isPipe, isPipe })}${accHtml}${altsFor(p, s.id, cfg)}</div>`;
+      }).join('')
+    : `<div class="empty-box"><p>No parts match the current search or filters in ${esc(s.name)}.</p><button type="button" class="btn btn-outline btn-sm" id="slot-filter-reset">Clear slot filters</button></div>`;
+  const othersHtml = othersGroup(rm, activeRow, cfg, filtered.map((o) => P[o.id]?.pn).filter(Boolean));
+  const pendingRadiusNote = activeRow.status === 'pending' && cfg.alt?.[s.id]?.length
+    ? '<div class="rd-note" role="status"><span>Radius alternate added to the parts list. Equip a Ditch Witch part in this slot to unlock the next one.</span></div>'
+    : '';
+  return `${partsHtml}${othersHtml}${pendingRadiusNote}`;
 }
 function renderBuild(rm, focusNext) {
   const cfg = buildCfg, P = rm.parts, m = machine(cfg.m), p = pipeOf(m, cfg.p);
   const rows = compute(rm, cfg);
   const items = lineItems(rm, cfg, rows);
-  const altItems = altLineItems(RADIUS, cfg, rows);
+  const allItems = orderedBomItems(rm, cfg, rows);
   const pending = rows.find((r) => r.status === 'pending');
   const blocked = rows.find((r) => r.status === 'blocked');
   const ready = isLoadoutReady(rows);
   persistBuild();
   setStepper(3, cfg, ready);
-  const strip = rows.map((r, i) => slotCell(r, i, P)).join('');
 
-  let n = 0;
-  const secHtml = rows.map((r) => {
-    const s = r.sec; n++;
-    const multi = s.multi;
-    let body = '', chip = '';
-    if (r.status === 'blocked') {
-      chip = '<span class="pill pill-warn">Needs changes</span>';
-      body = s.name === 'Drill Pipe'
-        ? '<p class="sec-note">The pipe selected in Step 02 cannot connect to the current rig-side parts.</p>'
-        : '<p class="sec-note">No compatible end tool is listed for this configuration.</p>';
-    } else if (r.status === 'skip') {
-      chip = '<span class="pill">Skipped</span>';
-      body = `<p class="sec-note">Nothing fits the slot before this one, so this slot stays empty.</p>`;
-    } else if (r.status === 'locked') {
-      chip = '<span class="pill">Locked</span>';
-      body = `<p class="sec-note">Equip ${esc(pending?.sec.name || 'the open slot')} first.</p>`;
-    } else if (r.status === 'pending') {
-      chip = `<span class="pill pill-orange">${multi ? 'Equip one or more' : 'Open slot'}</span>`;
-      const shown = r.cands.slice(0, 5);
-      body = `<p class="sec-note">${r.cands.length} option${r.cands.length > 1 ? 's' : ''} fit the slot before this one${r.hidden ? ` (${r.hidden} more hidden because nothing downstream fits them)` : ''}.</p>
-        ${shown.map((o) => partRow(P[o.id], { multi }) + altsFor(P[o.id], s.id, cfg)).join('')}
-        ${r.cands.length > shown.length ? `<button class="btn btn-outline btn-block more" data-browse="${s.id}">See all ${r.cands.length} options</button>` : ''}
-        ${othersGroup(rm, r, cfg, shown.map((o) => P[o.id].pn))}
-        ${cfg.alt?.[s.id]?.length ? '<p class="sec-note" role="status">Radius alternate added to the parts list. Equip a Ditch Witch part in this slot to unlock the next one.</p>' : ''}`;
-    } else {
-      chip = r.status === 'auto' ? '<span class="pill pill-ok">Auto-matched</span>' : `<span class="pill pill-dark">Equipped${r.sel.length > 1 ? ` · ${r.sel.length}` : ''}</span>`;
-      body = r.sel.map((id) => {
-        const opt = s.opts.find((o) => o.id === id), accs = (opt.acc || []), a = r.acc[id];
-        const accHtml = accs.length ? `<div class="acc"><div class="acc-title"><span>Add-on / adapter</span>${a?.auto ? '<span class="pill pill-ok">Auto-added to fit</span>' : ''}</div>
-          <div class="chips">
-            <button class="chip" data-acc="${s.id}.${id}" data-accid="0" aria-pressed="${!a}">None</button>
-            ${accs.map((aid) => `<button class="chip"${brandAttr(partTheme(P[aid]))} data-acc="${s.id}.${id}" data-accid="${aid}" aria-pressed="${a?.id === aid}">${esc(P[aid].name)}${P[aid].pn ? `<small>#${esc(P[aid].pn)}</small>` : ''}</button>`).join('')}
-          </div></div>` : '';
-        return partRow(P[id], { selected: true, multi, sel: false }) + altsFor(P[id], s.id, cfg) + accHtml;
-      }).join('') + (r.cands.length > 1 ? `<button class="linkbtn" data-browse="${s.id}">${multi ? 'Add or remove' : `Swap (${r.cands.length} fit this slot)`}</button>` : '')
-        + othersGroup(rm, r, cfg, r.sel.map((id) => P[id].pn));
-    }
-    const dot = r.status === 'done' || r.status === 'auto' ? '✓' : n;
-    const cls = { done: 'done', auto: 'done', pending: 'pending', blocked: 'pending', skip: 'skip', locked: 'locked' }[r.status];
-    return `<div class="sec ${cls}" id="sec-${s.id}"><span class="sec-dot" aria-hidden="true">${dot}</span><div class="sec-body">
-      <div class="sec-head"><div><p class="sec-kicker">Slot ${String(n).padStart(2, '0')}</p><h3>${esc(s.name)}</h3></div>${chip}</div>${body}</div></div>`;
-  }).join('');
-
-  const donePct = rows.filter((r) => ['done', 'auto', 'skip'].includes(r.status)).length;
-  const pct = rows.length ? Math.round((donePct / rows.length) * 100) : 0;
+  const rmKey = `${rm.id}:${cfg.mode}`;
+  if (activeSlotRmKey !== rmKey || !rows.some((r) => r.sec.id === activeSlotId)) {
+    activeSlotRmKey = rmKey;
+    const firstOpen = rows.find((r) => r.status === 'pending' || r.status === 'blocked');
+    activeSlotId = firstOpen ? firstOpen.sec.id : rows[rows.length - 1]?.sec.id;
+  }
+  const activeIdx = Math.max(0, rows.findIndex((r) => r.sec.id === activeSlotId));
+  const activeRow = rows[activeIdx];
+  const settledCount = rows.filter((r) => ['done', 'auto', 'skip'].includes(r.status)).length;
+  const openCount = rows.filter((r) => ['pending', 'locked', 'blocked'].includes(r.status)).length;
+  const totalPieces = allItems.reduce((sum, l) => sum + l.qty, 0);
   const ctx = loCtx.for(cfg);
-  const endLabel = cfg.mode === 'Bit' ? 'Bit end' : 'Reamer end';
+  const confirmHref = `#/summary?c=${b64e(cfg)}`;
+
+  const readinessPill = ready
+    ? `<span class="status-pill is-ready">READY · ${settledCount}/${rows.length}</span>`
+    : blocked
+      ? `<span class="status-pill is-blocked">BLOCKED · ${esc(blocked.sec.name)}</span>`
+      : `<span class="status-pill is-open">DRAFT · ${openCount} OPEN</span>`;
+
+  const telemetryHtml = `
+    <section class="telemetry-bar"${brandAttr(m?.brand)}>
+      <div class="telemetry-specs">
+        <div class="tele-cell">
+          <div class="tele-label">Rig <a class="tele-swap" href="#/drill">Change</a></div>
+          <div class="tele-val">${m ? brandChip(m.brand) : ''} <span>${esc(m?.model || 'Drill')}</span></div>
+        </div>
+        <div class="tele-cell">
+          <div class="tele-label">Locked pipe <a class="tele-swap" href="#/pipe/${cfg.m}">Swap</a></div>
+          <div class="tele-val">${p ? partChip(p) : ''} <span>${esc(p?.name || 'Pipe')}</span>${p?.pn ? ` <span class="mono small muted">#${esc(p.pn)}</span>` : ''}</div>
+        </div>
+      </div>
+      <div class="tele-controls">
+        <div class="mode-switch" role="group" aria-label="Configuration type">
+          <button type="button" data-mode="Bit" aria-pressed="${cfg.mode === 'Bit'}">Pilot (Bit)</button>
+          <button type="button" data-mode="Backreamer" aria-pressed="${cfg.mode === 'Backreamer'}">Pullback (Reamer)</button>
+        </div>
+        ${RADIUS ? `<label class="brand-toggle radius-switch ${showOther() ? 'is-on' : ''}"${brandAttr(RADIUS_BRAND)}><input type="checkbox" id="other-brands" ${showOther() ? 'checked' : ''}><span>${brandText(RADIUS_BRAND)} alternates</span></label>` : ''}
+        ${readinessPill}
+      </div>
+    </section>`;
+
+  const mobileStripHtml = `
+    <section class="mobile-slot-strip" aria-label="String slots">
+      <div class="mobile-slot-head"><span>Active Slot Selector</span><span>${settledCount}/${rows.length} Settled</span></div>
+      <div class="slot-strip-scroll">${rows.map((r, i) => {
+        const st = slotStatusMeta(r), firstPart = r.sel.length ? P[r.sel[0]] : null, isAct = r.sec.id === activeRow?.sec.id;
+        return `<button type="button" class="slot-pill-btn ${r.status === 'pending' ? 'is-open' : ''} ${isAct ? 'is-active' : ''}"${firstPart ? brandAttr(partTheme(firstPart)) : ''} data-slot="${r.sec.id}" aria-pressed="${isAct}">
+          <span class="slot-pill-top"><span>${String(i + 1).padStart(2, '0')}</span><span class="status-pill ${st.cls}" style="padding:1px 5px;font-size:9px">${st.text}</span></span>
+          <span class="slot-pill-name">${esc(r.sec.name)}</span></button>`;
+      }).join('')}</div>
+    </section>`;
+
+  const railHtml = `
+    <aside class="panel-card rail-panel" aria-label="Vertical string rail">
+      <div class="panel-head"><h2>String Rail</h2><span class="panel-head-meta">${settledCount}/${rows.length} · RIG → ${cfg.mode === 'Bit' ? 'BIT' : 'REAMER'}</span></div>
+      <div class="rail-list">${rows.map((r, i) => renderRailSlot(r, i, P, cfg, activeRow?.sec.id, rows)).join('')}</div>
+    </aside>`;
+
+  let centerBodyHtml = '';
+  if (activeRow) {
+    const s = activeRow.sec, st = slotStatusMeta(activeRow);
+    const upThread = upstreamThreadForSlot(rows, activeIdx, P);
+    const acceptThreads = [...new Set(activeRow.cands.map((o) => P[o.id]?.cl).filter(Boolean))];
+    const filter = getSlotFilter(s.id);
+    const headHtml = `
+      <div class="slot-bench-head">
+        <div style="min-width:0">
+          <div class="slot-bench-kicker">SLOT ${String(activeIdx + 1).padStart(2, '0')} · ${s.multi ? 'MULTI-EQUIP SLOT' : 'SINGLE-EQUIP SLOT'}</div>
+          <h2>${esc(s.name)}</h2>
+          <div class="slot-thread-info">
+            ${s.name === 'Drill Pipe' ? '<span>Locked from Step 02</span>' : upThread ? `<span>Upstream: <b>${esc(upThread)}</b></span>` : ''}
+            ${acceptThreads.length ? `<span>Accepts: <b>${esc(acceptThreads.slice(0, 4).join(' | '))}${acceptThreads.length > 4 ? '…' : ''}</b></span>` : ''}
+            <span>${activeRow.cands.length} compatible option${activeRow.cands.length === 1 ? '' : 's'}${activeRow.hidden ? ` (${activeRow.hidden} downstream-filtered)` : ''}</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;flex:none">
+          ${s.name === 'Drill Pipe' ? `<a class="btn btn-ghost btn-sm" href="#/pipe/${cfg.m}">Swap Pipe</a>` : ''}
+          <span class="status-pill ${st.cls}">${st.text}</span>
+        </div>
+      </div>`;
+
+    if (activeRow.status === 'locked') {
+      const firstOpen = rows.find((r) => r.status === 'pending' || r.status === 'blocked');
+      centerBodyHtml = `${headHtml}<div class="parts-body"><div class="rd-note is-warn"><div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+        <span><b>Slot locked:</b> Equip ${esc(firstOpen?.sec.name || 'the open slot')} first to unlock compatible parts here.</span>
+        ${firstOpen ? `<button type="button" class="btn btn-primary btn-sm" data-slot="${firstOpen.sec.id}">Jump to ${esc(firstOpen.sec.name)} →</button>` : ''}</div></div></div>`;
+    } else if (activeRow.status === 'skip') {
+      centerBodyHtml = `${headHtml}<div class="parts-body"><div class="rd-note"><span><b>Optional slot skipped:</b> Nothing fits or is required before this slot.</span></div></div>`;
+    } else if (activeRow.status === 'blocked') {
+      centerBodyHtml = `${headHtml}<div class="parts-body"><div class="rd-note is-warn" style="border-left-color:var(--danger)"><div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start">
+        <span><b>Needs changes:</b> ${s.name === 'Drill Pipe' ? 'The pipe selected in Step 02 cannot connect to the current rig-side parts.' : 'No compatible end tool is listed for this configuration.'}</span>
+        <a class="btn btn-outline btn-sm" href="#/pipe/${cfg.m}">Change Pipe →</a></div></div></div>`;
+    } else {
+      const candParts = activeRow.cands.map((o) => P[o.id]).filter(Boolean);
+      const brandCounts = new Map();
+      for (const part of candParts) { const b = partBrand(part); brandCounts.set(b, (brandCounts.get(b) || 0) + 1); }
+      const presentBrands = [...brandCounts.keys()].sort((a, b) => (a === 'Ditch Witch' ? -1 : b === 'Ditch Witch' ? 1 : a.localeCompare(b)));
+      if (filter.brand !== 'all' && !brandCounts.has(filter.brand)) filter.brand = 'all';
+      const soils = [...new Set(candParts.flatMap((part) => (part.soil || '').split(',').map((x) => x.trim()).filter(Boolean)))];
+      if (filter.soil && !soils.includes(filter.soil)) filter.soil = '';
+      const showToolbar = activeRow.cands.length > 1 || soils.length > 0;
+      const toolbarHtml = showToolbar
+        ? `<div class="filter-toolbar">
+            <div class="rd-search">${ICON.search}<input id="slot-search" type="search" inputmode="search" autocomplete="off" placeholder="Filter ${esc(s.name)} by name, part #, or thread…" value="${esc(filter.q)}" aria-label="Search parts in ${esc(s.name)}"><button type="button" class="rd-search-clear" id="slot-search-clear" aria-label="Clear filter"${filter.q ? '' : ' hidden'}>×</button></div>
+            ${presentBrands.length > 1 ? `<div class="filter-row" role="group" aria-label="Filter by brand"><span class="filter-label">Brand</span>
+              <button type="button" class="filter-chip" data-filter-brand="all" aria-pressed="${filter.brand === 'all'}">All <span class="cnt">(${candParts.length})</span></button>
+              ${presentBrands.map((b) => `<button type="button" class="filter-chip" data-filter-brand="${esc(b)}"${brandAttr(b)} aria-pressed="${filter.brand === b}">${esc(b)} <span class="cnt">(${brandCounts.get(b)})</span></button>`).join('')}
+            </div>` : ''}
+            ${soils.length ? `<div class="filter-row" role="group" aria-label="Filter by ground"><span class="filter-label">Ground</span>
+              <button type="button" class="filter-chip" data-filter-soil="" aria-pressed="${filter.soil === ''}">All ground</button>
+              ${soils.map((soil) => `<button type="button" class="filter-chip" data-filter-soil="${esc(soil)}" aria-pressed="${filter.soil === soil}">${esc(soil)}</button>`).join('')}</div>` : ''}
+          </div>`
+        : '';
+      centerBodyHtml = `${headHtml}${toolbarHtml}<div class="parts-body" id="slot-candidates-wrap">${renderActiveSlotCandidates(rm, rows, activeRow, P, cfg)}</div>`;
+    }
+  }
+
+  const centerHtml = `<section class="panel-card parts-panel" aria-label="Available parts for active slot">${centerBodyHtml}</section>`;
+  const bomHtml = `
+    <aside class="panel-card bom-panel" aria-label="Equipped list">
+      <div class="panel-head"><h2>Equipped</h2><span class="panel-head-meta">${allItems.length} lines · ${totalPieces} pcs</span></div>
+      <div class="bom-readiness ${ready ? 'is-ready' : 'is-draft'}">
+        <b>${ready ? 'READY FOR DISPATCH' : 'INCOMPLETE DRAFT'}</b>
+        <span>${ready ? `All ${rows.length} slots verified and thread-matched.` : `${openCount} slot${openCount === 1 ? '' : 's'} still open in string.`}</span>
+      </div>
+      <ul class="mini-list bom-items" id="desktop-bom-list">${allItems.map((l) => renderBomItemHtml(l)).join('') || '<li class="muted" style="padding:14px">No slots filled yet</li>'}</ul>
+      <div class="bom-foot">
+        <a class="btn ${ready ? 'btn-primary' : 'btn-outline'} btn-block" href="${confirmHref}">${ready ? 'Confirm class' : 'Review draft'}</a>
+        <div class="bom-foot-row">
+          <button type="button" class="btn btn-ghost btn-sm" data-save>${ICON.save} Save loadout</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="bom-copy">Copy BOM</button>
+        </div>
+      </div>
+    </aside>`;
+
   app.innerHTML = `
     ${ctx ? loBanner(ctx, ctx.loadout ? 'EDITING LOADOUT' : 'NEW LOADOUT · EQUIP SLOTS') : ''}
-    <div class="build-grid"><div>
-      <div class="build-title"><div><a class="linkbtn" href="#/pipe/${cfg.m}" style="padding-left:0">‹ Change pipe</a>
-        ${pageHead(m ? `Step 03 · Equip · ${brandText(m.brand)}` : 'Step 03 · Equip', esc(m?.model || 'Drill string'), p ? brandText(partTheme(p), `${p.name}${p.pn ? ` · #${p.pn}` : ''}`) : '')}</div></div>
-      <div class="seg" role="group" aria-label="Configuration type" style="margin:14px 0">
-        <button data-mode="Bit" aria-pressed="${cfg.mode === 'Bit'}">Pilot<small>Bit config</small></button>
-        <button data-mode="Backreamer" aria-pressed="${cfg.mode === 'Backreamer'}">Pullback<small>Backreamer config</small></button>
-      </div>
-      ${RADIUS ? `<label class="brand-toggle"${brandAttr(RADIUS_BRAND)}><input type="checkbox" id="other-brands" ${showOther() ? 'checked' : ''}><span>Show other brands<small>${brandText(RADIUS_BRAND)} alternates go on the parts list. Equip ${brandText('Ditch Witch')} parts to advance.</small></span></label>` : ''}
-      <div class="preview"><div class="preview-head"><span>Slot rail</span><span>${endLabel} →</span></div>
-        <div class="meter" role="img" aria-label="${donePct} of ${rows.length} slots settled"><span style="width:${pct}%"></span></div>
-        <div class="strip"><span class="rig">${esc(m?.model || 'RIG')}</span>${strip || '<span class="small muted">Slots appear here</span>'}</div></div>
-      <div class="timeline" style="margin-top:18px">${secHtml}</div>
-    </div>
-    <aside class="build-aside">
-      <div class="aside-card"><h3>Equipped</h3>
-        <ul class="mini-list">${[...items, ...altItems].map(({ part }) => `<li${brandAttr(partTheme(part))}><span>${partChip(part)} ${esc(part.name)}</span><span class="pn">${esc(pnTxt(part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}</ul>
-        <a class="btn ${ready ? 'btn-primary' : 'btn-ghost'} btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">${ready ? 'Confirm class' : 'Review draft'}</a>
-        <button class="btn btn-ghost btn-block" style="margin-top:8px" data-save>${ICON.save} Save loadout</button>
-      </div>
-    </aside></div>`;
+    ${telemetryHtml}
+    ${mobileStripHtml}
+    <div class="workbench-grid">${railHtml}${centerHtml}${bomHtml}</div>`;
 
-  const confirmHref = `#/summary?c=${b64e(cfg)}`;
-  setActionbar(`<div class="ab-info"><strong>${items.length} equipped</strong><span class="ab-line">${pending ? `Open · ${esc(pending.sec.name)}` : ready ? `Class ready · ${donePct}/${rows.length}` : `Needs changes${blocked ? ` · ${esc(blocked.sec.name)}` : ''}`}</span>${pending ? `<a class="ab-review" href="${confirmHref}">Review draft</a>` : ''}</div>
-    ${ctx && ready
-      ? `<button class="btn btn-primary" data-save>${ICON.save} Save</button><a class="btn btn-ghost" href="${confirmHref}">Confirm</a>`
-      : `<button class="btn btn-ghost btn-sm" data-save aria-label="Save loadout">${ICON.save}</button>${pending ? `<button class="btn btn-primary" type="button" data-equip-next>Equip</button>` : `<a class="btn ${ready ? 'btn-primary' : 'btn-ghost'}" href="${confirmHref}">${ready ? 'Confirm' : 'Review draft'}</a>`}`}`);
+  setActionbar(`<div class="ab-info"><strong>${allItems.length} equipped · ${ready ? 'READY' : `DRAFT · ${openCount} OPEN`}</strong>
+      <span class="ab-line">${pending ? `Open · ${esc(pending.sec.name)}` : ready ? `Class ready · ${settledCount}/${rows.length}` : `Needs changes${blocked ? ` · ${esc(blocked.sec.name)}` : ''}`}</span></div>
+    <div class="dock-actions">
+      <button type="button" class="btn btn-outline btn-sm" data-open-equipped>Equipped list (${allItems.length}) ▲</button>
+      ${ctx && ready ? `<button type="button" class="btn btn-primary btn-sm" data-save>${ICON.save} Save</button>` : ''}
+      <a class="btn ${ready ? 'btn-primary' : 'btn-ghost'} btn-sm" href="${confirmHref}">${ready ? 'Confirm' : 'Brief →'}</a>
+    </div>`);
   mountLoBanner();
 
-  // events
-  $$('[data-mode]').forEach((b) => b.addEventListener('click', () => { cfg.mode = b.dataset.mode; renderBuild(rm); window.scrollTo({ top: 0 }); }));
   const pick = (sid, id) => {
     const s = rm.sections.find((x) => x.id === sid);
     const cur = compute(rm, cfg).find((r) => r.sec.id === sid);
@@ -569,33 +809,109 @@ function renderBuild(rm, focusNext) {
     } else cfg.sel[sid] = [id];
     return s;
   };
-  $$('.sec [data-pick]').forEach((el) => {
-    const go = (e) => {
-      if (e.target.closest('[data-info]')) return;
-      const sid = +el.closest('.sec').id.slice(4);
-      const s = pick(sid, +el.dataset.pick);
-      renderBuild(rm, !s.multi ? sid : null);
-    };
-    el.addEventListener('click', go);
-    el.addEventListener('keydown', (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), go(e)));
+  const bindCandidates = (root) => {
+    if (!root) return;
+    $$('[data-pick]', root).forEach((el) => el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const s = pick(activeRow.sec.id, +el.dataset.pick);
+      if (!s.multi) {
+        const nxt = compute(rm, cfg).find((r) => r.status === 'pending' || r.status === 'blocked');
+        if (nxt) activeSlotId = nxt.sec.id;
+      }
+      renderBuild(rm, !s.multi ? activeRow.sec.id : null);
+    }));
+    $$('[data-info]', root).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); showPart(rm, +b.dataset.info); }));
+    $$('[data-acc]', root).forEach((b) => b.addEventListener('click', () => { cfg.acc[b.dataset.acc] = +b.dataset.accid; renderBuild(rm); }));
+    $$('[data-altadd]', root).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); toggleAlt(cfg, b.dataset.altadd, b.dataset.altpn); renderBuild(rm); }));
+    $('#slot-filter-reset', root)?.addEventListener('click', () => {
+      const f = getSlotFilter(activeRow.sec.id);
+      f.q = ''; f.brand = 'all'; f.soil = '';
+      renderBuild(rm);
+    });
+  };
+  const candWrap = $('#slot-candidates-wrap');
+  bindCandidates(candWrap && candWrap.addEventListener ? candWrap : app);
+
+  const redrawCandidates = () => {
+    const wrap = $('#slot-candidates-wrap');
+    if (!wrap) return;
+    wrap.innerHTML = renderActiveSlotCandidates(rm, rows, activeRow, P, cfg);
+    bindCandidates(wrap);
+  };
+  const slotSearch = $('#slot-search'), slotSearchClear = $('#slot-search-clear');
+  slotSearch?.addEventListener('input', () => {
+    getSlotFilter(activeRow.sec.id).q = slotSearch.value;
+    if (slotSearchClear) slotSearchClear.hidden = !slotSearch.value;
+    redrawCandidates();
   });
-  $$('[data-info]').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); showPart(rm, +b.dataset.info); }));
-  $$('[data-browse]').forEach((b) => b.addEventListener('click', () => browseSheet(rm, +b.dataset.browse)));
-  $$('[data-acc]').forEach((b) => b.addEventListener('click', () => { cfg.acc[b.dataset.acc] = +b.dataset.accid; renderBuild(rm); }));
-  $$('[data-altadd]', app).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); toggleAlt(cfg, b.dataset.altadd, b.dataset.altpn); renderBuild(rm); }));
-  $('#other-brands')?.addEventListener('change', (e) => { store.set(OTHER_BRANDS_KEY, !!e.target.checked); renderBuild(rm); });
-  $$('[data-jump]').forEach((b) => b.addEventListener('click', () => $(`#sec-${b.dataset.jump}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })));
-  $$('[data-save]').forEach((b) => b.addEventListener('click', () => saveSheet(cfg)));
-  $$('[data-equip-next]').forEach((b) => b.addEventListener('click', () => {
-    const el = pending && $(`#sec-${pending.sec.id}`);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  slotSearchClear?.addEventListener('click', () => {
+    slotSearch.value = '';
+    getSlotFilter(activeRow.sec.id).q = '';
+    slotSearchClear.hidden = true;
+    redrawCandidates();
+    slotSearch.focus?.();
+  });
+  $$('[data-filter-brand]').forEach((b) => b.addEventListener('click', () => {
+    getSlotFilter(activeRow.sec.id).brand = b.dataset.filterBrand;
+    $$('[data-filter-brand]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    redrawCandidates();
   }));
-  if (focusNext) {
-    const nxt = compute(rm, cfg).find((r) => r.status === 'pending');
-    const el = nxt && $(`#sec-${nxt.sec.id}`);
-    if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
-    else if (isLoadoutReady(compute(rm, cfg))) toast('Loadout complete');
-  }
+  $$('[data-filter-soil]').forEach((b) => b.addEventListener('click', () => {
+    getSlotFilter(activeRow.sec.id).soil = b.dataset.filterSoil;
+    $$('[data-filter-soil]').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    redrawCandidates();
+  }));
+
+  $$('[data-mode]').forEach((b) => b.addEventListener('click', () => { cfg.mode = b.dataset.mode; activeSlotId = null; renderBuild(rm); window.scrollTo({ top: 0 }); }));
+  $('#other-brands')?.addEventListener('change', (e) => { store.set(OTHER_BRANDS_KEY, !!e.target.checked); renderBuild(rm); });
+  $$('[data-slot]').forEach((b) => b.addEventListener('click', () => { activeSlotId = +b.dataset.slot; renderBuild(rm); }));
+  $$('[data-jump-slot]').forEach((b) => b.addEventListener('click', () => { activeSlotId = +b.dataset.jumpSlot; renderBuild(rm); }));
+  $$('[data-dq]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.dq; cfg.q[k] = quantity(quantity(cfg.q?.[k]) + +b.dataset.d); renderBuild(rm); }));
+  $$('[data-altrm]').forEach((b) => b.addEventListener('click', () => { toggleAlt(cfg, b.dataset.altrm, b.dataset.altpn); delete cfg.q[altKey(b.dataset.altrm, b.dataset.altpn)]; renderBuild(rm); }));
+  $$('.bom-panel [data-info]').forEach((b) => b.addEventListener('click', () => showPart(rm, +b.dataset.info)));
+  $$('[data-save]').forEach((b) => b.addEventListener('click', () => saveSheet(cfg)));
+  $('#bom-copy')?.addEventListener('click', async () => { await copyText(listText(cfg, allItems)); toast(ready ? 'Ready BOM copied' : 'Draft BOM copied'); });
+  $('[data-open-equipped]')?.addEventListener('click', () => openEquippedSheet(rm));
+  if (focusNext && isLoadoutReady(compute(rm, cfg))) toast('Loadout complete');
+}
+function openEquippedSheet(rm) {
+  const cfg = buildCfg;
+  if (!cfg || !rm) return;
+  const drawBody = (sh) => {
+    const rows = compute(rm, cfg);
+    const allItems = orderedBomItems(rm, cfg, rows);
+    const ready = isLoadoutReady(rows);
+    const openCount = rows.filter((r) => ['pending', 'locked', 'blocked'].includes(r.status)).length;
+    const totalPieces = allItems.reduce((sum, l) => sum + l.qty, 0);
+    $('#eq-sheet-body', sh).innerHTML = `
+      <div class="rd-note ${ready ? 'is-ready' : 'is-warn'}">
+        <span><b>${ready ? 'READY FOR DISPATCH' : 'INCOMPLETE DRAFT'}</b> · ${ready ? `All ${rows.length} slots verified (${totalPieces} pcs).` : `${openCount} slot${openCount === 1 ? '' : 's'} open.`}</span>
+      </div>
+      <ul class="mini-list bom-items" style="padding:0;overflow:visible">${allItems.map((l) => renderBomItemHtml(l)).join('') || '<li class="muted">No parts equipped yet.</li>'}</ul>`;
+    $$('[data-dq]', sh).forEach((b) => b.addEventListener('click', () => {
+      const k = b.dataset.dq; cfg.q[k] = quantity(quantity(cfg.q?.[k]) + +b.dataset.d);
+      renderBuild(rm); drawBody(sh);
+    }));
+    $$('[data-altrm]', sh).forEach((b) => b.addEventListener('click', () => {
+      toggleAlt(cfg, b.dataset.altrm, b.dataset.altpn); delete cfg.q[altKey(b.dataset.altrm, b.dataset.altpn)];
+      renderBuild(rm); drawBody(sh);
+    }));
+    $$('[data-jump-slot]', sh).forEach((b) => b.addEventListener('click', () => {
+      activeSlotId = +b.dataset.jumpSlot; closeSheet(); renderBuild(rm);
+    }));
+    $$('[data-info]', sh).forEach((b) => b.addEventListener('click', () => showPart(rm, +b.dataset.info)));
+  };
+  const rows = compute(rm, cfg), ready = isLoadoutReady(rows), href = `#/summary?c=${b64e(cfg)}`;
+  openSheet(`<div class="sheet-top"${brandAttr(machine(cfg.m)?.brand)}><div><div class="small muted mono">EQUIPPED STRING BOM</div><h2>${esc(titleOf(cfg))}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+    <div class="sheet-body" id="eq-sheet-body"></div>
+    <div class="sheet-foot"><button class="btn btn-ghost btn-sm" id="eq-copy">Copy BOM</button><button class="btn btn-ghost btn-sm" id="eq-save">${ICON.save} Save</button><a class="btn btn-primary" style="flex:1" href="${href}" data-close>${ready ? 'Confirm class' : 'Review draft'}</a></div>`, (sh) => {
+    drawBody(sh);
+    $('#eq-copy', sh)?.addEventListener('click', async () => {
+      const items = orderedBomItems(rm, cfg, compute(rm, cfg));
+      await copyText(listText(cfg, items)); toast('BOM copied');
+    });
+    $('#eq-save', sh)?.addEventListener('click', () => { closeSheet(); setTimeout(() => saveSheet(cfg), 230); });
+  });
 }
 function browseSheet(rm, sid) {
   const cfg = buildCfg, P = rm.parts;
@@ -607,8 +923,8 @@ function browseSheet(rm, sid) {
       <button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body">
       ${row.cands.length > 6 ? `<div class="searchbox" style="margin-bottom:8px">${ICON.search}<input id="bq" type="search" placeholder="Search name, size or part #" aria-label="Search options"></div>` : ''}
-      ${soils.length > 1 ? `<div class="filters"><button class="chip" data-soil="" aria-pressed="true">All ground</button>${soils.map((x) => `<button class="chip" data-soil="${esc(x)}" aria-pressed="false">${esc(x)}</button>`).join('')}</div>` : ''}
-      <div id="blist"></div></div>
+      ${soils.length > 1 ? `<div class="filter-row">${soils.length > 1 ? `<button class="chip" data-soil="" aria-pressed="true">All ground</button>${soils.map((x) => `<button class="chip" data-soil="${esc(x)}" aria-pressed="false">${esc(x)}</button>`).join('')}` : ''}</div>` : ''}
+      <div id="blist" class="parts-body" style="padding:0"></div></div>
     ${multi ? `<div class="sheet-foot"><button class="btn btn-primary btn-block" id="bdone">Done</button></div>` : ''}`, (sh) => {
     const draw = () => {
       const t = q.toLowerCase();
@@ -618,7 +934,7 @@ function browseSheet(rm, sid) {
         + (row.status === 'pending' && cfg.alt?.[sid]?.length ? '<p class="sec-note" role="status">Radius alternate added to the parts list. Equip a Ditch Witch part to advance.</p>' : '');
       $$('[data-altadd]', sh).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); toggleAlt(cfg, b.dataset.altadd, b.dataset.altpn); renderBuild(rm); draw(); }));
       $$('[data-pick]', sh).forEach((el) => el.addEventListener('click', (e) => {
-        if (e.target.closest('[data-info]')) return;
+        e.stopPropagation();
         const id = +el.dataset.pick;
         if (multi) { chosen.has(id) ? chosen.delete(id) : chosen.add(id); draw(); }
         else { cfg.sel[sid] = [id]; closeSheet(); renderBuild(rm, sid); }
@@ -635,19 +951,44 @@ function showPart(rm, id, stacked) {
   const p = rm.parts[id];
   const photos = [...new Set([...(p.imgs || []), p.img].filter(Boolean))];
   const specs = Object.entries({ 'Part #': p.pn || 'Not listed', Connection: connStr(p), 'Recommended ground': p.soil, ...(p.specs || {}) }).filter(([k, v]) => k !== 'Brand' && v);
-  const prev = stacked ? $('#sheet').innerHTML : null;
+  let equipRow = null;
+  if (buildCfg?.r === rm.id) {
+    equipRow = compute(rm, buildCfg).find((r) => r.cands.some((o) => o.id === id) && r.sec.name !== 'Drill Pipe') || null;
+  }
+  const isEq = equipRow ? equipRow.sel.includes(id) : false;
+  const equipBtn = equipRow
+    ? (isEq && equipRow.sec.multi
+        ? `<button type="button" class="btn btn-outline" id="sh-equip">Remove from slot</button>`
+        : isEq
+          ? '<button type="button" class="btn btn-primary" disabled>Equipped ✓</button>'
+          : `<button type="button" class="btn btn-primary" id="sh-equip">Equip in ${esc(equipRow.sec.name)}</button>`)
+    : '';
   openSheet(`<div class="sheet-top"${brandAttr(partTheme(p))}><div><div class="small muted" style="font-weight:800;letter-spacing:.06em">${partChip(p)} ${esc((p.type || '').replace(/_/g, ' ').toUpperCase())}</div><h2>${esc(p.name)}</h2></div>
       <button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body">
       <div class="gallery ${photos.length < 2 ? 'single' : ''}">${photos.map((i) => photoTag(i, p.name, dwFallback(p))).join('') || photoTag(0, p.name, dwFallback(p))}</div>
-      ${p.short ? `<p style="font-weight:700;margin:12px 0 0">${esc(p.short)}</p>` : ''}
+      ${p.short ? `<p style="font-weight:700;margin:6px 0 0">${esc(p.short)}</p>` : ''}
       <dl class="specs">${specs.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
       ${p.desc?.length ? `<ul class="bullets">${p.desc.map((d) => `<li>${esc(d)}</li>`).join('')}</ul>` : ''}
       ${(p.docs || []).map((d) => ({ name: d.name, url: safeHttpUrl(d.url) })).filter((d) => d.url).map((d) => `<a class="btn btn-ghost btn-block" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">${esc(d.name)}</a>`).join('')}
       <p class="small muted">Photos and specs from public manufacturer references.</p>
     </div>
-    <div class="sheet-foot">${p.pn ? `<button class="btn btn-ghost" id="cpn">Copy part #</button>` : ''}<button class="btn btn-primary" style="flex:1" ${stacked ? 'id="back"' : 'data-close'}>${stacked ? '‹ Back to list' : 'Close'}</button></div>`, (sh) => {
+    <div class="sheet-foot">${p.pn ? `<button class="btn btn-ghost" id="cpn">Copy part #</button>` : ''}${equipBtn}<button class="btn btn-primary" style="flex:1" ${stacked ? 'id="back"' : 'data-close'}>${stacked ? '‹ Back to list' : 'Close'}</button></div>`, (sh) => {
     $('#cpn', sh)?.addEventListener('click', async () => { await copyText(p.pn); toast(`Copied ${p.pn}`); });
+    $('#sh-equip', sh)?.addEventListener('click', () => {
+      if (!equipRow) return;
+      const sid = equipRow.sec.id;
+      if (equipRow.sec.multi) {
+        const set = new Set(equipRow.sel); set.has(id) ? set.delete(id) : set.add(id);
+        buildCfg.sel[sid] = [...set];
+      } else {
+        buildCfg.sel[sid] = [id];
+        const nxt = compute(rm, buildCfg).find((r) => r.status === 'pending' || r.status === 'blocked');
+        if (nxt) activeSlotId = nxt.sec.id;
+      }
+      closeSheet(); renderBuild(rm);
+      toast(isEq ? `Removed ${p.name}` : `Equipped ${p.name}`);
+    });
     if (stacked) $('#back', sh).addEventListener('click', () => { const sid = compute(rm, buildCfg).find((r) => r.cands.some((o) => o.id === id))?.sec.id; closeSheet(); setTimeout(() => sid && browseSheet(rm, sid), 230); });
   });
 }
@@ -821,7 +1162,7 @@ async function consumePendingSave() {
   return { saved };
 }
 
-/* Step 4 – summary */
+/* Step 4 – summary (Rig Dashboard BOM & Dispatch Brief) */
 function listText(cfg, items, withLink = true) {
   const lines = [`HDD loadout: ${titleOf(cfg)}`, 'Built with The Better Down Hole Tool', ''];
   items.forEach((l, i) => lines.push(`${i + 1}. ${l.brand ? `${l.brand} ` : ''}${l.part.name}: PN ${pnTxt(l.part)}, qty ${l.qty}${l.acc ? ' (add-on)' : ''}${l.alt ? ' (alternate)' : ''}`));
@@ -840,61 +1181,95 @@ async function viewSummary(q, isCurrent = () => true) {
   buildCfg = cfg;
   const draw = () => {
     const rows = compute(rm, cfg), items = lineItems(rm, cfg, rows);
-    const allItems = [...items, ...altLineItems(RADIUS, cfg, rows)];
+    const allItems = orderedBomItems(rm, cfg, rows);
     const pending = rows.filter((r) => ['pending', 'locked', 'blocked'].includes(r.status));
     const blocked = rows.find((r) => r.status === 'blocked');
     const ready = isLoadoutReady(rows);
     const saveLabel = ready ? 'Save loadout' : 'Save draft';
+    const totalPieces = allItems.reduce((sum, l) => sum + l.qty, 0);
     history.replaceState(null, '', `#/summary?c=${b64e(cfg)}`);
     currentHash = location.hash;
     rememberBuilder();
     setStepper(4, cfg, ready);
     const m = machine(cfg.m), p = pipeOf(m, cfg.p);
+    const buildHref = `#/build?c=${b64e(cfg)}`;
     app.innerHTML = `
-    <div class="sum-grid"><div class="stack">
-      <div class="sum-head"><small>${ready ? 'LOADOUT BRIEF' : 'INCOMPLETE DRAFT'} · ${cfg.mode === 'Bit' ? 'PILOT' : 'PULLBACK'}</small>
-        <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${p ? brandText(partTheme(p), `${p.name}${p.pn ? ` · #${p.pn}` : ''}`) : ''} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config</p>
-        <button class="btn btn-primary no-print" data-done>${ICON.save} ${saveLabel}</button>
-        <p class="small no-print" style="margin:8px 0 0;color:#d5deea">${needsGarageSave(cfg) ? 'Not in My rigs yet. Saving puts it on this drill.' : 'Saved to My rigs.'}</p></div>
-      ${!ready ? `<div class="note"><span>${blocked ? `<b>Needs changes in ${esc(blocked.sec.name)}.</b>` : pending.length ? `<b>${pending.length} slot${pending.length > 1 ? 's' : ''} still open.</b>` : '<b>Compatible tooling is unavailable.</b>'} <a class="no-print" href="#/build?c=${b64e(cfg)}">Edit loadout</a></span></div>` : ''}
-      <div class="card"><ul class="lines">${allItems.map((l) => `
-        <li class="line ${l.acc ? 'acc-line' : ''} ${l.alt ? 'alt-line' : ''}"${brandAttr(partTheme(l.part))}><div class="thumb">${l.alt ? radiusThumb(l.part) : imgTag(l.part.img, 200, 100, l.part.name, '', dwFallback(l.part))}</div>
-          <div><div class="l-sec">${partChip(l.part)} ${esc(l.sec)}${l.auto ? ' · auto' : ''}${l.alt ? ` <button type="button" class="linkbtn no-print alt-rm" data-altrm="${esc(l.key.split('.')[0])}" data-altpn="${esc(l.part.pn)}">Remove</button>` : ''}</div><div class="l-name">${esc(l.part.name)}</div>
-            <div class="l-row"><span class="l-pn">${l.part.pn ? '#' + esc(l.part.pn) : '<span class="muted">Part # not listed</span>'}</span>
-              <span class="print-qty">Qty: ${l.qty}</span><span class="qty no-print"><button data-dq="${l.key}" data-d="-1" aria-label="Less">−</button><input inputmode="numeric" data-qk="${l.key}" value="${esc(l.qty)}" aria-label="Quantity"><button data-dq="${l.key}" data-d="1" aria-label="More">+</button></span>
-            </div></div></li>`).join('') || '<li class="empty">No parts selected yet.</li>'}</ul></div>
-      <div class="share-grid no-print">
-        ${ready ? `<button class="btn btn-ghost" id="sh-share">${ICON.share}Share</button>
-        <a class="btn btn-ghost" id="sh-sms" href="#">${ICON.sms}Text list</a>
-        <a class="btn btn-ghost" id="sh-mail" href="#">${ICON.mail}Email list</a>
-        <button class="btn btn-ghost" id="sh-copy">${ICON.link}Copy link</button>` : ''}
-        <button class="btn btn-ghost" id="sh-print">${ICON.print}Print / PDF</button>
-        <button class="btn btn-ghost" data-done>${ICON.save}${saveLabel}</button>
-        <a class="btn btn-ghost" href="#/build?c=${b64e(cfg)}">✎ Edit loadout</a>
-        <button class="btn btn-ghost" id="sh-mode">⇄ ${cfg.mode === 'Bit' ? 'Pullback' : 'Pilot'} brief</button>
+    <div class="sum-grid summary-shell"><div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+      <div class="sum-head summary-hero"${brandAttr(m?.brand)}>
+        <div style="min-width:0">
+          <div class="view-kicker" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px">
+            <span>${ready ? 'LOADOUT BRIEF' : 'INCOMPLETE DRAFT'} · ${cfg.mode === 'Bit' ? 'PILOT' : 'PULLBACK'}</span>
+            <span class="status-pill ${ready ? 'is-ready' : 'is-draft'}">${ready ? 'READY' : 'DRAFT'}</span>
+          </div>
+          <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1>
+          <p>${p ? brandText(partTheme(p), `${p.name}${p.pn ? ` · #${p.pn}` : ''}`) : ''} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config · ${allItems.length} lines (${totalPieces} pcs)</p>
+          <p class="small no-print" style="margin:6px 0 0;color:var(--ink-2)">${needsGarageSave(cfg) ? 'Not in My rigs yet. Saving puts it on this drill.' : 'Saved to My rigs.'}</p>
+        </div>
+        <div class="summary-hero-actions no-print">
+          <a class="btn btn-outline btn-sm" href="${buildHref}">← Edit in workspace</a>
+          <button type="button" class="btn btn-ghost btn-sm" id="sh-mode">⇄ ${cfg.mode === 'Bit' ? 'Pullback' : 'Pilot'} brief</button>
+          <button type="button" class="btn btn-primary btn-sm" data-done>${ICON.save} ${saveLabel}</button>
+        </div>
       </div>
+      ${!ready ? `<div class="note rd-note is-warn"><span>${blocked ? `<b>Needs changes in ${esc(blocked.sec.name)}.</b>` : pending.length ? `<b>${pending.length} slot${pending.length > 1 ? 's' : ''} still open.</b>` : '<b>Compatible tooling is unavailable.</b>'} <a class="no-print" href="${buildHref}">Edit loadout</a></span></div>` : ''}
+      <ul class="lines bom-table">
+        <li class="bom-table-head"><span>Preview</span><span>String Slot</span><span>Brand &amp; Part Description</span><span>Part #</span><span style="text-align:right">Quantity</span></li>
+        ${allItems.map((l) => {
+          const isAlt = Boolean(l.alt), isAcc = Boolean(l.acc), slotId = l.key.split('.')[0];
+          const conn = isAlt ? radiusConn(l.part) : connStr(l.part);
+          return `<li class="line ${isAcc ? 'acc-line' : ''} ${isAlt ? 'alt-line' : ''}"${brandAttr(partTheme(l.part))}>
+            <div class="thumb bom-col-thumb">${isAlt ? radiusThumb(l.part) : imgTag(l.part.img, 200, 100, l.part.name, '', dwFallback(l.part))}</div>
+            <div class="bom-col-slot">
+              <div class="mono" style="font-size:11px;font-weight:800;color:var(--ink-2)">${esc(l.sec)}</div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:3px">
+                ${isAlt ? '<span class="status-pill" style="border-color:#244769;color:#9fd0ff">ALT</span>' : ''}
+                ${isAcc ? '<span class="status-pill">ADD-ON</span>' : ''}
+                ${l.auto ? '<span class="status-pill is-auto">AUTO</span>' : ''}
+              </div>
+            </div>
+            <div class="bom-col-part">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px">${partChip(l.part)} <strong style="font-size:14px">${esc(l.part.name)}</strong></div>
+              ${conn ? `<div class="mono muted" style="font-size:11px;margin-top:3px">${esc(conn)}</div>` : ''}
+            </div>
+            <div class="bom-col-pn">
+              <span class="bom-pn" style="font-size:13px">${l.part.pn ? '#' + esc(l.part.pn) : '<span class="muted">Part # not listed</span>'}</span>
+              ${isAlt ? `<div class="no-print" style="margin-top:4px"><button type="button" class="btn btn-ghost btn-sm" style="min-height:26px;padding:0 7px;font-size:10px" data-altrm="${esc(slotId)}" data-altpn="${esc(l.part.pn)}">Remove</button></div>`
+                : l.part.id ? `<div class="no-print" style="margin-top:4px"><button type="button" class="btn btn-ghost btn-sm" style="min-height:26px;padding:0 7px;font-size:10px" data-info="${l.part.id}">Specs</button></div>` : ''}
+            </div>
+            <div class="bom-col-qty">
+              <span class="print-qty">Qty: ${l.qty}</span>
+              <span class="qty-step no-print"><button type="button" data-dq="${l.key}" data-d="-1" aria-label="Less">−</button><input class="qty-input" inputmode="numeric" data-qk="${l.key}" value="${esc(l.qty)}" aria-label="Quantity"><button type="button" data-dq="${l.key}" data-d="1" aria-label="More">+</button></span>
+            </div></li>`;
+        }).join('') || '<li class="empty">No parts selected yet.</li>'}
+      </ul>
     </div>
-    <aside class="sum-aside stack">
-      <div class="cta"><h2>${ready ? 'Save this loadout' : 'Keep this draft'}</h2>
-        <p>${ready ? 'Save the class to your drill in My rigs.' : 'Finish equipping the loadout to share it.'}</p>
-        <div class="stack">
-          <button class="btn btn-primary btn-block" data-done>${ICON.save} ${saveLabel}</button>
-          ${ready ? `<button class="btn btn-dark btn-block" id="q-share">${ICON.share} Share list</button>
-          <button class="btn btn-block" id="q-copy">${ICON.link} Copy list</button>
-          <a class="btn btn-block" id="q-mail" href="#">${ICON.mail} Email list</a>` : ''}
-          <button class="btn btn-block" id="q-print">${ICON.print} Print / PDF</button>
-        </div></div>
+    <aside class="sum-aside summary-aside no-print">
+      <div class="cta dispatch-card"${brandAttr(m?.brand)}>
+        <h2>${ready ? 'Dispatch &amp; export' : 'Keep this draft'}</h2>
+        <p class="small muted">${ready ? 'Save the class to your drill in My rigs, or share the verified BOM.' : 'Finish equipping the loadout to unlock crew sharing.'}</p>
+        ${!ready ? '<div class="dispatch-gate-note">Sharing (Copy, Link, SMS, Email) unlocks once all required string slots are filled.</div>' : ''}
+        <div class="dispatch-grid">
+          ${ready ? `<button type="button" class="btn btn-primary btn-sm" id="q-copy">${ICON.link}Copy list</button>
+          <button type="button" class="btn btn-outline btn-sm" id="sh-copy">${ICON.link}Copy link</button>
+          <a class="btn btn-ghost btn-sm" id="sh-sms" href="#">${ICON.sms}Text list</a>
+          <a class="btn btn-ghost btn-sm" id="sh-mail" href="#">${ICON.mail}Email list</a>
+          <button type="button" class="btn btn-dark btn-sm" id="sh-share">${ICON.share}Share</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="q-share">${ICON.share}Quick share</button>` : ''}
+          <button type="button" class="btn btn-ghost btn-sm" id="sh-print">${ICON.print}Print / PDF</button>
+          <a class="btn btn-ghost btn-sm" href="${buildHref}">Edit string</a>
+        </div>
+        <button type="button" class="btn btn-primary btn-block" data-done>${ICON.save} ${saveLabel}</button>
+      </div>
     </aside></div>`;
     setActionbar(`<div class="ab-info"><strong>${needsGarageSave(cfg) ? 'Not saved' : 'Saved'}</strong><span class="ab-line">${items.length} equipped · ${ready ? 'class ready' : 'incomplete draft'}</span></div>
-      ${ready ? '<button class="btn btn-ghost btn-sm" id="ab-copy">Copy</button>' : ''}
-      <button class="btn btn-primary" data-done>${ICON.save} ${saveLabel}</button>`);
+      <div class="dock-actions">${ready ? '<button type="button" class="btn btn-ghost btn-sm" id="ab-copy">Copy</button>' : ''}
+      <button type="button" class="btn btn-primary btn-sm" data-done>${ICON.save} ${saveLabel}</button></div>`);
     if (ready) {
       const text = listText(cfg, allItems);
       const subj = `HDD loadout: ${titleOf(cfg)}`;
       const mailHref = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}`;
       $('#sh-sms').href = `sms:?&body=${encodeURIComponent(text)}`;
       $('#sh-mail').href = mailHref;
-      $('#q-mail').href = mailHref;
       const share = async () => {
         if (navigator.share) { try { await navigator.share({ title: subj, text: listText(cfg, allItems, false), url: shareUrl(cfg) }); } catch {} }
         else { await copyText(text); toast('Parts list copied'); }
@@ -907,12 +1282,12 @@ async function viewSummary(q, isCurrent = () => true) {
       $('#ab-copy').addEventListener('click', copyList);
     }
     $('#sh-print').addEventListener('click', () => window.print());
-    $('#q-print').addEventListener('click', () => window.print());
     $('#sh-mode').addEventListener('click', () => { cfg.mode = cfg.mode === 'Bit' ? 'Backreamer' : 'Bit'; draw(); window.scrollTo({ top: 0 }); });
     $$('[data-done]').forEach((b) => b.addEventListener('click', () => openDoneSheet(cfg)));
     $$('[data-dq]').forEach((b) => b.addEventListener('click', () => { const k = b.dataset.dq; cfg.q[k] = quantity(quantity(cfg.q[k]) + +b.dataset.d); draw(); }));
     $$('[data-qk]').forEach((i) => i.addEventListener('change', () => { cfg.q[i.dataset.qk] = quantity(i.value); draw(); }));
     $$('[data-altrm]').forEach((b) => b.addEventListener('click', () => { toggleAlt(cfg, b.dataset.altrm, b.dataset.altpn); delete cfg.q[altKey(b.dataset.altrm, b.dataset.altpn)]; draw(); }));
+    $$('[data-info]', app).forEach((b) => b.addEventListener('click', () => showPart(rm, +b.dataset.info)));
   };
   draw();
 }

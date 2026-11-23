@@ -81,7 +81,6 @@
       "variables": [
         "user_email",
         "reset_password_url",
-        "otp_code",
         "app_url",
         "support_email"
       ],
@@ -91,9 +90,9 @@
         "slug": "03-reset-password",
         "subject": "Reset your password for The Better Down Hole Tool",
         "variables": [
-          "{{ .ConfirmationURL }}",
-          "{{ .Token }}",
+          "{{ .RedirectTo }}",
           "{{ .TokenHash }}",
+          "{{ .ConfirmationURL }}",
           "{{ .SiteURL }}",
           "{{ .Email }}"
         ],

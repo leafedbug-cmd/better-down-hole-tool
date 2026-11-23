@@ -10,13 +10,15 @@ import { normalizeSuppliers, augmentRoadmap } from './suppliers.mjs';
 import { normalizeRadius, alternatesFor, slotOthers, fallbackImg, altLineItems, altKey, toggleAlt, MATCH_LABEL, RADIUS_BRAND } from './radius.mjs';
 
 const IMG_HOST = 'https://www.hddadvisor.com';
+// The manufacturer returns the same blank image for these catalog IDs.
+const EMPTY_IMAGE_IDS = new Set([8040, 8044, 8052, 8056, 8060, 8069, 8077, 8091, 8095, 8100, 8105, 8109, 8113, 8118, 8126]);
 
 /* ---------- tiny helpers ---------- */
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const validImgId = (id) => (typeof id === 'number' || typeof id === 'string') && /^\d+$/.test(String(id))
-  && Number.isSafeInteger(Number(id)) && Number(id) > 0 ? Number(id) : 0;
+  && Number.isSafeInteger(Number(id)) && Number(id) > 0 && !EMPTY_IMAGE_IDS.has(Number(id)) ? Number(id) : 0;
 function safeHttpUrl(u) {
   if (typeof u !== 'string') return null;
   const trimmed = u.trim();
@@ -173,7 +175,7 @@ const pnTxt = (p) => p.pn || 'not listed';
 
 /* ---------- UI shell ---------- */
 const app = $('#app');
-function setStepper(step, cfg) {
+function setStepper(step, cfg, ready = false) {
   const el = $('#stepper');
   if (!step) { el.hidden = true; return; }
   const m = cfg?.m && machine(cfg.m), p = m && pipeOf(m, cfg.p);
@@ -181,11 +183,12 @@ function setStepper(step, cfg) {
     ['Drill', m ? m.model : '', '#/drill'],
     ['Pipe', p ? p.name : '', m ? `#/pipe/${m.id}` : null],
     ['Equip', cfg?.r ? cfg.mode : '', cfg?.r ? `#/build?c=${b64e(cfg)}` : null],
-    ['Confirm', '', cfg?.r ? `#/summary?c=${b64e(cfg)}` : null],
+    [ready ? 'Confirm' : 'Review', '', cfg?.r ? `#/summary?c=${b64e(cfg)}` : null],
   ];
   el.innerHTML = `<ol>${steps.map(([t, sub, href], i) => {
-    const cls = i + 1 < step ? 'done' : i + 1 === step ? 'cur' : '';
-    const inner = `<i class="n">${i + 1 < step ? '✓' : i + 1}</i>${t}${sub ? `<em class="lbl-sub">${esc(sub)}</em>` : ''}`;
+    const done = i + 1 < step && (i !== 2 || ready);
+    const cls = done ? 'done' : i + 1 === step ? 'cur' : '';
+    const inner = `<i class="n">${done ? '✓' : i + 1}</i>${t}${sub ? `<em class="lbl-sub">${esc(sub)}</em>` : ''}`;
     return `<li class="${cls}">${href && i + 1 !== step ? `<a href="${href}">${inner}</a>` : `<span aria-current="${i + 1 === step ? 'step' : 'false'}">${inner}</span>`}</li>`;
   }).join('')}</ol>`;
   el.hidden = false;
@@ -379,7 +382,6 @@ function persistBuild(replace = true) {
   if (replace) { history.replaceState(null, '', url); currentHash = location.hash; }
   store.set(LAST_KEY, { cfg: buildCfg, title: titleOf(buildCfg) });
   rememberBuilder();
-  setStepper(3, buildCfg);
 }
 function partRow(p, { selected, multi, sel = true, compact } = {}) {
   const stamp = selected || !sel ? 'Equipped' : 'Equip';
@@ -417,14 +419,14 @@ function altsFor(p, sid, cfg) {
   const list = alternatesFor(RADIUS, p.pn);
   return list.length ? `<div class="alts" role="group" aria-label="Radius equivalents for ${esc(p.name)}">${list.map((a) => altRow(a, sid, cfg)).join('')}</div>` : '';
 }
-function othersGroup(rm, sec, cfg, shownPns) {
+function othersGroup(rm, row, cfg, shownPns) {
   if (!showOther()) return '';
   const P = rm.parts, m = machine(cfg.m);
-  const types = [...new Set(sec.opts.map((o) => P[o.id]?.type).filter(Boolean))];
-  const list = slotOthers(RADIUS, { types, machine: m ? `${m.brand} ${m.model}` : '', dwPns: shownPns });
-  return list.length ? `<details class="others"><summary>Other brands <span class="muted">· ${list.length} Radius part${list.length > 1 ? 's' : ''} for this drill</span></summary>
-    ${list.map((part) => altRow({ part }, sec.id, cfg)).join('')}
-    <p class="small muted">Not checked by the fit solver. Confirm threads with Radius before ordering.</p></details>` : '';
+  const slotParts = row.cands.map((o) => P[o.id]);
+  const list = slotOthers(RADIUS, { slotParts, pipe: P[cfg.p], machine: m ? `${m.brand} ${m.model}` : '', dwPns: shownPns });
+  return list.length ? `<details class="others"><summary>Other brands <span class="muted">· ${list.length} Radius part${list.length > 1 ? 's' : ''}</span></summary>
+    ${list.map((part) => altRow({ part }, row.sec.id, cfg)).join('')}
+    <p class="small muted">Radius parts are shopping-list alternates. Confirm fit with Radius before ordering.</p></details>` : '';
 }
 function slotCell(r, i, P) {
   const n = String(i + 1).padStart(2, '0');
@@ -456,8 +458,10 @@ function renderBuild(rm, focusNext) {
   const items = lineItems(rm, cfg, rows);
   const altItems = altLineItems(RADIUS, cfg, rows);
   const pending = rows.find((r) => r.status === 'pending');
+  const blocked = rows.find((r) => r.status === 'blocked');
   const ready = isLoadoutReady(rows);
   persistBuild();
+  setStepper(3, cfg, ready);
   const strip = rows.map((r, i) => slotCell(r, i, P)).join('');
 
   let n = 0;
@@ -467,7 +471,9 @@ function renderBuild(rm, focusNext) {
     let body = '', chip = '';
     if (r.status === 'blocked') {
       chip = '<span class="pill pill-warn">Needs changes</span>';
-      body = '<p class="sec-note">No compatible end tool fits. Change an earlier slot to complete this loadout.</p>' + othersGroup(rm, s, cfg, []);
+      body = s.name === 'Drill Pipe'
+        ? '<p class="sec-note">The pipe selected in Step 02 cannot connect to the current rig-side parts.</p>'
+        : '<p class="sec-note">No compatible end tool is listed for this configuration.</p>';
     } else if (r.status === 'skip') {
       chip = '<span class="pill">Skipped</span>';
       body = `<p class="sec-note">Nothing fits the slot before this one, so this slot stays empty.</p>`;
@@ -480,7 +486,8 @@ function renderBuild(rm, focusNext) {
       body = `<p class="sec-note">${r.cands.length} option${r.cands.length > 1 ? 's' : ''} fit the slot before this one${r.hidden ? ` (${r.hidden} more hidden because nothing downstream fits them)` : ''}.</p>
         ${shown.map((o) => partRow(P[o.id], { multi }) + altsFor(P[o.id], s.id, cfg)).join('')}
         ${r.cands.length > shown.length ? `<button class="btn btn-outline btn-block more" data-browse="${s.id}">See all ${r.cands.length} options</button>` : ''}
-        ${othersGroup(rm, s, cfg, shown.map((o) => P[o.id].pn))}`;
+        ${othersGroup(rm, r, cfg, shown.map((o) => P[o.id].pn))}
+        ${cfg.alt?.[s.id]?.length ? '<p class="sec-note" role="status">Radius alternate added to the parts list. Equip a Ditch Witch part in this slot to unlock the next one.</p>' : ''}`;
     } else {
       chip = r.status === 'auto' ? '<span class="pill pill-ok">Auto-matched</span>' : `<span class="pill pill-dark">Equipped${r.sel.length > 1 ? ` · ${r.sel.length}` : ''}</span>`;
       body = r.sel.map((id) => {
@@ -492,7 +499,7 @@ function renderBuild(rm, focusNext) {
           </div></div>` : '';
         return partRow(P[id], { selected: true, multi, sel: false }) + altsFor(P[id], s.id, cfg) + accHtml;
       }).join('') + (r.cands.length > 1 ? `<button class="linkbtn" data-browse="${s.id}">${multi ? 'Add or remove' : `Swap (${r.cands.length} fit this slot)`}</button>` : '')
-        + othersGroup(rm, s, cfg, r.sel.map((id) => P[id].pn));
+        + othersGroup(rm, r, cfg, r.sel.map((id) => P[id].pn));
     }
     const dot = r.status === 'done' || r.status === 'auto' ? '✓' : n;
     const cls = { done: 'done', auto: 'done', pending: 'pending', blocked: 'pending', skip: 'skip', locked: 'locked' }[r.status];
@@ -513,26 +520,25 @@ function renderBuild(rm, focusNext) {
         <button data-mode="Bit" aria-pressed="${cfg.mode === 'Bit'}">Pilot<small>Bit config</small></button>
         <button data-mode="Backreamer" aria-pressed="${cfg.mode === 'Backreamer'}">Pullback<small>Backreamer config</small></button>
       </div>
-      ${RADIUS ? `<label class="brand-toggle"><input type="checkbox" id="other-brands" ${showOther() ? 'checked' : ''}><span>Show other brands<small>Radius HDD alternates next to Ditch Witch parts</small></span></label>` : ''}
+      ${RADIUS ? `<label class="brand-toggle"><input type="checkbox" id="other-brands" ${showOther() ? 'checked' : ''}><span>Show other brands<small>Radius alternates go on the parts list. Equip Ditch Witch parts to advance.</small></span></label>` : ''}
       <div class="preview"><div class="preview-head"><span>Slot rail</span><span>${endLabel} →</span></div>
         <div class="meter" role="img" aria-label="${donePct} of ${rows.length} slots settled"><span style="width:${pct}%"></span></div>
         <div class="strip"><span class="rig">${esc(m?.model || 'RIG')}</span>${strip || '<span class="small muted">Slots appear here</span>'}</div></div>
       <div class="timeline" style="margin-top:18px">${secHtml}</div>
-      ${!pending && rows.length && rows[rows.length - 1].status === 'blocked' ? `<div class="note" style="margin-top:14px">${ICON.info}<span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
     </div>
     <aside class="build-aside">
       <div class="aside-card"><h3>Equipped</h3>
         <ul class="mini-list">${items.map((l) => `<li><span>${l.brand ? `<span class="brand-chip">${esc(l.brand)}</span> ` : ''}${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}${altItems.map((l) => `<li><span><span class="brand-chip">${esc(l.brand)}</span> ${esc(l.part.name)}</span><span class="pn">${esc(l.part.pn)}</span></li>`).join('')}</ul>
-        <a class="btn btn-primary btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">${ready ? 'Confirm class' : 'Review loadout'}</a>
+        <a class="btn ${ready ? 'btn-primary' : 'btn-ghost'} btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">${ready ? 'Confirm class' : 'Review draft'}</a>
         <button class="btn btn-ghost btn-block" style="margin-top:8px" data-save>${ICON.save} Save loadout</button>
       </div>
     </aside></div>`;
 
   const confirmHref = `#/summary?c=${b64e(cfg)}`;
-  setActionbar(`<div class="ab-info"><strong>${items.length} equipped</strong><span class="ab-line">${pending ? `Open · ${esc(pending.sec.name)}` : ready ? `Class ready · ${donePct}/${rows.length}` : 'Needs changes · no compatible end tool'}</span>${pending ? `<a class="ab-review" href="${confirmHref}">Review</a>` : ''}</div>
+  setActionbar(`<div class="ab-info"><strong>${items.length} equipped</strong><span class="ab-line">${pending ? `Open · ${esc(pending.sec.name)}` : ready ? `Class ready · ${donePct}/${rows.length}` : `Needs changes${blocked ? ` · ${esc(blocked.sec.name)}` : ''}`}</span>${pending ? `<a class="ab-review" href="${confirmHref}">Review draft</a>` : ''}</div>
     ${ctx && ready
       ? `<button class="btn btn-primary" data-save>${ICON.save} Save</button><a class="btn btn-ghost" href="${confirmHref}">Confirm</a>`
-      : `<button class="btn btn-ghost btn-sm" data-save aria-label="Save loadout">${ICON.save}</button>${pending ? `<button class="btn btn-primary" type="button" data-equip-next>Equip</button>` : `<a class="btn btn-primary" href="${confirmHref}">Confirm</a>`}`}`);
+      : `<button class="btn btn-ghost btn-sm" data-save aria-label="Save loadout">${ICON.save}</button>${pending ? `<button class="btn btn-primary" type="button" data-equip-next>Equip</button>` : `<a class="btn ${ready ? 'btn-primary' : 'btn-ghost'}" href="${confirmHref}">${ready ? 'Confirm' : 'Review draft'}</a>`}`}`);
   mountLoBanner();
 
   // events
@@ -591,7 +597,8 @@ function browseSheet(rm, sid) {
       const t = q.toLowerCase();
       const list = row.cands.filter((o) => { const pp = P[o.id]; return (!t || `${pp.name} ${pp.pn || ''} ${pp.short || ''}`.toLowerCase().includes(t)) && (!soil || (pp.soil || '').includes(soil)); });
       $('#blist', sh).innerHTML = (list.map((o) => partRow(P[o.id], { selected: chosen.has(o.id), multi }) + altsFor(P[o.id], sid, cfg)).join('') || '<div class="empty">No matches</div>')
-        + othersGroup(rm, s, cfg, list.map((o) => P[o.id].pn));
+        + othersGroup(rm, row, cfg, list.map((o) => P[o.id].pn))
+        + (row.status === 'pending' && cfg.alt?.[sid]?.length ? '<p class="sec-note" role="status">Radius alternate added to the parts list. Equip a Ditch Witch part to advance.</p>' : '');
       $$('[data-altadd]', sh).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); toggleAlt(cfg, b.dataset.altadd, b.dataset.altpn); renderBuild(rm); draw(); }));
       $$('[data-pick]', sh).forEach((el) => el.addEventListener('click', (e) => {
         if (e.target.closest('[data-info]')) return;
@@ -676,7 +683,7 @@ function keepPhoneDraft(cfg, name) {
   updateSavedBadge();
 }
 function stashPendingSave(cfg, name) {
-  store.set(PENDING_SAVE_KEY, { cfg: JSON.parse(JSON.stringify(cfg)), name: (name || titleOf(cfg)).replace(' config', '').slice(0, 60), ts: Date.now() });
+  store.set(PENDING_SAVE_KEY, { cfg: JSON.parse(JSON.stringify(cfg)), name: (name || titleOf(cfg)).replace(' config', '').slice(0, 60), ts: Date.now(), explicit: true });
 }
 function goHash(href) {
   skipLeaveGuard = true;
@@ -718,8 +725,8 @@ async function openDoneSheet(cfg) {
       const nameOf = () => $('#lname', sh).value.trim() || def;
       $('#gophone', sh).addEventListener('click', () => { keepPhoneDraft(cfg, nameOf()); closeSheet(); toast('Saved on this phone. Sign in when you want it in My rigs.'); });
       const stash = (hash) => { stashPendingSave(cfg, nameOf()); closeSheet(); goHash(hash); };
-      $('#gosign', sh).addEventListener('click', () => stash('#/account?m=signin'));
-      $('#gosignup', sh).addEventListener('click', () => stash('#/account'));
+      $('#gosign', sh).addEventListener('click', () => stash('#/account?m=signin&save=1'));
+      $('#gosignup', sh).addEventListener('click', () => stash('#/account?save=1'));
     });
     return;
   }
@@ -767,7 +774,7 @@ async function openDoneSheet(cfg) {
 }
 async function consumePendingSave() {
   const p = store.get(PENDING_SAVE_KEY, null);
-  if (!p?.cfg || !ME.member) return null;
+  if (!p?.userId || p.userId !== ME.user?.id || !p.cfg || !ME.member) return null;
   if (p.ts && Date.now() - Number(p.ts) > 24 * 60 * 60 * 1000) {
     store.set(PENDING_SAVE_KEY, null);
     return null;
@@ -818,20 +825,21 @@ async function viewSummary(q, isCurrent = () => true) {
     const rows = compute(rm, cfg), items = lineItems(rm, cfg, rows);
     const allItems = [...items, ...altLineItems(RADIUS, cfg, rows)];
     const pending = rows.filter((r) => ['pending', 'locked', 'blocked'].includes(r.status));
+    const blocked = rows.find((r) => r.status === 'blocked');
     const ready = isLoadoutReady(rows);
+    const saveLabel = ready ? 'Save loadout' : 'Save draft';
     history.replaceState(null, '', `#/summary?c=${b64e(cfg)}`);
     currentHash = location.hash;
     rememberBuilder();
-    setStepper(4, cfg);
+    setStepper(4, cfg, ready);
     const m = machine(cfg.m), p = pipeOf(m, cfg.p);
     app.innerHTML = `
     <div class="sum-grid"><div class="stack">
-      <div class="sum-head"><small>LOADOUT BRIEF · ${cfg.mode === 'Bit' ? 'PILOT' : 'PULLBACK'}</small>
+      <div class="sum-head"><small>${ready ? 'LOADOUT BRIEF' : 'INCOMPLETE DRAFT'} · ${cfg.mode === 'Bit' ? 'PILOT' : 'PULLBACK'}</small>
         <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config</p>
-        <button class="btn btn-primary" data-done style="margin-top:14px">${ICON.save} Save loadout</button>
-        <p class="small" style="margin:8px 0 0;color:#d5deea">${needsGarageSave(cfg) ? 'Not in My rigs yet. Saving puts it on this drill.' : 'Saved to My rigs.'}</p></div>
-      ${rows.length && rows[rows.length - 1].status === 'blocked' ? `<div class="note no-print"><span><b>No ${esc(rows[rows.length - 1].sec.name.toLowerCase())} fits this loadout.</b> Try a different choice in an earlier slot.</span></div>` : ''}
-      ${pending.length ? `<div class="note no-print"><span><b>${pending.length} slot${pending.length > 1 ? 's' : ''} still open</b> (${esc(pending.map((r) => r.sec.name).join(', '))}). <a href="#/build?c=${b64e(cfg)}">Finish equipping</a></span></div>` : ''}
+        <button class="btn btn-primary no-print" data-done>${ICON.save} ${saveLabel}</button>
+        <p class="small no-print" style="margin:8px 0 0;color:#d5deea">${needsGarageSave(cfg) ? 'Not in My rigs yet. Saving puts it on this drill.' : 'Saved to My rigs.'}</p></div>
+      ${!ready ? `<div class="note"><span>${blocked ? `<b>Needs changes in ${esc(blocked.sec.name)}.</b>` : pending.length ? `<b>${pending.length} slot${pending.length > 1 ? 's' : ''} still open.</b>` : '<b>Compatible tooling is unavailable.</b>'} <a class="no-print" href="#/build?c=${b64e(cfg)}">Edit loadout</a></span></div>` : ''}
       <div class="card"><ul class="lines">${allItems.map((l) => `
         <li class="line ${l.acc ? 'acc-line' : ''} ${l.alt ? 'alt-line' : ''}"><div class="thumb">${l.alt ? radiusThumb(l.part) : imgTag(l.part.img, 200, 100, l.part.name, '', dwFallback(l.part))}</div>
           <div><div class="l-sec">${l.brand ? `<span class="brand-chip">${esc(l.brand)}</span> ` : ''}${esc(l.sec)}${l.auto ? ' · auto' : ''}${l.alt ? ` <button type="button" class="linkbtn no-print alt-rm" data-altrm="${esc(l.key.split('.')[0])}" data-altpn="${esc(l.part.pn)}">Remove</button>` : ''}</div><div class="l-name">${esc(l.part.name)}</div>
@@ -839,46 +847,48 @@ async function viewSummary(q, isCurrent = () => true) {
               <span class="print-qty">Qty: ${l.qty}</span><span class="qty no-print"><button data-dq="${l.key}" data-d="-1" aria-label="Less">−</button><input inputmode="numeric" data-qk="${l.key}" value="${esc(l.qty)}" aria-label="Quantity"><button data-dq="${l.key}" data-d="1" aria-label="More">+</button></span>
             </div></div></li>`).join('') || '<li class="empty">No parts selected yet.</li>'}</ul></div>
       <div class="share-grid no-print">
-        <button class="btn btn-ghost" id="sh-share">${ICON.share}Share</button>
+        ${ready ? `<button class="btn btn-ghost" id="sh-share">${ICON.share}Share</button>
         <a class="btn btn-ghost" id="sh-sms" href="#">${ICON.sms}Text list</a>
         <a class="btn btn-ghost" id="sh-mail" href="#">${ICON.mail}Email list</a>
-        <button class="btn btn-ghost" id="sh-copy">${ICON.link}Copy link</button>
+        <button class="btn btn-ghost" id="sh-copy">${ICON.link}Copy link</button>` : ''}
         <button class="btn btn-ghost" id="sh-print">${ICON.print}Print / PDF</button>
-        <button class="btn btn-ghost" data-done>${ICON.save}Save loadout</button>
+        <button class="btn btn-ghost" data-done>${ICON.save}${saveLabel}</button>
         <a class="btn btn-ghost" href="#/build?c=${b64e(cfg)}">✎ Edit loadout</a>
         <button class="btn btn-ghost" id="sh-mode">⇄ ${cfg.mode === 'Bit' ? 'Pullback' : 'Pilot'} brief</button>
       </div>
     </div>
     <aside class="sum-aside stack">
-      <div class="cta"><h2>Save this loadout</h2>
-        <p>Confirm the class and put it in My rigs. You can still copy, text, email, or print the list.</p>
+      <div class="cta"><h2>${ready ? 'Save this loadout' : 'Keep this draft'}</h2>
+        <p>${ready ? 'Save the class to your drill in My rigs.' : 'Finish equipping the loadout to share it.'}</p>
         <div class="stack">
-          <button class="btn btn-primary btn-block" data-done>${ICON.save} Save loadout</button>
-          <button class="btn btn-dark btn-block" id="q-share">${ICON.share} Share list</button>
+          <button class="btn btn-primary btn-block" data-done>${ICON.save} ${saveLabel}</button>
+          ${ready ? `<button class="btn btn-dark btn-block" id="q-share">${ICON.share} Share list</button>
           <button class="btn btn-block" id="q-copy">${ICON.link} Copy list</button>
-          <a class="btn btn-block" id="q-mail" href="#">${ICON.mail} Email list</a>
+          <a class="btn btn-block" id="q-mail" href="#">${ICON.mail} Email list</a>` : ''}
           <button class="btn btn-block" id="q-print">${ICON.print} Print / PDF</button>
         </div></div>
     </aside></div>`;
-    setActionbar(`<div class="ab-info"><strong>${needsGarageSave(cfg) ? 'Not saved' : 'Saved'}</strong><span class="ab-line">${items.length} equipped${ready ? ' · class ready' : ` · ${pending.length} incomplete`}</span></div>
-      <button class="btn btn-ghost btn-sm" id="ab-copy">Copy</button>
-      <button class="btn btn-primary" data-done>${ICON.save} Save loadout</button>`);
-    const text = listText(cfg, allItems);
-    const subj = `HDD loadout: ${titleOf(cfg)}`;
-    const mailHref = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}`;
-    $('#sh-sms').href = `sms:?&body=${encodeURIComponent(text)}`;
-    $('#sh-mail').href = mailHref;
-    $('#q-mail').href = mailHref;
-    const share = async () => {
-      if (navigator.share) { try { await navigator.share({ title: subj, text: listText(cfg, allItems, false), url: shareUrl(cfg) }); } catch {} }
-      else { await copyText(text); toast('Parts list copied'); }
-    };
-    $('#sh-share').addEventListener('click', share);
-    $('#q-share').addEventListener('click', share);
-    const copyList = async () => { await copyText(text); toast('Parts list copied'); };
-    $('#sh-copy').addEventListener('click', async () => { await copyText(shareUrl(cfg)); toast('Link copied'); });
-    $('#q-copy').addEventListener('click', copyList);
-    $('#ab-copy').addEventListener('click', copyList);
+    setActionbar(`<div class="ab-info"><strong>${needsGarageSave(cfg) ? 'Not saved' : 'Saved'}</strong><span class="ab-line">${items.length} equipped · ${ready ? 'class ready' : 'incomplete draft'}</span></div>
+      ${ready ? '<button class="btn btn-ghost btn-sm" id="ab-copy">Copy</button>' : ''}
+      <button class="btn btn-primary" data-done>${ICON.save} ${saveLabel}</button>`);
+    if (ready) {
+      const text = listText(cfg, allItems);
+      const subj = `HDD loadout: ${titleOf(cfg)}`;
+      const mailHref = `mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}`;
+      $('#sh-sms').href = `sms:?&body=${encodeURIComponent(text)}`;
+      $('#sh-mail').href = mailHref;
+      $('#q-mail').href = mailHref;
+      const share = async () => {
+        if (navigator.share) { try { await navigator.share({ title: subj, text: listText(cfg, allItems, false), url: shareUrl(cfg) }); } catch {} }
+        else { await copyText(text); toast('Parts list copied'); }
+      };
+      const copyList = async () => { await copyText(text); toast('Parts list copied'); };
+      $('#sh-share').addEventListener('click', share);
+      $('#q-share').addEventListener('click', share);
+      $('#sh-copy').addEventListener('click', async () => { await copyText(shareUrl(cfg)); toast('Link copied'); });
+      $('#q-copy').addEventListener('click', copyList);
+      $('#ab-copy').addEventListener('click', copyList);
+    }
     $('#sh-print').addEventListener('click', () => window.print());
     $('#q-print').addEventListener('click', () => window.print());
     $('#sh-mode').addEventListener('click', () => { cfg.mode = cfg.mode === 'Bit' ? 'Backreamer' : 'Bit'; draw(); window.scrollTo({ top: 0 }); });
@@ -911,15 +921,68 @@ function viewNotFound() {
 const SB_URL = 'https://rdyhhszmfpomixaoehgy.supabase.co';
 const SB_KEY = 'sb_publishable_3XIxMYWm9FnbzybMqpWXfg_T-TsFqT7';
 const PENDING_KEY = 'bdht.pendingSetup', LO_KEY = 'bdht.loCtx';
+const RESET_ROUTE = '#/account?m=reset', RECOVERY_KEY = 'bdht.recoverySession';
 let SB = null;
+let recoveryReady = null;
 const ME = { user: null, member: null, company: null, billing: null };
-async function sb() {
-  if (!SB) {
-    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm');
-    SB = createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'bdht.auth', flowType: 'pkce', detectSessionInUrl: true } });
-    SB.auth.onAuthStateChange((ev) => {
-      if (ev === 'PASSWORD_RECOVERY') setTimeout(() => { location.hash = '#/account?m=reset'; }, 0);
+function readRecoveryCallback(href) {
+  const url = new URL(href);
+  const [routeHash, authHash] = url.hash.slice(1).split('#');
+  const hashParams = new URLSearchParams(authHash ?? routeHash);
+  const query = url.searchParams;
+  const legacy = routeHash === '/account?m=signin' || routeHash === '/account?m=reset';
+  const hasError = [query, hashParams].some((p) => p.has('error') || p.has('error_code'));
+  if (query.get('auth') !== 'reset' && query.get('type') !== 'recovery' && hashParams.get('type') !== 'recovery'
+    && !(legacy && (query.has('code') || hasError))) return null;
+  if (hasError) return {};
+  return {
+    tokenHash: query.get('token_hash'), code: query.get('code'),
+    accessToken: hashParams.get('access_token'), refreshToken: hashParams.get('refresh_token'),
+  };
+}
+function recoverySessionId(session) {
+  try {
+    const payload = session.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(payload)).session_id || null;
+  } catch { return null; }
+}
+async function verifyRecovery(callback) {
+  try {
+    if (!callback.tokenHash && !callback.code && !(callback.accessToken && callback.refreshToken)) return;
+    const { auth } = await sb();
+    const { tokenHash, code, accessToken, refreshToken } = callback;
+    let result;
+    if (tokenHash) result = await auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' });
+    else if (code) result = await auth.exchangeCodeForSession(code);
+    else result = await auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+    const id = !result.error && recoverySessionId(result.data?.session);
+    if (id) sessionStorage.setItem(RECOVERY_KEY, id);
+  } catch { /* The reset view shows a fresh-link action. */ }
+}
+function startRecovery() {
+  const callback = readRecoveryCallback(location.href);
+  if (!callback) return;
+  sessionStorage.removeItem(RECOVERY_KEY);
+  history.replaceState(null, '', location.pathname + RESET_ROUTE);
+  recoveryReady = verifyRecovery(callback).finally(() => { recoveryReady = null; });
+}
+async function currentRecoverySession() {
+  const expected = sessionStorage.getItem(RECOVERY_KEY);
+  if (!expected) return false;
+  try {
+    const c = await sb();
+    const { data, error } = await c.auth.getSession();
+    if (!error && recoverySessionId(data?.session) === expected) return true;
+  } catch { /* A recovery session may have expired or been signed out. */ }
+  sessionStorage.removeItem(RECOVERY_KEY);
+  return false;
+}
+function sb() {
+  return SB ||= import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/+esm').then(({ createClient }) => {
+    const client = createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'bdht.auth', flowType: 'pkce', detectSessionInUrl: true } });
+    client.auth.onAuthStateChange((ev) => {
       if (ev === 'SIGNED_OUT') {
+        sessionStorage.removeItem(RECOVERY_KEY);
         ME.user = ME.member = ME.company = ME.billing = null;
         store.set(PENDING_KEY, null);
         store.set(PENDING_SAVE_KEY, null);
@@ -928,11 +991,12 @@ async function sb() {
         updateAcctNav();
       }
     });
-  }
-  return SB;
+    return client;
+  }).catch((error) => { SB = null; throw error; });
 }
 async function refreshMe() {
   try {
+    await recoveryReady;
     const c = await sb();
     const { data: { session } } = await c.auth.getSession();
     ME.user = session?.user || null; ME.member = ME.company = ME.billing = null;
@@ -972,31 +1036,51 @@ function busy(btn, on, label) { if (!btn) return; if (on) { btn.dataset.l = btn.
 
 /* sign up / sign in / finish setup */
 async function viewAccount(q, isCurrent = () => true) {
-  await loadCatalog(); await meReady();
-  if (!isCurrent()) return;
   setStepper(0); setActionbar('');
-  if (q.get('m') === 'reset' && ME.user) {
+  if (q.get('m') === 'reset') {
+    app.innerHTML = '<div class="auth-wrap"><p role="status">Checking your reset link…</p></div>';
+    await recoveryReady;
+    const valid = await currentRecoverySession();
+    if (!isCurrent()) return;
+    if (!valid) return viewResetError();
     app.innerHTML = `<div class="auth-wrap"><h1>Set a new password</h1>
       <form class="card pad stack" id="rst" novalidate style="margin-top:14px"><div id="ferr"></div>
       <label class="field"><span>New password (8+ characters)</span><input id="npw" type="password" autocomplete="new-password" minlength="8" required></label>
       <button class="btn btn-primary btn-block" id="rgo">Save password</button></form></div>`;
     $('#rst').addEventListener('submit', async (e) => {
       e.preventDefault(); const pw = $('#npw').value;
-      if (pw.length < 8) { $('#ferr').innerHTML = '<div class="form-err">Use at least 8 characters.</div>'; return; }
-      const c = await sb(); const { error } = await c.auth.updateUser({ password: pw });
-      if (error) { $('#ferr').innerHTML = `<div class="form-err">${esc(friendlyAuthError(error))}</div>`; return; }
-      toast('Password updated'); location.replace(ME.member ? '#/garage' : '#/setup');
+      const err = $('#ferr'), btn = $('#rgo');
+      if (pw.length < 8) { err.innerHTML = '<div class="form-err">Use at least 8 characters.</div>'; return; }
+      busy(btn, true, 'Saving…');
+      if (!await currentRecoverySession()) { if (isCurrent()) viewResetError(); return; }
+      try {
+        const c = await sb();
+        const { error } = await c.auth.updateUser({ password: pw });
+        if (error) throw error;
+        sessionStorage.removeItem(RECOVERY_KEY);
+        toast('Password updated');
+        location.replace('#/garage');
+      } catch (error) {
+        if (!await currentRecoverySession()) { if (isCurrent()) viewResetError(); return; }
+        busy(btn, false);
+        err.innerHTML = `<div class="form-err" role="alert">${esc(friendlyAuthError(error))}</div>`;
+      }
     });
     return;
   }
+  if (q.get('m') === 'forgot') return viewResetRequest();
+  await loadCatalog(); await meReady();
+  if (!isCurrent()) return;
+  const saveOnSignIn = q.get('save') === '1';
+  if (saveOnSignIn && ME.user) authorizePendingSave();
   if (ME.user && ME.member) { location.replace('#/garage'); return; }
   if (ME.user) return viewSetup(isCurrent);
   const mode = q.get('m') === 'signin' ? 'signin' : 'signup';
   app.innerHTML = `<div class="auth-wrap">
     ${pageHead(mode === 'signup' ? 'New crew' : 'Returning crew', mode === 'signup' ? 'Set up your crew' : 'Welcome back', mode === 'signup' ? 'Save a named loadout for every machine your crew runs, and share those classes with the company.' : 'Sign in to open your machines and loadouts.')}
     <div class="seg" role="tablist" style="margin-bottom:14px">
-      <button aria-pressed="${mode === 'signup'}" data-go="#/account">Sign up</button>
-      <button aria-pressed="${mode === 'signin'}" data-go="#/account?m=signin">Sign in</button></div>
+      <button aria-pressed="${mode === 'signup'}" data-go="#/account${saveOnSignIn ? '?save=1' : ''}">Sign up</button>
+      <button aria-pressed="${mode === 'signin'}" data-go="#/account?m=signin${saveOnSignIn ? '&amp;save=1' : ''}">Sign in</button></div>
     ${mode === 'signup' ? onboardForm(true) : `<form class="card pad stack" id="fin" novalidate>
       <label class="field"><span>Email</span><input id="e" type="email" autocomplete="email" inputmode="email" required></label>
       <label class="field"><span>Password</span><input id="pw" type="password" autocomplete="current-password" required></label>
@@ -1005,7 +1089,7 @@ async function viewAccount(q, isCurrent = () => true) {
       <button type="button" class="linkbtn" id="forgot" style="align-self:center">Forgot password?</button></form>`}
     <p class="small muted" style="margin-top:14px;text-align:center">No account needed to build and share a loadout. <a href="#/drill">Keep building as a guest</a></p></div>`;
   $$('[data-go]').forEach((b) => b.addEventListener('click', () => { location.hash = b.dataset.go; }));
-  if (mode === 'signup') return mountOnboard(true);
+  if (mode === 'signup') return mountOnboard(true, saveOnSignIn);
   const err = (m) => { const e = $('#err'); e.textContent = m; e.hidden = !m; };
   $('#fin').addEventListener('submit', async (ev) => {
     ev.preventDefault(); err('');
@@ -1016,6 +1100,7 @@ async function viewAccount(q, isCurrent = () => true) {
     const { error } = await c.auth.signInWithPassword({ email, password });
     if (error) { busy($('#go'), false); return err(friendlyAuthError(error)); }
     await refreshMe();
+    if (saveOnSignIn) authorizePendingSave();
     const pend = store.get(PENDING_KEY, null);
     if (!ME.member && pend && pend.email?.toLowerCase() === email.toLowerCase()) {
       try { await runSetup(pend); } catch (e) {
@@ -1026,9 +1111,52 @@ async function viewAccount(q, isCurrent = () => true) {
     location.hash = ME.member ? '#/garage' : '#/setup';
   });
   $('#forgot').addEventListener('click', async () => {
-    const email = $('#e').value.trim(); if (!email) return err('Type your email above first.');
-    const c = await sb(); const { error } = await c.auth.resetPasswordForEmail(email, { redirectTo: location.origin + location.pathname + '#/account?m=signin' });
-    error ? err(friendlyAuthError(error)) : toast('Check your email for a reset link');
+    const email = $('#e').value.trim();
+    if (!email || !$('#e').validity.valid) return viewResetRequest(email);
+    const btn = $('#forgot');
+    busy(btn, true, 'Sending…');
+    try { await requestPasswordReset(email); toast('Check your email for a reset link'); }
+    catch (error) { if (isCurrent()) err(friendlyAuthError(error)); }
+    finally { busy(btn, false); }
+  });
+}
+function authorizePendingSave() {
+  const pending = store.get(PENDING_SAVE_KEY, null);
+  if (pending?.explicit && !pending.userId && ME.user) store.set(PENDING_SAVE_KEY, { ...pending, userId: ME.user.id });
+}
+async function requestPasswordReset(email) {
+  const c = await sb();
+  const redirectTo = location.origin + location.pathname + '?auth=reset';
+  const { error } = await c.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) throw error;
+}
+function viewResetError() {
+  app.innerHTML = `<div class="auth-wrap"><h1>Reset your password</h1>
+    <div class="card pad stack" style="margin-top:14px">
+      <p class="form-err" role="alert">This password reset link is invalid, expired, or has already been used.</p>
+      <a class="btn btn-primary btn-block" href="#/account?m=forgot">Request a new reset link</a>
+    </div></div>`;
+}
+function viewResetRequest(email = '') {
+  app.innerHTML = `<div class="auth-wrap"><h1>Request a password reset link</h1>
+    <form class="card pad stack" id="freset" style="margin-top:14px">
+      <label class="field"><span>Email</span><input id="reset-email" type="email" autocomplete="email" value="${esc(email)}" required></label>
+      <p id="reset-msg" role="status" hidden></p>
+      <button class="btn btn-primary btn-block" id="send-reset">Send reset link</button>
+      <a class="linkbtn" href="#/account?m=signin">Back to sign in</a>
+    </form></div>`;
+  $('#freset').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = $('#send-reset'), msg = $('#reset-msg');
+    busy(btn, true, 'Sending…');
+    try {
+      await requestPasswordReset($('#reset-email').value.trim());
+      msg.className = '';
+      msg.textContent = 'Check your email for a reset link.';
+    } catch (error) {
+      msg.className = 'form-err';
+      msg.textContent = friendlyAuthError(error);
+    } finally { msg.hidden = false; busy(btn, false); }
   });
 }
 async function viewSetup(isCurrent = () => true) {
@@ -1057,7 +1185,7 @@ function onboardForm(withAuth) {
     <button class="btn btn-primary btn-block" id="go">${withAuth ? 'Create account' : 'Save and continue'}</button>
   </form>`;
 }
-function mountOnboard(withAuth) {
+function mountOnboard(withAuth, saveOnSignIn = false) {
   let cm = 'new';
   const saved = store.get(PENDING_KEY, {}) || {};
   const rows = saved.machines?.length ? saved.machines.map((r) => ({ id: r.id || '', nick: r.nick || '' })) : [{ id: '', nick: '' }];
@@ -1118,6 +1246,7 @@ function mountOnboard(withAuth) {
         if (signed.error) throw new Error('Your account was created. Sign in with the same email and password to open it.');
         store.set(PENDING_KEY, null);
         await refreshMe();
+        if (saveOnSignIn) authorizePendingSave();
         const first = p.employee.split(' ')[0];
         toast(data?.capped
           ? `Welcome, ${first}! Free plan saved 3 machines. Upgrade in My rigs for unlimited.`
@@ -1311,8 +1440,7 @@ async function viewGarage(isCurrent = () => true) {
       </a></div>
       ${guestUpsell('garage')}`;
     const stashAccount = () => { if (unsavedOpen && unsaved?.cfg) stashPendingSave(unsaved.cfg, unsaved.title); };
-    $('#stash-in')?.addEventListener('click', () => { stashAccount(); goHash('#/account?m=signin'); });
-    $$('a[href="#/account"], a[href="#/account?m=signin"]').forEach((a) => a.addEventListener('click', stashAccount));
+    $('#stash-in')?.addEventListener('click', () => { stashAccount(); goHash('#/account?m=signin&save=1'); });
     return;
   }
   if (!ME.member) { location.replace('#/setup'); return; }
@@ -1565,6 +1693,10 @@ async function saveToRigSection(cfg, sh) {
 /* ---------- router ---------- */
 let routeId = 0;
 async function route() {
+  if ((recoveryReady || sessionStorage.getItem(RECOVERY_KEY)) && location.hash !== RESET_ROUTE) {
+    history.replaceState(null, '', RESET_ROUTE);
+    currentHash = RESET_ROUTE;
+  }
   const id = ++routeId, requestedHash = location.hash;
   const isCurrent = () => id === routeId && location.hash === requestedHash;
   const h = location.hash.slice(1) || '/';
@@ -1607,6 +1739,11 @@ function leaveGuard(destHash, fromHash) {
 document.addEventListener('click', (e) => {
   const a = e.target.closest('a[href^="#"]');
   if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === '_blank') return;
+  if (a.matches('a.skip-link')) {
+    e.preventDefault();
+    app.focus();
+    return;
+  }
   const href = a.getAttribute('href');
   if (!leaveGuard(href, location.hash)) return;
   e.preventDefault();
@@ -1634,6 +1771,8 @@ window.addEventListener('hashchange', () => {
   lastPath = p; route();
 });
 updateSavedBadge();
+startRecovery();
+currentHash = location.hash;
 loadCatalog().catch(() => {});
 lastPath = location.hash.split('?')[0];
 route();

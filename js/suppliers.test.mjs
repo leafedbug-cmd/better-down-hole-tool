@@ -80,7 +80,7 @@ test('solver: a supplier part is only ever offered when the part before it threa
   for (const rm0 of roadmaps()) {
     const rm = augmentRoadmap(rm0, S);
     for (const mode of ['Bit', 'Backreamer']) {
-      const cfg = { mode, sel: {}, acc: {}, q: {} };
+      const cfg = { p: rm0.pipe, mode, sel: {}, acc: {}, q: {} };
       let rows;
       for (let i = 0; i < 12; i++) {
         rows = compute(rm, cfg);
@@ -106,7 +106,7 @@ test('solver: a supplier part is only ever offered when the part before it threa
 test('solver: existing options and their order are unchanged by the supplier merge', () => {
   for (const rm0 of roadmaps().slice(0, 25)) {
     const rm = augmentRoadmap(rm0, S);
-    const a = compute(rm0, { mode: 'Bit', sel: {}, acc: {}, q: {} }), b = compute(rm, { mode: 'Bit', sel: {}, acc: {}, q: {} });
+    const a = compute(rm0, { p: rm0.pipe, mode: 'Bit', sel: {}, acc: {}, q: {} }), b = compute(rm, { p: rm0.pipe, mode: 'Bit', sel: {}, acc: {}, q: {} });
     assert.equal(a.length, b.length);
     a.forEach((r, i) => assert.deepEqual(b[i].cands.filter((o) => !S.parts[o.id]).map((o) => o.id).slice(0, r.cands.length),
       r.cands.map((o) => o.id).slice(0, b[i].cands.filter((o) => !S.parts[o.id]).length)));

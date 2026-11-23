@@ -73,13 +73,27 @@ const machineKey = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '
 export const fitsMachine = (part, machineName) => !!machineName
   && part.machines.some((m) => machineKey(m) === machineKey(machineName));
 
-/** Radius parts of the slot's types that fit the drill, minus any already shown as a direct alternate. */
-export function slotOthers(radius, { types, machine, dwPns = [] }) {
-  if (!radius || !machine) return [];
+const connectionCode = (s) => String(s || '').replace(/[®™]/g, '').trim().replace(/\s+/g, ' ').toUpperCase()
+  .replace(/([\d.])([MF])(?= |$)/g, '$1 $2');
+
+/** Pipe-facing parts use the selected pipe. Downstream parts use the fitting DW slot options. */
+export function slotOthers(radius, { slotParts, machine, pipe, dwPns = [] }) {
+  if (!radius || !machine || !pipe || !slotParts?.length) return [];
   const shown = new Set(dwPns.flatMap((pn) => alternatesFor(radius, pn).map((a) => a.part.pn)));
-  const want = new Set(types || []);
+  const types = new Set(slotParts.map((p) => p.type));
+  const left = connectionCode(pipe.cl), right = [pipe.cr, pipe.cr2].map(connectionCode).filter(Boolean);
+  const mating = (code) => code.replace(/\b[MF]\b/, (end) => end === 'M' ? 'F' : 'M');
+  const matchesSlot = (p) => {
+    const rigSide = connectionCode(p.conn.l), toolSide = connectionCode(p.conn.r);
+    if (p.type === 'Drill_Pipe') return rigSide === left && right.includes(toolSide);
+    if (p.type === 'Saver_Sub') return !!left && [rigSide, toolSide].includes(mating(left));
+    if (['Transition_Sub', 'Quick_Connect'].includes(p.type)) {
+      return !!rigSide && right.some((c) => mating(c) === rigSide);
+    }
+    return !!rigSide && slotParts.some((dw) => dw.type === p.type && connectionCode(dw.cl) === rigSide);
+  };
   return Object.values(radius.parts)
-    .filter((p) => want.has(p.type) && !shown.has(p.pn) && fitsMachine(p, machine))
+    .filter((p) => types.has(p.type) && !shown.has(p.pn) && fitsMachine(p, machine) && matchesSlot(p))
     .sort((a, b) => a.name.localeCompare(b.name) || a.pn.localeCompare(b.pn));
 }
 

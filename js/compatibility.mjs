@@ -23,30 +23,44 @@ function linkOK(L, R, P) {
    done (user picked) | auto (only one fits) | pending (needs a pick) | skip (optional slot) | blocked (no end tool fits) | locked (waiting on an earlier pick) */
 export function compute(rm, cfg) {
   const P = rm.parts, rows = [], secs = rm.sections.filter((x) => x.mode === cfg.mode), n = secs.length;
+  const pipeSlots = new Set(secs.filter((s) => s.name === 'Drill Pipe'));
+  const options = (s) => pipeSlots.has(s) ? s.opts.filter((o) => o.id === cfg.p) : s.opts;
+  const required = (s, i) => i === n - 1 || pipeSlots.has(s);
+  const discontinued = (o) => /\bdiscontinued\b/i.test(P[o.id].name);
   const item = (o) => ({ part: P[o.id], accs: o.acc || [], accChoice: undefined });
   const fitsAfter = (F, o) => !F || F.some((L) => linkOK(L, P[o.id], P));
   // collars are sleeves, not threaded joints: the part before a collar still mates with the part after it
   const after = (items, F) => (items.every((x) => x.part.type === 'Collar') ? (F ? [...items, ...F] : null) : items);
-  // lookahead: from frontier F at section i, can the string still reach the bit / backreamer?
+  // Rank paths ending in an active tool (2), a discontinued tool (1), or no tool (0).
   const memo = new Map();
   const canFinish = (i, F) => {
-    if (i >= n) return true;
+    if (i >= n) return 2;
     const k = `${i}|${F ? F.map((L) => L.part.id + ':' + L.accChoice).join(',') : '-'}`;
     if (memo.has(k)) return memo.get(k);
-    memo.set(k, false);
-    const c = secs[i].opts.filter((o) => fitsAfter(F, o));
-    const ok = c.length ? c.some((o) => canFinish(i + 1, after([item(o)], F))) : i < n - 1 && canFinish(i + 1, F);
-    memo.set(k, ok); return ok;
+    const s = secs[i], fits = options(s).filter((o) => fitsAfter(F, o));
+    let rank = fits.length || required(s, i) ? 0 : canFinish(i + 1, F);
+    for (const o of fits) {
+      rank = Math.max(rank, i === n - 1 && discontinued(o) ? 1 : canFinish(i + 1, after([item(o)], F)));
+      if (rank === 2) break;
+    }
+    memo.set(k, rank); return rank;
   };
   let F = null, locked = false;
   secs.forEach((s, i) => {
     const row = { sec: s, status: '', cands: [], sel: [], acc: {}, hidden: 0 };
     rows.push(row);
     if (locked) { row.status = 'locked'; return; }
-    const fits = s.opts.filter((o) => fitsAfter(F, o));
-    if (!fits.length) { row.status = i === n - 1 ? 'blocked' : 'skip'; return; }
-    const viable = fits.filter((o) => canFinish(i + 1, after([item(o)], F)));
-    row.cands = viable.length ? viable : fits;
+    const fits = options(s).filter((o) => fitsAfter(F, o));
+    if (!fits.length) {
+      row.status = required(s, i) ? 'blocked' : 'skip';
+      locked = row.status === 'blocked';
+      return;
+    }
+    const ranked = fits.map((o) => ({
+      option: o, rank: i === n - 1 && discontinued(o) ? 1 : canFinish(i + 1, after([item(o)], F)),
+    }));
+    const viable = ranked.filter(({ rank }) => rank > 0).sort((a, b) => b.rank - a.rank);
+    row.cands = viable.length ? viable.map(({ option }) => option) : fits;
     row.hidden = fits.length - row.cands.length;
     const want = (cfg.sel[s.id] || []).filter((id) => row.cands.some((o) => o.id === id));
     if (want.length) { row.sel = want; row.status = 'done'; }

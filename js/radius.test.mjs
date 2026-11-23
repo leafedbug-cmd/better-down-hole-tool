@@ -11,7 +11,7 @@ const read = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), '
 const PARTS = {
   parts: {
     'R-CN': { pn: 'R-CN', name: 'Connector A', type: 'Connector', conn: { l: '#900 F', r: '2.88 M API R' }, machines: ['Vermeer D60X90'], url: 'https://www.radiushdd.com/p/cn', img: 'https://cdn11.bigcommerce.com/s-uwymjpsd0i/i/cn.jpg' },
-    'R-CN2': { pn: 'R-CN2', name: 'Connector B', type: 'Connector', conn: {}, machines: ['vermeer  d60x90'], url: 'javascript:alert(1)', img: 'https://evil.example/x.jpg' },
+    'R-CN2': { pn: 'R-CN2', name: 'Connector B', type: 'Connector', conn: { l: '#900 F' }, machines: ['vermeer  d60x90'], url: 'javascript:alert(1)', img: 'https://evil.example/x.jpg' },
     'R-HS': { pn: 'R-HS', name: 'Housing', type: 'Electronic_Housing', machines: ['Vermeer D60X90'], url: null, img: null },
     'R-HS2': { pn: 'R-HS2', name: 'Housing 2', type: 'Electronic_Housing', machines: ['Vermeer D60X90'], img: 'http://cdn11.bigcommerce.com/s-uwymjpsd0i/i/hs2.jpg' },
     'R-OTHER': { pn: 'R-OTHER', name: 'Other drill', type: 'Connector', machines: ['Ditch Witch JT20'] },
@@ -54,14 +54,31 @@ test('crossref lookup dedupes, skips unknown parts and normalizes match kinds', 
 });
 
 test('per-slot other brands: same type, fits the drill, excludes parts already shown as alternates', () => {
-  const others = slotOthers(R, { types: ['Connector'], machine: 'Vermeer D60X90', dwPns: ['908-5184'] });
+  const opts = { slotParts: [{ type: 'Connector', cl: '#900 F' }], pipe: { cl: '#900 F', cr: '#900 M' }, machine: 'Vermeer D60X90' };
+  const others = slotOthers(R, { ...opts, dwPns: ['908-5184'] });
   assert.deepEqual(others.map((p) => p.pn), ['R-CN2']);
-  const all = slotOthers(R, { types: ['Connector'], machine: 'Vermeer D60X90', dwPns: [] });
+  const all = slotOthers(R, opts);
   assert.deepEqual(all.map((p) => p.pn), ['R-CN', 'R-CN2']);
-  assert.deepEqual(slotOthers(R, { types: ['Connector'], machine: 'Ditch Witch JT20' }).map((p) => p.pn), ['R-OTHER']);
-  assert.deepEqual(slotOthers(R, { types: ['Bit'], machine: 'Vermeer D60X90' }), []);
-  assert.deepEqual(slotOthers(R, { types: ['Connector'], machine: '' }), []);
+  assert.deepEqual(slotOthers(R, { ...opts, machine: 'Ditch Witch JT20' }), []);
+  assert.deepEqual(slotOthers(R, { ...opts, slotParts: [{ type: 'Bit' }] }), []);
+  assert.deepEqual(slotOthers(R, { ...opts, machine: '' }), []);
+  assert.deepEqual(slotOthers(R, { ...opts, pipe: null }), []);
   assert.equal(fitsMachine(R.parts['R-CN2'], 'Vermeer D60X90'), true, 'case/space-insensitive');
+});
+
+test('Radius drawer uses the active pipe thread and orientation for a pipe-facing slot', () => {
+  const inventory = normalizeRadius(read('../data/radius/parts.json'), read('../data/radius/crossref.json'));
+  const jt25 = { machine: 'Ditch Witch JT25', slotParts: [{ type: 'Quick_Connect' }] };
+  const firestick = { cl: '#600 M', cr: '#600 F' };
+  const pn = (opts) => slotOthers(inventory, opts).map((p) => p.pn);
+  for (const sku of ['953-0553', '953-0401']) {
+    assert.ok(pn({ ...jt25, pipe: firestick }).includes(sku));
+    assert.ok(!pn({ ...jt25, pipe: { cl: '2.11 M', cr: '2.11 F' } }).includes(sku));
+    assert.ok(!pn({ ...jt25, pipe: { cl: '#600 F', cr: '#600 M' } }).includes(sku));
+  }
+  const jt20 = { machine: 'Ditch Witch JT20', slotParts: [{ type: 'Drill_Pipe' }] };
+  assert.ok(pn({ ...jt20, pipe: { cl: '1.94 M', cr: '1.94 F' } }).includes('PIP-0010'));
+  assert.ok(!pn({ ...jt20, pipe: firestick }).includes('PIP-0010'));
 });
 
 test('image fallback picks the first cross-referenced Radius image that exists', () => {

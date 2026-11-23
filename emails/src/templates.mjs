@@ -8,6 +8,11 @@
  *  - No emoji in subject lines. No exclamation-mark spam. No OEM trademarks.
  */
 
+// This Supabase project serves more than one app. Keep ConfirmationURL for
+// requests that did not come from the loadout builder's recovery callback.
+const bdhtRecoveryRequest = '{{ if or (eq .RedirectTo "https://thebetterdownholetool.com/?auth=reset") (eq .RedirectTo "https://leafedbug-cmd.github.io/better-down-hole-tool/?auth=reset") (eq .RedirectTo "http://localhost:8765/?auth=reset") (eq .RedirectTo "http://127.0.0.1:8765/?auth=reset") }}';
+const recoveryUrl = (separator) => `${bdhtRecoveryRequest}{{ .RedirectTo }}${separator}token_hash={{ .TokenHash }}{{ else }}{{ .ConfirmationURL }}{{ end }}`;
+
 export const SAMPLE_DATA = {
   logo_url: '../../brand/email/email-logo-dark@2x.png',
   app_url: 'https://leafedbug-cmd.github.io/better-down-hole-tool/',
@@ -27,7 +32,7 @@ export const SAMPLE_DATA = {
   invited_by: 'Cole Harlan',
   confirmation_url: 'https://rdyhhszmfpomixaoehgy.supabase.co/auth/v1/verify?token=pkce_sample_token&type=signup',
   magic_link_url: 'https://rdyhhszmfpomixaoehgy.supabase.co/auth/v1/verify?token=pkce_sample_magic&type=magiclink',
-  reset_password_url: 'https://rdyhhszmfpomixaoehgy.supabase.co/auth/v1/verify?token=pkce_sample_recovery&type=recovery',
+  reset_password_url: 'https://thebetterdownholetool.com/?auth=reset&token_hash=sample_recovery',
   invite_url: 'https://leafedbug-cmd.github.io/better-down-hole-tool/#/account',
   email_change_url: 'https://rdyhhszmfpomixaoehgy.supabase.co/auth/v1/verify?token=pkce_sample_email_change&type=email_change',
   otp_code: '482910',
@@ -169,13 +174,13 @@ This link works once and expires shortly. If you did not request it, ignore this
     transactional: true,
     subject: 'Reset your password for The Better Down Hole Tool',
     preheader: 'Follow this link to set a new 8+ character password.',
-    variables: ['user_email', 'reset_password_url', 'otp_code', 'app_url', 'support_email'],
-    supabaseVariables: ['{{ .ConfirmationURL }}', '{{ .Token }}', '{{ .TokenHash }}', '{{ .SiteURL }}', '{{ .Email }}'],
+    variables: ['user_email', 'reset_password_url', 'app_url', 'support_email'],
+    supabaseVariables: ['{{ .RedirectTo }}', '{{ .TokenHash }}', '{{ .ConfirmationURL }}', '{{ .SiteURL }}', '{{ .Email }}'],
     kicker: 'Password reset',
     heading: 'Set a new password',
     ctaLabel: 'Reset password',
     ctaUrlVar: 'reset_password_url',
-    supabaseCtaUrl: '{{ .ConfirmationURL }}',
+    supabaseCtaUrl: recoveryUrl('&amp;'),
     bodyHtml: `
       <p>We received a request to reset the password for <strong>{{user_email}}</strong>.</p>
       <p>Use the button below to choose a new password (at least 8 characters).</p>
@@ -186,7 +191,6 @@ This link works once and expires shortly. If you did not request it, ignore this
     `,
     details: [
       ['Account', '{{user_email}}', '{{ .Email }}'],
-      ['Reset code (if prompted)', '{{otp_code}}', '{{ .Token }}'],
     ],
     footnoteHtml: `If you did not ask to reset your password, leave this email alone. Your current password will keep working.`,
     bodyText: `We received a request to reset the password for {{user_email}} on The Better Down Hole Tool.
@@ -194,15 +198,11 @@ This link works once and expires shortly. If you did not request it, ignore this
 Set a new password (8+ characters):
 {{reset_password_url}}
 
-Reset code (if prompted): {{otp_code}}
-
 If you did not ask to reset your password, ignore this email. Your current password will keep working.`,
     supabaseBodyText: `We received a request to reset the password for {{ .Email }} on The Better Down Hole Tool.
 
 Set a new password (8+ characters):
-{{ .ConfirmationURL }}
-
-Reset code (if prompted): {{ .Token }}
+${recoveryUrl('&')}
 
 If you did not ask to reset your password, ignore this email. Your current password will keep working.`,
   },

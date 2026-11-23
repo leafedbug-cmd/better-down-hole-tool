@@ -91,6 +91,8 @@ npx --yes deno test --allow-read --allow-env supabase/tests/billing-reliability.
 
 ## Catalog follow-up
 
+The production smoke-test follow-up below supersedes the roadmap dead-end list in this section.
+
 Twelve first-choice smoke paths still have no compatible terminal tool in the
 current data. They now display an incomplete state correctly. Verify the catalog
 against manufacturer references before changing connections or available parts:
@@ -132,4 +134,32 @@ Deliberately **not** changed (need a manufacturer reference):
 `node tools/radius_catalog.mjs --pdf "<Radius catalog.pdf>"` rebuilds `data/radius/parts.json` and `crossref.json`
 from the 2022 print catalog, merging product URLs/photos from `data/radius/web.json` (radiushdd.com scrape).
 No prices are published. Radius photos are off (`RADIUS_IMAGES_ENABLED` in `js/radius.mjs`) until Radius grants permission.
+
+## Production smoke-test follow-up
+
+The seven Vermeer rigs in the smoke test now have a catalog path to an end tool.
+The D7X11 pullback slots follow rig-to-tool order. D23X30, D24X26 and D33X44 can
+use 2.38 API Reg connectors, D33X44 and D40X40 can use the listed 2.59 Rockmaster
+reamers, and D60X90 and D80X120 use their #900 and #1000 connectors. The
+2.59, 2.38 API Reg and 3.5 API IF connections remain distinct. Sources include
+the [Ditch Witch HDD Parts Book](https://www.ditchwitch.com/wp-content/uploads/2025/10/HDD-Parts-Book_10_2025_JJ.pdf)
+and the [Vermeer Borestore tooling catalog](https://www.vermeer.com/getmedia/faa6c533-943c-4c44-b4ac-53063d3556dd/borestore-hdd-tooling-catalog-volume-9.pdf).
+
+### Catalog gaps
+
+- The D7X11 pilot roadmap carried a JT5/JT520 saver sub. D7X11 drive hardware depends on variant and serial number. The pilot parts list starts at the pipe.
+- AT100 `355-1254` uses the catalog's 3.44 tooling path. The removed `400-2169` SaverLok is listed for 3.44SS. The correct rig-side saver hardware for the non-SS setup still needs a manufacturer part reference.
+- The D33X44 `#700` path comes from the Ditch Witch Advisor roadmap and exact thread matches. Vermeer's rod table lists `#650` for D33X44 and `#700` for D36X50. Confirm the installed pipe and rig-side hardware for the `#700` setup before ordering.
+- D23X30/D24X26 2.59 connector options remain in the source data. The working 2.38 API Reg paths use different connector SKUs. The 2.59 branches still need a reamer or crossover confirmed for those 24K rigs.
+
+### Next production torture test for Gemini
+
+Run this after deploying the frontend and completing the [Supabase reset template and redirect setup](emails/README.md#deploy-the-bdht-recovery-change). Use a disposable crew account and report browser, viewport, rig, pipe SKU, mode, selected parts, and expected versus actual outcome for each failure. Redact recovery credentials and personal account data.
+
+1. Request a password reset in browser profile A. Open the new email link in a clean profile B, then repeat with a fresh link on a phone. Verify **Set a new password** appears and the URL becomes `#/account?m=reset`. Refresh and click **My rigs** before submitting. The reset form should persist. Save a new password, sign in with it in profile A, then replay the used link in profile B. Verify the inline error and request a new link from its button. Repeat the error check with `/?auth=reset` and a fake hash.
+2. At **375 × 812**, exercise **Swap** and **Add or remove** on JT20, JT60 and JT4020 All Terrain with skipped slots visible. Click the first modal option and its info button. Check that skipped slots sit below the drawers, keyboard **Skip to content** focuses the main area, and the builder route stays open.
+3. Compare the Step 02 and Step 03 pipe SKUs in both modes for JT2720 All Terrain `355-1225`, JT25 `355-1350`, JT20 and JT30 `355-1350-PU`, AT100 `355-1254`, and D7X11 `355-1121 PD`. Share a complete build, reopen it in a clean profile, and confirm the same SKU. Check the D36X50 HIWS1 pipe cards for placeholder images and JT40 Forged HD `355-1303` for SaverLok before its collar.
+4. Finish D7X11 in both modes and test both pullback starter rods. Test every offered pullback starter rod for D23X30 and D24X26 `#400`, D33X44 `#650` and `#700`, and D40X40 `#600`. Finish pullback on D60X90 `#900` and D80X120 `#1000`. Check that D16X20 and D20X22 offer active reamers.
+5. Turn on **Other brands**. Check JT25 Forged HD 2.11 for the absence of `953-0553` and `953-0401` in the drawer, and JT20 HDX `#600` pin-up for the absence of `PIP-0010`. Add a Radius starter rod to a pending slot. Verify the alternate appears in the list, the guidance appears, and the next slot opens only after equipping a Ditch Witch part.
+6. Review incomplete and complete builds at **375 × 812**. Compare `document.documentElement.scrollWidth` and `document.body.scrollWidth` to `innerWidth`. Incomplete summaries should show **Incomplete draft**, offer **Save draft**, and omit share, email, text and copy controls. Complete summaries should share and print. Leave a guest draft on the device and sign in ordinarily, then repeat through **Sign in and save**. Only the explicit save flow should put it on a rig.
 

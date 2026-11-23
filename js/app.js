@@ -1021,8 +1021,12 @@ function cfgFp(cfg) {
 function onBuilder(hash = location.hash) {
   return /^#\/(build|summary)(\?|$)/.test(hash);
 }
+function hasAnySelection(cfg) {
+  return !!(cfg && (Object.values(cfg.sel || {}).some((a) => Array.isArray(a) && a.length > 0)
+    || Object.values(cfg.alt || {}).some((a) => Array.isArray(a) && a.length > 0)));
+}
 function needsGarageSave(cfg = buildCfg) {
-  return !!(cfg?.r && sessionStorage.getItem(GARAGE_FP_KEY) !== cfgFp(cfg));
+  return !!(cfg?.r && hasAnySelection(cfg) && sessionStorage.getItem(GARAGE_FP_KEY) !== cfgFp(cfg));
 }
 function markGarageSaved(cfg) {
   if (cfg?.r) sessionStorage.setItem(GARAGE_FP_KEY, cfgFp(cfg));
@@ -1051,10 +1055,11 @@ function confirmLeave(href) {
   const cfg = buildCfg;
   if (!cfg?.r) { goHash(href); return; }
   openSheet(`<div class="sheet-top"><div><h2>Save this loadout?</h2><p class="small muted">My rigs does not have it yet.</p></div><button class="iconbtn" data-close aria-label="Keep editing">✕</button></div>
-    <div class="sheet-body"><p>Save it onto the drill, or keep a draft on this phone.</p></div>
+    <div class="sheet-body"><p>Save it onto the drill, keep a draft on this phone, or leave without saving.</p></div>
     <div class="sheet-foot sheet-actions">
       <button class="btn btn-primary btn-block" id="save-go">Save loadout</button>
       <button class="btn btn-ghost btn-block" id="discard-go">Keep a draft on this phone</button>
+      <button class="btn btn-outline danger btn-block" id="leave-no">No, don’t save</button>
       <button class="btn btn-ghost btn-block" data-close>Keep editing</button>
     </div>`, (sh) => {
     $('#save-go', sh).addEventListener('click', () => { closeSheet(); setTimeout(() => openDoneSheet(cfg), 240); });
@@ -1062,6 +1067,13 @@ function confirmLeave(href) {
       keepPhoneDraft(cfg);
       closeSheet();
       toast('Draft kept on this phone. My rigs does not have it yet.');
+      goHash(href);
+    });
+    $('#leave-no', sh).addEventListener('click', () => {
+      buildCfg = null;
+      loCtx.set(null);
+      store.set(LAST_KEY, null);
+      closeSheet();
       goHash(href);
     });
   });

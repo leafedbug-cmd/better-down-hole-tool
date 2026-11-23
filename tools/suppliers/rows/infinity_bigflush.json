@@ -1,0 +1,570 @@
+[
+ {
+  "title": "Big Flush PDC Bits - 2 7/8\", 73, 3 Blades, Big Flush, 1 1/2\" AMT, No Back Out Cutters",
+  "diaIn": 2.875,
+  "diaMm": 73.0,
+  "face": "3 Blades",
+  "conn": "1-1/2\" AMT",
+  "sku": "ITM260811"
+ },
+ {
+  "title": "Big Flush PDC Bits - 2 7/8\", 73, 3 Blades, Big Flush, N ROD 4, No Back Out Cutters",
+  "diaIn": 2.875,
+  "diaMm": 73.0,
+  "face": "3 Blades",
+  "conn": "N ROD 4",
+  "sku": "ITM260706"
+ },
+ {
+  "title": "Big Flush PDC Bits - 2 15/16\", 74.6, 3 Blades, Big Flush, N ROD 4, No Back Out Cutters",
+  "diaIn": 2.9375,
+  "diaMm": 74.6,
+  "face": "3 Blades",
+  "conn": "N ROD 4",
+  "sku": "ITM260645"
+ },
+ {
+  "title": "Big Flush PDC Bits - 3\", 76.2, 3 Blades, Big Flush, 1 1/2\" AMT, No Back Out Cutters",
+  "diaIn": 3.0,
+  "diaMm": 76.2,
+  "face": "3 Blades",
+  "conn": "1-1/2\" AMT",
+  "sku": "ITM260746"
+ },
+ {
+  "title": "Big Flush PDC Bits - 3\", 76.2, 3 Blades, Big Flush, N ROD 4, No Back Out Cutters",
+  "diaIn": 3.0,
+  "diaMm": 76.2,
+  "face": "3 Blades",
+  "conn": "N ROD 4",
+  "sku": "ITM260783"
+ },
+ {
+  "title": "Big Flush PDC Bits - 3 1/4\", 82.6, 5 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 3.25,
+  "diaMm": 82.6,
+  "face": "5 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260716"
+ },
+ {
+  "title": "Big Flush PDC Bits - 3 1/2\", 88.9, 3 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 3.5,
+  "diaMm": 88.9,
+  "face": "3 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260775"
+ },
+ {
+  "title": "Big Flush PDC Bits - 3 3/4\", 95.3, 4 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 3.75,
+  "diaMm": 95.3,
+  "face": "4 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260776"
+ },
+ {
+  "title": "Big Flush PDC Bits - 3 7/8\", 98.4, 3 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 3.875,
+  "diaMm": 98.4,
+  "face": "3 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260646"
+ },
+ {
+  "title": "Big Flush PDC Bits - 3 7/8\", 98.4, 4 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 3.875,
+  "diaMm": 98.4,
+  "face": "4 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260859"
+ },
+ {
+  "title": "Big Flush PDC Bits - 3 7/8\", 98.4, 5 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 3.875,
+  "diaMm": 98.4,
+  "face": "5 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260638"
+ },
+ {
+  "title": "Big Flush PDC Bits - 3 15/16\", 100, 5 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 3.9375,
+  "diaMm": 100.0,
+  "face": "5 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260705"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4\", 101.6, 3 Blades, Big Flush, 1 1/2\" AMT, No Back Out Cutters",
+  "diaIn": 4.0,
+  "diaMm": 101.6,
+  "face": "3 Blades",
+  "conn": "1-1/2\" AMT",
+  "sku": "ITM260812"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4\", 101.6, 3 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.0,
+  "diaMm": 101.6,
+  "face": "3 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260670"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4\", 101.6, 4 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.0,
+  "diaMm": 101.6,
+  "face": "4 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260699"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4\", 101.6, 5 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.0,
+  "diaMm": 101.6,
+  "face": "5 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260630"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 1/8\", 104.8, 4 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.125,
+  "diaMm": 104.8,
+  "face": "4 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260713"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 1/8\", 104.8, 5 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.125,
+  "diaMm": 104.8,
+  "face": "5 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260759"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 1/4\", 108, 3 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.25,
+  "diaMm": 108.0,
+  "face": "3 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260695"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 1/4\", 108, 4 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.25,
+  "diaMm": 108.0,
+  "face": "4 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260778"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 1/4\", 108, 5 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.25,
+  "diaMm": 108.0,
+  "face": "5 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260669"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 1/2\", 114.3, 3 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.5,
+  "diaMm": 114.3,
+  "face": "3 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260823"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 1/2\", 114.3, 5 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.5,
+  "diaMm": 114.3,
+  "face": "5 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260642"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 3/4\", 120.7, 3 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.75,
+  "diaMm": 120.7,
+  "face": "3 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260648"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 3/4\", 120.7, 5 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.75,
+  "diaMm": 120.7,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260640"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 7/8\", 123.8, 4 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.875,
+  "diaMm": 123.8,
+  "face": "4 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260837"
+ },
+ {
+  "title": "Big Flush PDC Bits - 4 7/8\", 123.8, 5 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 4.875,
+  "diaMm": 123.8,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260632"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5\", 127, 4 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.0,
+  "diaMm": 127.0,
+  "face": "4 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260804"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5\", 127, 5 Blades, Big Flush, 2 3/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.0,
+  "diaMm": 127.0,
+  "face": "5 Blades",
+  "conn": "2-3/8\" API REG PIN Connection",
+  "sku": "ITM260820"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5\", 127, 5 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.0,
+  "diaMm": 127.0,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260633"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 1/8\", 130.2, 4 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.125,
+  "diaMm": 130.2,
+  "face": "4 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260717"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 1/8\", 130.2, 5 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.125,
+  "diaMm": 130.2,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260657"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 1/4\", 133.4, 5 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.25,
+  "diaMm": 133.4,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260634"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5.3\", 135, 5 Blades, Big Flush, 2 7/8\" API REG PIN Connection",
+  "diaIn": 5.3,
+  "diaMm": 135.0,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260715"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 1/2\", 139.7, 4 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.5,
+  "diaMm": 139.7,
+  "face": "4 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260744"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 1/2\", 139.7, 4 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.5,
+  "diaMm": 139.7,
+  "face": "4 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260882"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 1/2\", 139.7, 5 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.5,
+  "diaMm": 139.7,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260635"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 1/2\", 139.7, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.5,
+  "diaMm": 139.7,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260818"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 5/8\", 142.9, 4 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.625,
+  "diaMm": 142.9,
+  "face": "4 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260745"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 5/8\", 142.9, 5 Blades, Big Flush, 2 7/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.625,
+  "diaMm": 142.9,
+  "face": "5 Blades",
+  "conn": "2-7/8\" API REG PIN Connection",
+  "sku": "ITM260637"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 5/8\", 142.9, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.625,
+  "diaMm": 142.9,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260636"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 5/8\", 142.9, 6 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.625,
+  "diaMm": 142.9,
+  "face": "6 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260813"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 3/4\", 146.1, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.75,
+  "diaMm": 146.1,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260862"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 7/8\", 149.2, 3 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.875,
+  "diaMm": 149.2,
+  "face": "3 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260671"
+ },
+ {
+  "title": "Big Flush PDC Bits - 5 7/8\", 149.2, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 5.875,
+  "diaMm": 149.2,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260639"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6”, 152.4, 3 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 6.0,
+  "diaMm": 152.4,
+  "face": "3 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260857"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6”, 152.4, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 6.0,
+  "diaMm": 152.4,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260631"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6 1/8”, 155.6, 3 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 6.125,
+  "diaMm": 155.6,
+  "face": "3 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260774"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6 1/8”, 155.6, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 6.125,
+  "diaMm": 155.6,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260772"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6 1/4”, 158.8, 4 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 6.25,
+  "diaMm": 158.8,
+  "face": "4 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260757"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6 1/4”, 158.8, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, Back Out Cutters",
+  "diaIn": 6.25,
+  "diaMm": 158.8,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260747"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6 1/2”, 165.1, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 6.5,
+  "diaMm": 165.1,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260836"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6 1/2”, 165.1, 6 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 6.5,
+  "diaMm": 165.1,
+  "face": "6 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260816"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6 3/4”, 171.5, 4 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 6.75,
+  "diaMm": 171.5,
+  "face": "4 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260756"
+ },
+ {
+  "title": "Big Flush PDC Bits - 6 3/4”, 171.5, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 6.75,
+  "diaMm": 171.5,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260696"
+ },
+ {
+  "title": "Big Flush PDC Bits - 7\", 177.8, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 7.0,
+  "diaMm": 177.8,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260702"
+ },
+ {
+  "title": "Big Flush PDC Bits - 7\", 177.8, 6 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 7.0,
+  "diaMm": 177.8,
+  "face": "6 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260703"
+ },
+ {
+  "title": "Big Flush PDC Bits - 7 1/8\", 181, 6 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 7.125,
+  "diaMm": 181.0,
+  "face": "6 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260788"
+ },
+ {
+  "title": "Big Flush PDC Bits - 7 1/2\", 190.5, 5 Blades, Big Flush, 4 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 7.5,
+  "diaMm": 190.5,
+  "face": "5 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260847"
+ },
+ {
+  "title": "Big Flush PDC Bits - 7 5/8\", 193.7, 5 Blades, Big Flush, 4 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 7.625,
+  "diaMm": 193.7,
+  "face": "5 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260689"
+ },
+ {
+  "title": "Big Flush PDC Bits - 7 7/8\", 200, 5 Blades, Big Flush, 3 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 7.875,
+  "diaMm": 200.0,
+  "face": "5 Blades",
+  "conn": "3-1/2\" API REG PIN Connection",
+  "sku": "ITM260743"
+ },
+ {
+  "title": "Big Flush PDC Bits - 7 7/8\", 200, 5 Blades, Big Flush, 4 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 7.875,
+  "diaMm": 200.0,
+  "face": "5 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260688"
+ },
+ {
+  "title": "Big Flush PDC Bits - 8\", 203.2, 5 Blades, Big Flush, 4 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 8.0,
+  "diaMm": 203.2,
+  "face": "5 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260694"
+ },
+ {
+  "title": "Big Flush PDC Bits - 8 1/2\", 215.9, 5 Blades, Big Flush, 4 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 8.5,
+  "diaMm": 215.9,
+  "face": "5 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260647"
+ },
+ {
+  "title": "Big Flush PDC Bits - 8 3/4\", 222.3, 5 Blades, Big Flush, 4 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 8.75,
+  "diaMm": 222.3,
+  "face": "5 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260803"
+ },
+ {
+  "title": "Big Flush PDC Bits - 9\", 228.6, 5 Blades, Big Flush, 4 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 9.0,
+  "diaMm": 228.6,
+  "face": "5 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260687"
+ },
+ {
+  "title": "Big Flush PDC Bits - 9 1/4\", 235, 6 Blades, Big Flush, 4 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 9.25,
+  "diaMm": 235.0,
+  "face": "6 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260728"
+ },
+ {
+  "title": "Big Flush PDC Bits - 9 7/8\", 250.8, 5 Blades, Big Flush, 4 1/2\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 9.875,
+  "diaMm": 250.8,
+  "face": "5 Blades",
+  "conn": "4-1/2\" API REG PIN Connection",
+  "sku": "ITM260712"
+ },
+ {
+  "title": "Big Flush PDC Bits - 9 7/8\", 250.8, 5 Blades, Big Flush, 6 5/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 9.875,
+  "diaMm": 250.8,
+  "face": "5 Blades",
+  "conn": "6-5/8\" API REG PIN Connection",
+  "sku": "ITM260718"
+ },
+ {
+  "title": "Big Flush PDC Bits - 9 7/8\", 250.8, 6 Blades, Big Flush, 6 5/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 9.875,
+  "diaMm": 250.8,
+  "face": "6 Blades",
+  "conn": "6-5/8\" API REG PIN Connection",
+  "sku": "ITM260704"
+ },
+ {
+  "title": "Big Flush PDC Bits - 17 1/2\", 444.5, 5 Blades, Big Flush, 7 5/8\" API REG PIN Connection, No Back Out Cutters",
+  "diaIn": 17.5,
+  "diaMm": 444.5,
+  "face": "5 Blades",
+  "conn": "7-5/8\" API REG PIN Connection",
+  "sku": "ITM260798"
+ }
+]

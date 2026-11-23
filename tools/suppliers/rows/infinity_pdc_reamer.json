@@ -1,0 +1,146 @@
+[
+ {
+  "title": "PDC Pull Reamer - 5 1/2\", 139.7, 5 Blades, 2 3/8\" REG BOX BOX, N",
+  "diaIn": 5.5,
+  "diaMm": 139.7,
+  "face": "5 Blades",
+  "conn": "2 3/8\" REG BOX BOX",
+  "sku": "ITM260127"
+ },
+ {
+  "title": "PDC Pull Reamer - 6 1/4\", 158.8, 5 Blades, 2 3/8\" REG BOX BOX, N",
+  "diaIn": 6.25,
+  "diaMm": 158.8,
+  "face": "5 Blades",
+  "conn": "2 3/8\" REG BOX BOX",
+  "sku": "ITM260117"
+ },
+ {
+  "title": "PDC Pull Reamer - 6 3/4\", 171.5, 5 Blades, 2 7/8\" IF BOX BOX, N",
+  "diaIn": 6.75,
+  "diaMm": 171.5,
+  "face": "5 Blades",
+  "conn": "2 7/8\" IF BOX BOX",
+  "sku": "ITM260126"
+ },
+ {
+  "title": "PDC Pull Reamer - 8\", 203.2, 5 Blades, 2 3/8\" REG BOX BOX, N",
+  "diaIn": 8.0,
+  "diaMm": 203.2,
+  "face": "5 Blades",
+  "conn": "2 3/8\" REG BOX BOX",
+  "sku": "ITM260104"
+ },
+ {
+  "title": "PDC Pull Reamer - 10\", 254, 5 Blades, 2 7/8\" IF BOX BOX, N",
+  "diaIn": 10.0,
+  "diaMm": 254.0,
+  "face": "5 Blades",
+  "conn": "2 7/8\" IF BOX BOX",
+  "sku": "ITM260103"
+ },
+ {
+  "title": "PDC Pull Reamer - 12\", 304.8, 5 Blades, 2 7/8\" IF BOX BOX, N",
+  "diaIn": 12.0,
+  "diaMm": 304.8,
+  "face": "5 Blades",
+  "conn": "2 7/8\" IF BOX BOX",
+  "sku": "ITM260105"
+ },
+ {
+  "title": "PDC Pull Reamer - 14\", 355.6, 6 Blades, 3 1/2\" IF BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 14.0,
+  "diaMm": 355.6,
+  "face": "6 Blades",
+  "conn": "3 1/2\" IF BOX BOX",
+  "sku": "ITM585003"
+ },
+ {
+  "title": "PDC Pull Reamer - 16\", 406.4, 6 Blades, 3 1/2\" IF BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 16.0,
+  "diaMm": 406.4,
+  "face": "6 Blades",
+  "conn": "3 1/2\" IF BOX BOX",
+  "sku": "ITM585004"
+ },
+ {
+  "title": "PDC Pull Reamer - 18\", 457.2, 6 Blades, 3 1/2\" IF BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 18.0,
+  "diaMm": 457.2,
+  "face": "6 Blades",
+  "conn": "3 1/2\" IF BOX BOX",
+  "sku": "ITM585005"
+ },
+ {
+  "title": "PDC Pull Reamer - 20\", 508, 6 Blades, 3 1/2\" IF BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 20.0,
+  "diaMm": 508.0,
+  "face": "6 Blades",
+  "conn": "3 1/2\" IF BOX BOX",
+  "sku": "ITM585006"
+ },
+ {
+  "title": "PDC Pull Reamer - 22\", 555.8, 6 Blades, 4 1/2\" IF BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 22.0,
+  "diaMm": 555.8,
+  "face": "6 Blades",
+  "conn": "4 1/2\" IF BOX BOX",
+  "sku": "ITM585008"
+ },
+ {
+  "title": "PDC Pull Reamer - 24\", 609.6, 6 Blades, 4 1/2\" IF BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 24.0,
+  "diaMm": 609.6,
+  "face": "6 Blades",
+  "conn": "4 1/2\" IF BOX BOX",
+  "sku": "ITM585009"
+ },
+ {
+  "title": "PDC Pull Reamer - 26\", 660.4, 6 Blades, 4 1/2\" IF BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 26.0,
+  "diaMm": 660.4,
+  "face": "6 Blades",
+  "conn": "4 1/2\" IF BOX BOX",
+  "sku": "ITM585010"
+ },
+ {
+  "title": "PDC Pull Reamer - 28\", 711.2, 6 Blades, 4 1/2\" IF BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 28.0,
+  "diaMm": 711.2,
+  "face": "6 Blades",
+  "conn": "4 1/2\" IF BOX BOX",
+  "sku": "ITM585011"
+ },
+ {
+  "title": "PDC Pull Reamer - 30\", 762, 6 Blades, 4 1/2\" IF BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 30.0,
+  "diaMm": 762.0,
+  "face": "6 Blades",
+  "conn": "4 1/2\" IF BOX BOX",
+  "sku": "ITM585013"
+ },
+ {
+  "title": "PDC Pull Reamer - 32\", 812.8, 6 Blades, 5 1/2\" FH BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 32.0,
+  "diaMm": 812.8,
+  "face": "6 Blades",
+  "conn": "5 1/2\" FH BOX BOX",
+  "sku": "ITM585014"
+ },
+ {
+  "title": "PDC Pull Reamer - 34\", 863.6, 6 Blades, 5 1/2\" FH BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 34.0,
+  "diaMm": 863.6,
+  "face": "6 Blades",
+  "conn": "5 1/2\" FH BOX BOX",
+  "sku": "ITM585015"
+ },
+ {
+  "title": "PDC Pull Reamer - 36\", 914.4, 6 Blades, 5 1/2\" FH BOX BOX, Shark Replaceable Cutters",
+  "diaIn": 36.0,
+  "diaMm": 914.4,
+  "face": "6 Blades",
+  "conn": "5 1/2\" FH BOX BOX",
+  "sku": "ITM585016"
+ }
+]

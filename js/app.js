@@ -6,6 +6,7 @@ import { canAddSignupMachine, equipmentCopy, signupMachineCap, signupMachineLimi
 import { friendlyAuthError } from './signup-errors.mjs';
 import { normalizeConfig, quantity } from './config.mjs';
 import { compute, lineItems, isLoadoutReady } from './compatibility.mjs';
+import { normalizeSuppliers, augmentRoadmap } from './suppliers.mjs';
 import { normalizeRadius, alternatesFor, slotOthers, fallbackImg, altLineItems, altKey, toggleAlt, MATCH_LABEL, RADIUS_BRAND } from './radius.mjs';
 
 const IMG_HOST = 'https://www.hddadvisor.com';
@@ -124,13 +125,23 @@ async function loadCatalog() {
   }
   return CATALOG;
 }
+/* Supplier parts (data/suppliers): lazy, shared, and optional. Any failure leaves the roadmap exactly as it was. */
+let SUPPLIERS_P = null;
+function loadSuppliers() {
+  if (!SUPPLIERS_P) {
+    SUPPLIERS_P = Promise.all(['data/suppliers/brands.json', 'data/suppliers/parts.json'].map((u) => fetch(u).then((r) => (r.ok ? r.json() : null))))
+      .then(([b, p]) => normalizeSuppliers(b, p)).catch(() => null);
+  }
+  return SUPPLIERS_P;
+}
 async function loadRoadmap(id) {
   const safeId = validImgId(id);
   if (!safeId) throw new Error('Tooling data not available for this drill/pipe yet.');
   if (!RM_CACHE.has(safeId)) {
     const r = await fetch(`data/roadmaps/${safeId}.json`);
     if (!r.ok) throw new Error('Tooling data not available for this drill/pipe yet.');
-    RM_CACHE.set(safeId, await r.json());
+    const [rm, sup] = await Promise.all([r.json(), loadSuppliers()]);
+    RM_CACHE.set(safeId, augmentRoadmap(rm, sup));
   }
   return RM_CACHE.get(safeId);
 }
@@ -374,12 +385,13 @@ function partRow(p, { selected, multi, sel = true, compact } = {}) {
   const stamp = selected || !sel ? 'Equipped' : 'Equip';
   return `<div class="part ${selected ? 'sel' : ''} ${multi ? 'multi' : ''}" ${sel ? `role="button" tabindex="0" data-pick="${p.id}" aria-pressed="${!!selected}"` : ''}>
     <div class="thumb">${imgTag(p.img, 240, 120, p.name, '', dwFallback(p))}</div>
-    <div class="p-main"><div class="p-name">${esc(p.name)}</div>
+    <div class="p-main"><div class="p-name">${p.brand ? `<span class="brand-chip">${esc(p.brand)}</span> ` : ''}${esc(p.name)}</div>
       <div class="p-pn">${p.pn ? `#${esc(p.pn)}` : '<span class="muted">Part # not listed</span>'}</div>
       ${connStr(p) ? `<div class="p-conn">${esc(connStr(p))}</div>` : ''}
       ${!compact && p.short ? `<div class="p-short">${esc(p.short)}</div>` : ''}</div>
     <div class="p-act">
       <button class="iconbtn" data-info="${p.id}" aria-label="Details for ${esc(p.name)}">${ICON.info}</button>
+      ${p.supplier && p.url ? `<a class="iconbtn" href="${esc(p.url)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${esc(p.name)} on the ${esc(p.brand)} site">${ICON.link}</a>` : ''}
       <span class="equip-stamp">${stamp}</span>
       ${sel ? `<span class="check" aria-hidden="true">${selected ? ICON.check : ''}</span>` : ''}
     </div></div>`;
@@ -510,7 +522,7 @@ function renderBuild(rm, focusNext) {
     </div>
     <aside class="build-aside">
       <div class="aside-card"><h3>Equipped</h3>
-        <ul class="mini-list">${items.map((l) => `<li><span>${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}${altItems.map((l) => `<li><span><span class="brand-chip">${esc(l.brand)}</span> ${esc(l.part.name)}</span><span class="pn">${esc(l.part.pn)}</span></li>`).join('')}</ul>
+        <ul class="mini-list">${items.map((l) => `<li><span>${l.brand ? `<span class="brand-chip">${esc(l.brand)}</span> ` : ''}${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}${altItems.map((l) => `<li><span><span class="brand-chip">${esc(l.brand)}</span> ${esc(l.part.name)}</span><span class="pn">${esc(l.part.pn)}</span></li>`).join('')}</ul>
         <a class="btn btn-primary btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">${ready ? 'Confirm class' : 'Review loadout'}</a>
         <button class="btn btn-ghost btn-block" style="margin-top:8px" data-save>${ICON.save} Save loadout</button>
       </div>
@@ -577,7 +589,7 @@ function browseSheet(rm, sid) {
     ${multi ? `<div class="sheet-foot"><button class="btn btn-primary btn-block" id="bdone">Done</button></div>` : ''}`, (sh) => {
     const draw = () => {
       const t = q.toLowerCase();
-      const list = row.cands.filter((o) => { const pp = P[o.id]; return (!t || `${pp.name} ${pp.pn} ${pp.short || ''}`.toLowerCase().includes(t)) && (!soil || (pp.soil || '').includes(soil)); });
+      const list = row.cands.filter((o) => { const pp = P[o.id]; return (!t || `${pp.name} ${pp.pn || ''} ${pp.short || ''}`.toLowerCase().includes(t)) && (!soil || (pp.soil || '').includes(soil)); });
       $('#blist', sh).innerHTML = (list.map((o) => partRow(P[o.id], { selected: chosen.has(o.id), multi }) + altsFor(P[o.id], sid, cfg)).join('') || '<div class="empty">No matches</div>')
         + othersGroup(rm, s, cfg, list.map((o) => P[o.id].pn));
       $$('[data-altadd]', sh).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); toggleAlt(cfg, b.dataset.altadd, b.dataset.altpn); renderBuild(rm); draw(); }));

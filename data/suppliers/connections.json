@@ -1,0 +1,191 @@
+{
+ "fetched": "2026-11-23",
+ "conventions": {
+  "code": "size gender thread, same format as data/radius/dw-connections.json (M = pin, F = box)",
+  "status": "existing = already used by a roadmap part; new = added for supplier parts",
+  "wired": "only ends whose page wording states box or pin become codes the fit solver uses"
+ },
+ "connections": [
+  {
+   "code": "2.38 F API R",
+   "status": "existing",
+   "sizeIn": 2.38,
+   "gender": "F",
+   "family": "api-if",
+   "base": "2.38 API R",
+   "matesWith": "2.38 M API R"
+  },
+  {
+   "code": "2.38 M API R",
+   "status": "existing",
+   "sizeIn": 2.38,
+   "gender": "M",
+   "family": "api-if",
+   "base": "2.38 API R",
+   "matesWith": "2.38 F API R"
+  },
+  {
+   "code": "2.88 F API IF",
+   "status": "new",
+   "sizeIn": 2.88,
+   "gender": "F",
+   "family": "api-if",
+   "base": "2.88 API IF",
+   "matesWith": "2.88 M API IF"
+  },
+  {
+   "code": "2.88 M API R",
+   "status": "existing",
+   "sizeIn": 2.88,
+   "gender": "M",
+   "family": "api-if",
+   "base": "2.88 API R",
+   "matesWith": "2.88 F API R"
+  },
+  {
+   "code": "3.5 F API IF",
+   "status": "existing",
+   "sizeIn": 3.5,
+   "gender": "F",
+   "family": "api-if",
+   "base": "3.5 API IF",
+   "matesWith": "3.5 M API IF"
+  },
+  {
+   "code": "3.5 F API R",
+   "status": "existing",
+   "sizeIn": 3.5,
+   "gender": "F",
+   "family": "api-if",
+   "base": "3.5 API R",
+   "matesWith": "3.5 M API R"
+  },
+  {
+   "code": "3.5 M API R",
+   "status": "existing",
+   "sizeIn": 3.5,
+   "gender": "M",
+   "family": "api-if",
+   "base": "3.5 API R",
+   "matesWith": "3.5 F API R"
+  },
+  {
+   "code": "4.5 F API IF",
+   "status": "existing",
+   "sizeIn": 4.5,
+   "gender": "F",
+   "family": "api-if",
+   "base": "4.5 API IF",
+   "matesWith": "4.5 M API IF"
+  },
+  {
+   "code": "4.5 M API R",
+   "status": "new",
+   "sizeIn": 4.5,
+   "gender": "M",
+   "family": "api-if",
+   "base": "4.5 API R",
+   "matesWith": "4.5 F API R"
+  },
+  {
+   "code": "5.5 F FH",
+   "status": "existing",
+   "sizeIn": 5.5,
+   "gender": "F",
+   "family": "fh",
+   "base": "5.5 FH",
+   "matesWith": "5.5 M FH"
+  },
+  {
+   "code": "6.63 F API R",
+   "status": "new",
+   "sizeIn": 6.63,
+   "gender": "F",
+   "family": "api-if",
+   "base": "6.63 API R",
+   "matesWith": "6.63 M API R"
+  },
+  {
+   "code": "6.63 M API R",
+   "status": "new",
+   "sizeIn": 6.63,
+   "gender": "M",
+   "family": "api-if",
+   "base": "6.63 API R",
+   "matesWith": "6.63 F API R"
+  },
+  {
+   "code": "7.63 F API R",
+   "status": "new",
+   "sizeIn": 7.63,
+   "gender": "F",
+   "family": "api-if",
+   "base": "7.63 API R",
+   "matesWith": "7.63 M API R"
+  },
+  {
+   "code": "7.63 M API R",
+   "status": "new",
+   "sizeIn": 7.63,
+   "gender": "M",
+   "family": "api-if",
+   "base": "7.63 API R",
+   "matesWith": "7.63 F API R"
+  }
+ ],
+ "unwiredRaw": [
+  "(2.375\" FSI) (B) x 3.5\" Rotolock (B)",
+  "(3.5\" FSI) (B) x 5\" Rotolock (B)",
+  "1-1/2\" AMT",
+  "2 3/8” Reg x 2 3/8 Reg",
+  "2 7/8 IF B x P",
+  "2 7/8\" IF",
+  "2 7/8\" IF pin",
+  "2 IF B x P",
+  "2-3/8” IF",
+  "2-7/8” API Reg Round Cutters",
+  "2-7/8” API Reg Shaped Cutters",
+  "2-7/8” IF",
+  "2.375 API REG PIN",
+  "2.375\" API (B) x (B)",
+  "2.375\" API(P)",
+  "2.375\" API(P) x 2.875\" API Reg. (B)",
+  "2.38 API R",
+  "2.875\" API (B)",
+  "3 1/2 IF B x P",
+  "3 1/2\" API Reg Pin",
+  "3 1/2\" IF box",
+  "3 1/2” Reg/IF x 3 1/2” Reg",
+  "3\" Rotolock (B) x 2\" IF (B)",
+  "3-1/2” API Reg Round Cutters",
+  "3-1/2” API Reg Shaped Cutters",
+  "3-1/2” IF",
+  "3-1/2” IF With Ring",
+  "3-1/2” Reg Round Cutters",
+  "3-1/2” Reg Shaped Cutters",
+  "3.5 API REG PIN",
+  "3.5\" Rotolock (B)",
+  "3.5\" x 2.375\" API (P)",
+  "4 1/2 IF B x P",
+  "4 1/2\" API Reg Pin",
+  "4 1/2\" IF box (NC50 per description)",
+  "4 1/2” IF x 4 1/2” IF x 6 5/8” Reg",
+  "5-1/2” FH With Ring",
+  "6 5/8” Reg x 6 5/8” Reg",
+  "6 5/8” Reg x 7 5/8” Reg x 7 5/8” Reg",
+  "7 5/8 reg B x P",
+  "Bolt pattern: Ultra X3 325",
+  "Bolt pattern: Ultra X3 375, non-torqued spline connection system",
+  "Box to clevis, clevis to clevis or custom",
+  "Connection type: QuickFire HD 400",
+  "Firestick 1 #1000",
+  "Firestick 1 #200",
+  "Firestick 1 #250",
+  "Firestick 1 #600",
+  "Firestick 1 #650",
+  "Front: Ultra X3 325 Pin; rear: pull eye",
+  "N ROD 4",
+  "Pin: 2 7/8\" IF DS; box: HDD82",
+  "Vermeer x API (D24x40 / D40x40), Vermeer x Vermeer, API x API, Vermeer x JetTrac"
+ ]
+}

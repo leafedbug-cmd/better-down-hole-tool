@@ -1,0 +1,20 @@
+[
+ {
+  "diaIn": 5.5,
+  "cutter": "1313",
+  "blades": "4/5",
+  "pin": "2-7/8\" API Reg"
+ },
+ {
+  "diaIn": 6.0,
+  "cutter": "1313",
+  "blades": "4/5",
+  "pin": "3-1/2\" API Reg"
+ },
+ {
+  "diaIn": 6.5,
+  "cutter": "1313",
+  "blades": "4/5",
+  "pin": "3-1/2\" API Reg"
+ }
+]

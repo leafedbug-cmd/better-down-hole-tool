@@ -1,0 +1,122 @@
+[
+ {
+  "title": "Tricone Hole Opener - 8\", 203.2, 5 1/2\" Pilot Hole Size, 5 Cones, 2 3/8\" API REG Box Box Connection",
+  "diaIn": 8.0,
+  "diaMm": 203.2,
+  "face": "5 Cones",
+  "conn": "2-3/8\" API REG Box Box Connection",
+  "sku": "ITM582020"
+ },
+ {
+  "title": "Tricone Hole Opener - 10\", 254, 5 1/2\" Pilot Hole Size, 5 Cones, 2 3/8\" API REG Box Box Connection",
+  "diaIn": 10.0,
+  "diaMm": 254.0,
+  "face": "5 Cones",
+  "conn": "2-3/8\" API REG Box Box Connection",
+  "sku": "ITM582052"
+ },
+ {
+  "title": "Tricone Hole Opener - 12\", 304.8, 5 1/2\" Pilot Hole Size, 5 Cones, 2 3/8\" API REG Box Box Connection",
+  "diaIn": 12.0,
+  "diaMm": 304.8,
+  "face": "5 Cones",
+  "conn": "2-3/8\" API REG Box Box Connection",
+  "sku": "ITM582021"
+ },
+ {
+  "title": "Tricone Hole Opener - 14\", 355.6, 10\" Pilot Hole Size, 5 Cones, 2 3/8\" API REG Box Box Connection",
+  "diaIn": 14.0,
+  "diaMm": 355.6,
+  "face": "5 Cones",
+  "conn": "2-3/8\" API REG Box Box Connection",
+  "sku": "ITM582153"
+ },
+ {
+  "title": "Tricone Hole Opener - 14\", 355.6, 10\" Pilot Hole Size, 5 Cones, 3 1/2\" API REG Box Box Connection",
+  "diaIn": 14.0,
+  "diaMm": 355.6,
+  "face": "5 Cones",
+  "conn": "3-1/2\" API REG Box Box Connection",
+  "sku": "ITM582031"
+ },
+ {
+  "title": "Tricone Hole Opener - 16\", 406.4, 12\" Pilot Hole Size, 5 Cones, 3 1/2\" API REG Box Box Connection",
+  "diaIn": 16.0,
+  "diaMm": 406.4,
+  "face": "5 Cones",
+  "conn": "3-1/2\" API REG Box Box Connection",
+  "sku": "ITM582032"
+ },
+ {
+  "title": "Tricone Hole Opener - 16\", 406.4, 12\" Pilot Hole Size, 5 Cones, 3 1/2\" API IF Box Box",
+  "diaIn": 16.0,
+  "diaMm": 406.4,
+  "face": "5 Cones",
+  "conn": "3-1/2\" API IF Box Box",
+  "sku": "ITM582201"
+ },
+ {
+  "title": "Tricone Hole Opener - 18\", 457.2, 12\" Pilot Hole Size, 5 Cones, 3 1/2\" API REG Box Box Connection",
+  "diaIn": 18.0,
+  "diaMm": 457.2,
+  "face": "5 Cones",
+  "conn": "3-1/2\" API REG Box Box Connection",
+  "sku": "ITM582228"
+ },
+ {
+  "title": "Tricone Hole Opener - 20\", 508, 12\" Pilot Hole Size, 5 Cones, 3 1/2\" API REG Box Box Connection",
+  "diaIn": 20.0,
+  "diaMm": 508.0,
+  "face": "5 Cones",
+  "conn": "3-1/2\" API REG Box Box Connection",
+  "sku": "ITM582192"
+ },
+ {
+  "title": "Tricone Hole Opener - 22\", 555.8, 20\" Pilot Hole Size, 5 Cones, 3 1/2\" API REG Box Box Connection",
+  "diaIn": 22.0,
+  "diaMm": 555.8,
+  "face": "5 Cones",
+  "conn": "3-1/2\" API REG Box Box Connection",
+  "sku": "ITM582034"
+ },
+ {
+  "title": "Tricone Hole Opener - 24\", 609.6, 22\" Pilot Hole Size, 5 Cones, 3 1/2\" API REG Box Box Connection",
+  "diaIn": 24.0,
+  "diaMm": 609.6,
+  "face": "5 Cones",
+  "conn": "3-1/2\" API REG Box Box Connection",
+  "sku": "ITM582027"
+ },
+ {
+  "title": "Tricone Hole Opener - 26\", 660.4, 24\" Pilot Hole Size, 5 Cones, 4 1/2\" API IF Box Box Connection",
+  "diaIn": 26.0,
+  "diaMm": 660.4,
+  "face": "5 Cones",
+  "conn": "4-1/2\" API IF Box Box Connection",
+  "sku": "ITM582035"
+ },
+ {
+  "title": "Tricone Hole Opener - 28\", 711.2, 26\" Pilot Hole Size, 5 Cones, 4 1/2\" API IF Box Box Connection",
+  "diaIn": 28.0,
+  "diaMm": 711.2,
+  "face": "5 Cones",
+  "conn": "4-1/2\" API IF Box Box Connection",
+  "sku": "ITM582036"
+ },
+ {
+  "title": "Tricone Hole Opener - 30\", 762, 28\" Pilot Hole Size, 5 Cones, 4 1/2\" API IF Box Box Connection",
+  "diaIn": 30.0,
+  "diaMm": 762.0,
+  "face": "5 Cones",
+  "conn": "4-1/2\" API IF Box Box Connection",
+  "sku": "ITM582037"
+ },
+ {
+  "title": "Tricone Hole Opener - 32\", 812.8, 30\" Pilot Hole Size, 5 Cones, 4 1/2\" API IF Box Box Connection",
+  "diaIn": 32.0,
+  "diaMm": 812.8,
+  "face": "5 Cones",
+  "conn": "4-1/2\" API IF Box Box Connection",
+  "sku": "ITM582038"
+ }
+]

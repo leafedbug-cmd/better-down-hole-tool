@@ -1,0 +1,58 @@
+[
+ {
+  "motor": "3 1/2” 5/6 3.1 Stages",
+  "oalFt": 10.1,
+  "conn": "2 3/8” Reg x 2 3/8 Reg",
+  "wt": 253.0,
+  "gpm": "48-111 GPM",
+  "stall": "531 ft lb"
+ },
+ {
+  "motor": "4 3/4” 5/6 2.0 Stages",
+  "oalFt": 11.99,
+  "conn": "3 1/2” Reg/IF x 3 1/2” Reg",
+  "wt": 462.0,
+  "gpm": "143-254 GPM",
+  "stall": "1,328 ft lb"
+ },
+ {
+  "motor": "4 3/4” 5/6 5.0 Stages",
+  "oalFt": 18.8,
+  "conn": "3 1/2” Reg/IF x 3 1/2” Reg",
+  "wt": 805.0,
+  "gpm": "143-254 GPM",
+  "stall": "2,945 ft lb"
+ },
+ {
+  "motor": "6 3/4” 7/8 3 Stages",
+  "oalFt": 19.4,
+  "conn": "4 1/2” IF x 4 1/2” IF x 6 5/8” Reg",
+  "wt": 1765.0,
+  "gpm": "300-600 GPM",
+  "stall": "7,515 ft lb"
+ },
+ {
+  "motor": "7 3/4” 7/8 3.0 Stages",
+  "oalFt": 24.0,
+  "conn": "6 5/8” Reg x 6 5/8” Reg",
+  "wt": 2607.0,
+  "gpm": "300-900 GPM",
+  "stall": "10,490 ft lb"
+ },
+ {
+  "motor": "7 3/4” 7/8 4.0 Stages",
+  "oalFt": 29.2,
+  "conn": "6 5/8” Reg x 6 5/8” Reg",
+  "wt": 3200.0,
+  "gpm": "400-900 GPM",
+  "stall": "14,930 ft lb"
+ },
+ {
+  "motor": "7 3/4” 7/8 4.0 Stages Combo",
+  "oalFt": 30.3,
+  "conn": "6 5/8” Reg x 7 5/8” Reg x 7 5/8” Reg",
+  "wt": 3850.0,
+  "gpm": "400-900 GPM",
+  "stall": "14,930 ft lb"
+ }
+]

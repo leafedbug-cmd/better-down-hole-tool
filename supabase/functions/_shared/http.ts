@@ -1,5 +1,6 @@
 export const PAGES_ORIGIN = 'https://leafedbug-cmd.github.io';
-export const SITE = `${PAGES_ORIGIN}/better-down-hole-tool/`;
+export const SITE_ORIGIN = 'https://thebetterdownholetool.com';
+export const SITE = SITE_ORIGIN + '/';
 
 export const SUCCESS_URL =
   `${SITE}?billing=success&session_id={CHECKOUT_SESSION_ID}#/garage`;
@@ -14,12 +15,12 @@ const ALLOWED_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
 export function isAllowedOrigin(req: Request): boolean {
   const origin = req.headers.get('Origin');
   if (!origin) return true;
-  return origin === PAGES_ORIGIN || ALLOWED_ORIGIN.test(origin);
+  return origin === SITE_ORIGIN || origin === PAGES_ORIGIN || ALLOWED_ORIGIN.test(origin);
 }
 
 export function corsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get('Origin') ?? '';
-  const allow = origin === PAGES_ORIGIN || ALLOWED_ORIGIN.test(origin)
+  const allow = origin === SITE_ORIGIN || origin === PAGES_ORIGIN || ALLOWED_ORIGIN.test(origin)
     ? origin
     : PAGES_ORIGIN;
   return {

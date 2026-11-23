@@ -17,6 +17,19 @@ const EMPTY_IMAGE_IDS = new Set([8040, 8044, 8052, 8056, 8060, 8069, 8077, 8091,
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const BRAND_THEMES = new Map([
+  ['vermeer', 'vermeer'], ['vermeer-borestore', 'vermeer'],
+  ['ditch-witch', 'ditch-witch'], ['melfred-borzall', 'melfred-borzall'],
+  ['radius', 'radius'], ['radius-hdd', 'radius'],
+]);
+const brandTheme = (brand) => BRAND_THEMES.get(String(brand || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) || 'neutral';
+const brandAttr = (brand) => ` data-brand-theme="${brandTheme(brand)}"`;
+const brandChip = (brand, id = brand) => `<span class="brand-chip"${brandAttr(id)}>${esc(brand)}</span>`;
+const brandText = (brand, label = brand) => `<span class="brand-text"${brandAttr(brand)}>${esc(label)}</span>`;
+// The base HDD Advisor roadmap supplies Ditch Witch tooling for both drill makes.
+const partBrand = (part) => part.brand || 'Ditch Witch';
+const partTheme = (part) => part.brandId || partBrand(part);
+const partChip = (part) => brandChip(partBrand(part), partTheme(part));
 const validImgId = (id) => (typeof id === 'number' || typeof id === 'string') && /^\d+$/.test(String(id))
   && Number.isSafeInteger(Number(id)) && Number(id) > 0 && !EMPTY_IMAGE_IDS.has(Number(id)) ? Number(id) : 0;
 function safeHttpUrl(u) {
@@ -166,7 +179,7 @@ function loadRadius() {
 }
 const showOther = () => !!RADIUS && store.get(OTHER_BRANDS_KEY, true) !== false;
 const dwFallback = (p) => (showOther() && p?.pn ? fallbackImg(RADIUS, p.pn) : null);
-const machine = (id) => CATALOG.machines.find((m) => m.id === +id);
+const machine = (id) => CATALOG?.machines.find((m) => m.id === +id);
 const pipeOf = (m, pid) => m?.pipes.find((p) => p.id === +pid);
 
 /* ---------- part labels ---------- */
@@ -177,8 +190,12 @@ const pnTxt = (p) => p.pn || 'not listed';
 const app = $('#app');
 function setStepper(step, cfg, ready = false) {
   const el = $('#stepper');
-  if (!step) { el.hidden = true; return; }
   const m = cfg?.m && machine(cfg.m), p = m && pipeOf(m, cfg.p);
+  for (const node of [app, el, $('#actionbar')]) {
+    if (step && m) node.dataset.brandTheme = brandTheme(m.brand);
+    else delete node.dataset.brandTheme;
+  }
+  if (!step) { el.hidden = true; return; }
   const steps = [
     ['Drill', m ? m.model : '', '#/drill'],
     ['Pipe', p ? p.name : '', m ? `#/pipe/${m.id}` : null],
@@ -248,7 +265,7 @@ function viewHome() {
   const last = store.get(LAST_KEY, null), saved = getSaved().slice(0, 3);
   let lastHtml = '';
   if (last?.cfg) {
-    lastHtml = `<a class="choice" href="#/build?c=${b64e(last.cfg)}"><div class="pipe-ico">${ICON.pipe}</div>
+    lastHtml = `<a class="choice"${brandAttr(machine(last.cfg.m)?.brand)} href="#/build?c=${b64e(last.cfg)}"><div class="pipe-ico">${ICON.pipe}</div>
       <div class="c-main"><div class="small muted">Resume loadout</div><div class="c-title">${esc(last.title)}</div></div>${ICON.chev}</a>`;
   }
   app.innerHTML = `
@@ -257,7 +274,7 @@ function viewHome() {
     <div class="hero-body">
       <p class="kicker">Create a class</p>
       <h1>Build the loadout. <em>Equip every slot.</em></h1>
-      <p>Pick a Ditch Witch® or Vermeer® drill, lock the pipe, then fill the string from the rig out to the bit. Share the loadout when the class is ready.</p>
+      <p>Pick a ${brandText('Ditch Witch', 'Ditch Witch®')} or ${brandText('Vermeer', 'Vermeer®')} drill, lock the pipe, then fill the string from the rig out to the bit. Share the loadout when the class is ready.</p>
       <a class="btn btn-primary btn-block" href="#/drill">Start a loadout ${ICON.chev}</a>
     </div>
   </section>
@@ -268,18 +285,18 @@ function viewHome() {
     <div class="lo-grid">${saved.map((s) => savedRow(s)).join('')}</div>` : ''}
   <div class="section-head"><h2>How a class is built</h2></div>
   <div class="howto"><ol style="display:contents">
-    <li><span class="num">1</span><div><h3>Choose the drill</h3><p>Current Ditch Witch® and Vermeer® models. This is the machine the loadout is for.</p></div></li>
+    <li><span class="num">1</span><div><h3>Choose the drill</h3><p>Current ${brandText('Ditch Witch', 'Ditch Witch®')} and ${brandText('Vermeer', 'Vermeer®')} models. This is the machine the loadout is for.</p></div></li>
     <li><span class="num">2</span><div><h3>Lock the pipe</h3><p>Only pipe that fits that drill can be equipped.</p></div></li>
     <li><span class="num">3</span><div><h3>Equip the slots</h3><p>Fill the string from housing to bit. Threads and adapters match as you go.</p></div></li>
     <li><span class="num">4</span><div><h3>Confirm and send</h3><p>Text, email, copy, or print the loadout.</p></div></li>
   </ol></div>`;
 }
 function savedRow(s, { del = false } = {}) {
-  const c = b64e(s.cfg);
-  return `<article class="lo-card">
+  const c = b64e(s.cfg), m = machine(s.cfg?.m);
+  return `<article class="lo-card"${brandAttr(m?.brand)}>
     <div class="lo-top"><div style="min-width:0">
       <div class="lo-name">${esc(s.name)}</div>
-      <div class="small muted">${esc(s.title)} · ${new Date(s.ts).toLocaleDateString()}</div>
+      <div class="small muted">${m ? `${brandText(m.brand)} · ` : ''}${esc(s.title)} · ${new Date(s.ts).toLocaleDateString()}</div>
     </div>
     ${del
       ? `<button class="iconbtn" data-del="${esc(s.id)}" aria-label="Delete ${esc(s.name)}">${ICON.trash}</button>`
@@ -298,11 +315,11 @@ async function viewDrill(isCurrent = () => true) {
   if (!isCurrent()) return;
   setStepper(1, null); setActionbar('');
   app.innerHTML = `
-    ${pageHead('Step 01 · Drill class', 'Choose your drill', 'This is the machine you are building for. Tap a Ditch Witch® or Vermeer® model, or search “JT25” or “D24”.')}
+    ${pageHead('Step 01 · Drill class', 'Choose your drill', `This is the machine you are building for. Tap a ${brandText('Ditch Witch', 'Ditch Witch®')} or ${brandText('Vermeer', 'Vermeer®')} model, or search “JT25” or “D24”.`)}
     <div class="stack">
       <div class="searchbox">${ICON.search}<input id="q" type="search" inputmode="search" autocomplete="off" placeholder="Search drill model" value="${esc(drillFilter.q)}" aria-label="Search drill model"><button class="clear" id="clear" aria-label="Clear" ${drillFilter.q ? '' : 'hidden'}>×</button></div>
       <div class="seg" role="group" aria-label="Brand">
-        ${[['all', 'All'], ['Ditch Witch', 'Ditch Witch®'], ['Vermeer', 'Vermeer®']].map(([v, l]) => `<button data-brand="${v}" aria-pressed="${drillFilter.brand === v}">${l}</button>`).join('')}
+        ${[['all', 'All'], ['Ditch Witch', 'Ditch Witch®'], ['Vermeer', 'Vermeer®']].map(([v, l]) => `<button data-brand="${v}"${v === 'all' ? '' : brandAttr(v)} aria-pressed="${drillFilter.brand === v}">${l}</button>`).join('')}
       </div>
     </div>
     <div id="drills"></div>`;
@@ -315,12 +332,12 @@ async function viewDrill(isCurrent = () => true) {
       groups.map(([g, l]) => `<div class="section-head"><h2>${g}</h2><span class="small muted">${sub[g]}</span></div>
         <div class="tiles">${l.map((m) => {
           const n = m.pipes.length;
-          return `<a class="tile ${m.brand === 'Vermeer' ? 'vermeer' : ''}" href="#/pipe/${m.id}">
+          return `<a class="tile"${brandAttr(m.brand)} href="#/pipe/${m.id}">
             <div><div class="t-brand">${esc(m.brand)}</div><div class="t-model">${esc(m.model)}</div></div>
             <div class="t-meta">${n ? `${n} pipe option${n === 1 ? '' : 's'}` : 'No pipe listed'}</div>
             <div class="t-act">Select</div></a>`;
         }).join('')}</div>`).join('') +
-      (drillFilter.brand !== 'Ditch Witch' ? `<div class="note" style="margin-top:16px">${ICON.info}<span>Running a Vermeer®? Ditch Witch drill pipe HIWS1® and HXT® is compatible with all Vermeer® Firestick® threads.</span></div>` : '');
+      (drillFilter.brand !== 'Ditch Witch' ? `<div class="note" style="margin-top:16px">${ICON.info}<span>Running a ${brandText('Vermeer', 'Vermeer®')}? ${brandText('Ditch Witch')} drill pipe HIWS1® and HXT® is compatible with all ${brandText('Vermeer', 'Vermeer®')} Firestick® threads.</span></div>` : '');
   };
   draw();
   const q = $('#q');
@@ -345,16 +362,16 @@ async function viewPipe(mid, isCurrent = () => true) {
     ${ctx ? `<a class="linkbtn" href="#/rig/${esc(ctx.machine.id)}">‹ Back to ${esc(rigName(ctx.machine))}</a>` : '<a class="linkbtn" href="#/drill">‹ Change drill</a>'}
     ${pageHead('Step 02 · Pipe', `${esc(m.brand)} ${esc(m.model)}`, `Lock the pipe for this drill. Only pipe that fits the ${esc(m.model)} can be equipped.`)}
     <div class="stack">${m.pipes.map((p) => p.roadmap ? `
-      <a class="choice" href="#/build?c=${b64e(newCfg(m.id, p.id, p.roadmap))}">
+      <a class="choice"${brandAttr(partTheme(p))} href="#/build?c=${b64e(newCfg(m.id, p.id, p.roadmap))}">
         ${catalogPhoto(p.img, p.name)}
         <div class="c-main"><div class="c-title">${esc(p.name)}</div>
-          <div class="c-sub">${p.pn ? `Part # <b class="pn">${esc(p.pn)}</b>` : ''}</div></div>${ICON.chev}</a>` : `
-      <div class="choice" aria-disabled="true">
+          <div class="c-sub">${partChip(p)} ${p.pn ? `Part # <b class="pn">${esc(p.pn)}</b>` : ''}</div></div>${ICON.chev}</a>` : `
+      <div class="choice"${brandAttr(partTheme(p))} aria-disabled="true">
         ${catalogPhoto(p.img, p.name)}
-        <div class="c-main"><div class="c-title">${esc(p.name)}</div><div class="c-sub">${p.pn ? `Part # ${esc(p.pn)} · ` : ''}Tooling data not loaded yet</div></div></div>`).join('') ||
+        <div class="c-main"><div class="c-title">${esc(p.name)}</div><div class="c-sub">${partChip(p)} ${p.pn ? `Part # ${esc(p.pn)} · ` : ''}Tooling data not loaded yet</div></div></div>`).join('') ||
       `<div class="empty">No pipe is listed for this drill.</div>`}
     </div>
-    ${m.brand === 'Vermeer' ? `<div class="note" style="margin-top:16px"><span>Ditch Witch drill pipe HIWS1® and HXT® is compatible with all Vermeer® Firestick® threads.</span></div>` : ''}`;
+    ${m.brand === 'Vermeer' ? `<div class="note" style="margin-top:16px"><span>${brandText('Ditch Witch')} drill pipe HIWS1® and HXT® is compatible with all ${brandText('Vermeer', 'Vermeer®')} Firestick® threads.</span></div>` : ''}`;
   mountLoBanner();
 }
 
@@ -385,9 +402,9 @@ function persistBuild(replace = true) {
 }
 function partRow(p, { selected, multi, sel = true, compact } = {}) {
   const stamp = selected || !sel ? 'Equipped' : 'Equip';
-  return `<div class="part ${selected ? 'sel' : ''} ${multi ? 'multi' : ''}" ${sel ? `role="button" tabindex="0" data-pick="${p.id}" aria-pressed="${!!selected}"` : ''}>
+  return `<div class="part ${selected ? 'sel' : ''} ${multi ? 'multi' : ''}"${brandAttr(partTheme(p))} ${sel ? `role="button" tabindex="0" data-pick="${p.id}" aria-pressed="${!!selected}"` : ''}>
     <div class="thumb">${imgTag(p.img, 240, 120, p.name, '', dwFallback(p))}</div>
-    <div class="p-main"><div class="p-name">${p.brand ? `<span class="brand-chip">${esc(p.brand)}</span> ` : ''}${esc(p.name)}</div>
+    <div class="p-main"><div class="p-name">${partChip(p)} ${esc(p.name)}</div>
       <div class="p-pn">${p.pn ? `#${esc(p.pn)}` : '<span class="muted">Part # not listed</span>'}</div>
       ${connStr(p) ? `<div class="p-conn">${esc(connStr(p))}</div>` : ''}
       ${!compact && p.short ? `<div class="p-short">${esc(p.short)}</div>` : ''}</div>
@@ -404,9 +421,9 @@ const radiusThumb = (p) => (p.imgUrl
   : '<img src="img/placeholder.svg" alt="">');
 function altRow(a, sid, cfg) {
   const p = a.part, added = (cfg.alt?.[sid] || []).includes(p.pn);
-  return `<div class="alt-part">
+  return `<div class="alt-part"${brandAttr(RADIUS_BRAND)}>
     <div class="thumb">${radiusThumb(p)}</div>
-    <div class="p-main"><div class="alt-meta"><span class="brand-chip">${esc(RADIUS_BRAND)}</span>${a.match ? `<span class="alt-match">${esc(MATCH_LABEL[a.match] || '')}</span>` : ''}</div>
+    <div class="p-main"><div class="alt-meta">${brandChip(RADIUS_BRAND)}${a.match ? `<span class="alt-match">${esc(MATCH_LABEL[a.match] || '')}</span>` : ''}</div>
       <div class="p-name">${esc(p.name)}</div><div class="p-pn">#${esc(p.pn)}</div>
       ${a.note ? `<div class="p-short">${esc(a.note)}</div>` : ''}</div>
     <div class="p-act">
@@ -417,14 +434,14 @@ function altRow(a, sid, cfg) {
 function altsFor(p, sid, cfg) {
   if (!showOther() || !p?.pn) return '';
   const list = alternatesFor(RADIUS, p.pn);
-  return list.length ? `<div class="alts" role="group" aria-label="Radius equivalents for ${esc(p.name)}">${list.map((a) => altRow(a, sid, cfg)).join('')}</div>` : '';
+  return list.length ? `<div class="alts"${brandAttr(RADIUS_BRAND)} role="group" aria-label="Radius equivalents for ${esc(p.name)}">${list.map((a) => altRow(a, sid, cfg)).join('')}</div>` : '';
 }
 function othersGroup(rm, row, cfg, shownPns) {
   if (!showOther()) return '';
   const P = rm.parts, m = machine(cfg.m);
   const slotParts = row.cands.map((o) => P[o.id]);
   const list = slotOthers(RADIUS, { slotParts, pipe: P[cfg.p], machine: m ? `${m.brand} ${m.model}` : '', dwPns: shownPns });
-  return list.length ? `<details class="others"><summary>Other brands <span class="muted">· ${list.length} Radius part${list.length > 1 ? 's' : ''}</span></summary>
+  return list.length ? `<details class="others"${brandAttr(RADIUS_BRAND)}><summary>Other brands <span class="muted">· ${list.length} ${brandText(RADIUS_BRAND)} part${list.length > 1 ? 's' : ''}</span></summary>
     ${list.map((part) => altRow({ part }, row.sec.id, cfg)).join('')}
     <p class="small muted">Radius parts are shopping-list alternates. Confirm fit with Radius before ordering.</p></details>` : '';
 }
@@ -448,7 +465,7 @@ function slotCell(r, i, P) {
     state = 'skip'; tag = 'Skipped';
     plate = `<span class="slot-plate slot-plate-empty"><span class="slot-mark" aria-hidden="true">–</span></span>`;
   }
-  return `<button type="button" class="slot slot-${state}" data-jump="${r.sec.id}">
+  return `<button type="button" class="slot slot-${state}"${r.sel.length ? brandAttr(partTheme(P[r.sel[0]])) : ''} data-jump="${r.sec.id}">
     <span class="slot-idx" aria-hidden="true">${n}</span>${plate}
     <span class="slot-name">${name}</span><span class="slot-tag">${tag}</span></button>`;
 }
@@ -495,7 +512,7 @@ function renderBuild(rm, focusNext) {
         const accHtml = accs.length ? `<div class="acc"><div class="acc-title"><span>Add-on / adapter</span>${a?.auto ? '<span class="pill pill-ok">Auto-added to fit</span>' : ''}</div>
           <div class="chips">
             <button class="chip" data-acc="${s.id}.${id}" data-accid="0" aria-pressed="${!a}">None</button>
-            ${accs.map((aid) => `<button class="chip" data-acc="${s.id}.${id}" data-accid="${aid}" aria-pressed="${a?.id === aid}">${esc(P[aid].name)}${P[aid].pn ? `<small>#${esc(P[aid].pn)}</small>` : ''}</button>`).join('')}
+            ${accs.map((aid) => `<button class="chip"${brandAttr(partTheme(P[aid]))} data-acc="${s.id}.${id}" data-accid="${aid}" aria-pressed="${a?.id === aid}">${esc(P[aid].name)}${P[aid].pn ? `<small>#${esc(P[aid].pn)}</small>` : ''}</button>`).join('')}
           </div></div>` : '';
         return partRow(P[id], { selected: true, multi, sel: false }) + altsFor(P[id], s.id, cfg) + accHtml;
       }).join('') + (r.cands.length > 1 ? `<button class="linkbtn" data-browse="${s.id}">${multi ? 'Add or remove' : `Swap (${r.cands.length} fit this slot)`}</button>` : '')
@@ -515,12 +532,12 @@ function renderBuild(rm, focusNext) {
     ${ctx ? loBanner(ctx, ctx.loadout ? 'EDITING LOADOUT' : 'NEW LOADOUT · EQUIP SLOTS') : ''}
     <div class="build-grid"><div>
       <div class="build-title"><div><a class="linkbtn" href="#/pipe/${cfg.m}" style="padding-left:0">‹ Change pipe</a>
-        ${pageHead('Step 03 · Equip', esc(m?.model || 'Drill string'), `${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''}`)}</div></div>
+        ${pageHead(m ? `Step 03 · Equip · ${brandText(m.brand)}` : 'Step 03 · Equip', esc(m?.model || 'Drill string'), p ? brandText(partTheme(p), `${p.name}${p.pn ? ` · #${p.pn}` : ''}`) : '')}</div></div>
       <div class="seg" role="group" aria-label="Configuration type" style="margin:14px 0">
         <button data-mode="Bit" aria-pressed="${cfg.mode === 'Bit'}">Pilot<small>Bit config</small></button>
         <button data-mode="Backreamer" aria-pressed="${cfg.mode === 'Backreamer'}">Pullback<small>Backreamer config</small></button>
       </div>
-      ${RADIUS ? `<label class="brand-toggle"><input type="checkbox" id="other-brands" ${showOther() ? 'checked' : ''}><span>Show other brands<small>Radius alternates go on the parts list. Equip Ditch Witch parts to advance.</small></span></label>` : ''}
+      ${RADIUS ? `<label class="brand-toggle"${brandAttr(RADIUS_BRAND)}><input type="checkbox" id="other-brands" ${showOther() ? 'checked' : ''}><span>Show other brands<small>${brandText(RADIUS_BRAND)} alternates go on the parts list. Equip ${brandText('Ditch Witch')} parts to advance.</small></span></label>` : ''}
       <div class="preview"><div class="preview-head"><span>Slot rail</span><span>${endLabel} →</span></div>
         <div class="meter" role="img" aria-label="${donePct} of ${rows.length} slots settled"><span style="width:${pct}%"></span></div>
         <div class="strip"><span class="rig">${esc(m?.model || 'RIG')}</span>${strip || '<span class="small muted">Slots appear here</span>'}</div></div>
@@ -528,7 +545,7 @@ function renderBuild(rm, focusNext) {
     </div>
     <aside class="build-aside">
       <div class="aside-card"><h3>Equipped</h3>
-        <ul class="mini-list">${items.map((l) => `<li><span>${l.brand ? `<span class="brand-chip">${esc(l.brand)}</span> ` : ''}${esc(l.part.name)}</span><span class="pn">${esc(pnTxt(l.part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}${altItems.map((l) => `<li><span><span class="brand-chip">${esc(l.brand)}</span> ${esc(l.part.name)}</span><span class="pn">${esc(l.part.pn)}</span></li>`).join('')}</ul>
+        <ul class="mini-list">${[...items, ...altItems].map(({ part }) => `<li${brandAttr(partTheme(part))}><span>${partChip(part)} ${esc(part.name)}</span><span class="pn">${esc(pnTxt(part))}</span></li>`).join('') || '<li class="muted">No slots filled yet</li>'}</ul>
         <a class="btn ${ready ? 'btn-primary' : 'btn-ghost'} btn-block" style="margin-top:12px" href="#/summary?c=${b64e(cfg)}">${ready ? 'Confirm class' : 'Review draft'}</a>
         <button class="btn btn-ghost btn-block" style="margin-top:8px" data-save>${ICON.save} Save loadout</button>
       </div>
@@ -617,9 +634,9 @@ function browseSheet(rm, sid) {
 function showPart(rm, id, stacked) {
   const p = rm.parts[id];
   const photos = [...new Set([...(p.imgs || []), p.img].filter(Boolean))];
-  const specs = Object.entries({ 'Part #': p.pn || 'Not listed', Connection: connStr(p), 'Recommended ground': p.soil, ...(p.specs || {}) }).filter(([, v]) => v);
+  const specs = Object.entries({ 'Part #': p.pn || 'Not listed', Connection: connStr(p), 'Recommended ground': p.soil, ...(p.specs || {}) }).filter(([k, v]) => k !== 'Brand' && v);
   const prev = stacked ? $('#sheet').innerHTML : null;
-  openSheet(`<div class="sheet-top"><div><div class="small muted" style="font-weight:800;letter-spacing:.06em">${esc((p.type || '').replace(/_/g, ' ').toUpperCase())}</div><h2>${esc(p.name)}</h2></div>
+  openSheet(`<div class="sheet-top"${brandAttr(partTheme(p))}><div><div class="small muted" style="font-weight:800;letter-spacing:.06em">${partChip(p)} ${esc((p.type || '').replace(/_/g, ' ').toUpperCase())}</div><h2>${esc(p.name)}</h2></div>
       <button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body">
       <div class="gallery ${photos.length < 2 ? 'single' : ''}">${photos.map((i) => photoTag(i, p.name, dwFallback(p))).join('') || photoTag(0, p.name, dwFallback(p))}</div>
@@ -740,7 +757,7 @@ async function openDoneSheet(cfg) {
       <label class="field"><span>Loadout name</span><input id="lname" value="${esc(def)}" maxlength="60"></label>
       <div class="chips">${['Rock setup', 'Sand pilot', 'Clay pilot', 'Backream 12in'].map((s) => `<button type="button" class="chip" data-sug="${s}">${s}</button>`).join('')}</div>
       ${list.length ? `<div class="form-sub"><b>Machine</b><span class="small muted">Where it shows in My rigs</span></div>
-        <div class="stack">${list.map((mc) => `<button type="button" class="choice" data-mc="${esc(mc.id)}" aria-pressed="${mc.id === pre}"><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div></button>`).join('')}</div>`
+        <div class="stack">${list.map((mc) => `<button type="button" class="choice"${brandAttr(rigBrand(mc))} data-mc="${esc(mc.id)}" aria-pressed="${mc.id === pre}"><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div></button>`).join('')}</div>`
         : `<p>This drill is not in My rigs yet. Saving adds it as a machine.</p>
            <label class="field"><span>Unit name (optional)</span><input id="an" maxlength="60" placeholder="Unit 12"></label>`}
       <p class="small muted">Everyone at ${esc(ME.company.name)} will see it.</p>
@@ -836,13 +853,13 @@ async function viewSummary(q, isCurrent = () => true) {
     app.innerHTML = `
     <div class="sum-grid"><div class="stack">
       <div class="sum-head"><small>${ready ? 'LOADOUT BRIEF' : 'INCOMPLETE DRAFT'} · ${cfg.mode === 'Bit' ? 'PILOT' : 'PULLBACK'}</small>
-        <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${esc(p?.name || '')}${p?.pn ? ` · #${esc(p.pn)}` : ''} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config</p>
+        <h1>${esc(m?.brand || '')} ${esc(m?.model || '')}</h1><p>${p ? brandText(partTheme(p), `${p.name}${p.pn ? ` · #${p.pn}` : ''}`) : ''} · ${cfg.mode === 'Bit' ? 'Bit' : 'Backreamer'} config</p>
         <button class="btn btn-primary no-print" data-done>${ICON.save} ${saveLabel}</button>
         <p class="small no-print" style="margin:8px 0 0;color:#d5deea">${needsGarageSave(cfg) ? 'Not in My rigs yet. Saving puts it on this drill.' : 'Saved to My rigs.'}</p></div>
       ${!ready ? `<div class="note"><span>${blocked ? `<b>Needs changes in ${esc(blocked.sec.name)}.</b>` : pending.length ? `<b>${pending.length} slot${pending.length > 1 ? 's' : ''} still open.</b>` : '<b>Compatible tooling is unavailable.</b>'} <a class="no-print" href="#/build?c=${b64e(cfg)}">Edit loadout</a></span></div>` : ''}
       <div class="card"><ul class="lines">${allItems.map((l) => `
-        <li class="line ${l.acc ? 'acc-line' : ''} ${l.alt ? 'alt-line' : ''}"><div class="thumb">${l.alt ? radiusThumb(l.part) : imgTag(l.part.img, 200, 100, l.part.name, '', dwFallback(l.part))}</div>
-          <div><div class="l-sec">${l.brand ? `<span class="brand-chip">${esc(l.brand)}</span> ` : ''}${esc(l.sec)}${l.auto ? ' · auto' : ''}${l.alt ? ` <button type="button" class="linkbtn no-print alt-rm" data-altrm="${esc(l.key.split('.')[0])}" data-altpn="${esc(l.part.pn)}">Remove</button>` : ''}</div><div class="l-name">${esc(l.part.name)}</div>
+        <li class="line ${l.acc ? 'acc-line' : ''} ${l.alt ? 'alt-line' : ''}"${brandAttr(partTheme(l.part))}><div class="thumb">${l.alt ? radiusThumb(l.part) : imgTag(l.part.img, 200, 100, l.part.name, '', dwFallback(l.part))}</div>
+          <div><div class="l-sec">${partChip(l.part)} ${esc(l.sec)}${l.auto ? ' · auto' : ''}${l.alt ? ` <button type="button" class="linkbtn no-print alt-rm" data-altrm="${esc(l.key.split('.')[0])}" data-altpn="${esc(l.part.pn)}">Remove</button>` : ''}</div><div class="l-name">${esc(l.part.name)}</div>
             <div class="l-row"><span class="l-pn">${l.part.pn ? '#' + esc(l.part.pn) : '<span class="muted">Part # not listed</span>'}</span>
               <span class="print-qty">Qty: ${l.qty}</span><span class="qty no-print"><button data-dq="${l.key}" data-d="-1" aria-label="Less">−</button><input inputmode="numeric" data-qk="${l.key}" value="${esc(l.qty)}" aria-label="Quantity"><button data-dq="${l.key}" data-d="1" aria-label="More">+</button></span>
             </div></div></li>`).join('') || '<li class="empty">No parts selected yet.</li>'}</ul></div>
@@ -1022,15 +1039,16 @@ const loCtx = {
   set(v) { v ? sessionStorage.setItem(LO_KEY, JSON.stringify(v)) : sessionStorage.removeItem(LO_KEY); },
   for(cfg) { const c = this.get(); return c && cfg && +c.machine.machine_type_id === +cfg.m ? c : null; },
 };
-const rigName = (mc) => mc.nickname ? mc.nickname : `${mc.brand || ''} ${mc.model}`.trim();
-const rigSub = (mc) => `${mc.brand || ''} ${mc.model}`.trim();
+const rigBrand = (mc) => mc.brand || machine(mc.machine_type_id)?.brand;
+const rigSub = (mc) => `${rigBrand(mc) || ''} ${mc.model}`.trim();
+const rigName = (mc) => mc.nickname || rigSub(mc);
 const errMsg = (e) => (e?.message || String(e)).replace(/^.*?:\s*(?=Invite|You already|Sign in)/, '');
 const ICON_RIG = '<svg viewBox="0 0 24 24"><path d="M12 3 2 8v13h4v-9h12v9h4V8zM8 14h8v2H8zm0 3h8v2H8z"/></svg>';
 const ICON_MORE = '<svg viewBox="0 0 24 24"><path d="M6 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm6 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg>';
 const ICON_STAR = '<svg viewBox="0 0 24 24"><path d="M12 17.3 18.2 21l-1.6-7L22 9.2l-7.2-.6L12 2 9.2 8.6 2 9.2 7.4 14l-1.6 7z"/></svg>';
 function drillOptions(sel) {
   const by = (b) => CATALOG.machines.filter((m) => m.brand === b && m.pipes.length);
-  return `<option value="">Choose a drill…</option>` + ['Ditch Witch', 'Vermeer'].map((b) => `<optgroup label="${b}">${by(b).map((m) => `<option value="${m.id}" ${+sel === m.id ? 'selected' : ''}>${esc(b)} ${esc(m.model)}</option>`).join('')}</optgroup>`).join('');
+  return `<option value="">Choose a drill…</option>` + ['Ditch Witch', 'Vermeer'].map((b) => `<optgroup label="${b}"${brandAttr(b)}>${by(b).map((m) => `<option value="${m.id}" ${+sel === m.id ? 'selected' : ''}>${esc(b)} ${esc(m.model)}</option>`).join('')}</optgroup>`).join('');
 }
 function busy(btn, on, label) { if (!btn) return; if (on) { btn.dataset.l = btn.innerHTML; btn.innerHTML = label || 'Working…'; btn.disabled = true; } else { btn.innerHTML = btn.dataset.l || btn.innerHTML; btn.disabled = false; } }
 
@@ -1289,10 +1307,12 @@ async function fetchFleet() {
   return { machines: m.data, loadouts: l.data };
 }
 const loImgs = (lo, n = 6) => (lo?.items || []).filter((i) => i.img).slice(0, n);
-const loKey = (lo) => (lo.items || []).slice().reverse().find((i) => !i.alt && (/^(Bit|Backreamer)$/i.test(i.type || '') || /^(Bit|Backreamer)\b/i.test(i.sec || '')));
+const loKey = (lo) => (lo.items || []).slice().reverse().find((i) =>
+  !(i.alt && brandTheme(i.brand || RADIUS_BRAND) === 'radius')
+  && (/^(Bit|Backreamer)$/i.test(i.type || '') || /^(Bit|Backreamer)\b/i.test(i.sec || '')));
 function stripHtml(lo, cls = 'lo-strip') {
   const im = loImgs(lo);
-  return `<div class="${cls}">${im.map((i) => imgTag(i.img, 200, 100, i.name)).join('') || '<span class="small muted">No parts yet</span>'}</div>`;
+  return `<div class="${cls}">${im.map((i) => `<span class="lo-thumb"${brandAttr(partTheme(i))}>${imgTag(i.img, 200, 100, i.name)}</span>`).join('') || '<span class="small muted">No parts yet</span>'}</div>`;
 }
 function guestUpsell(where) {
   return `<div class="upsell card pad stack">
@@ -1472,15 +1492,15 @@ async function viewGarage(isCurrent = () => true) {
     <div class="section-head"><h2>Equipment · ${count}</h2><button class="linkbtn" id="addm">${atLimit ? 'Upgrade for unlimited' : '+ Add machine'}</button></div>
     <div class="rig-grid">${fleet.machines.map((mc) => {
       const los = byM(mc.id), def = los.find((l) => l.is_default) || los[0];
-      return `<a class="rig-card" href="#/rig/${esc(mc.id)}">
-        <div class="rig-top"><div><div class="t-brand">Machine · ${esc(mc.brand || '')} ${esc(mc.model)}</div><div class="rig-name">${esc(rigName(mc))}</div></div>
+      return `<a class="rig-card"${brandAttr(rigBrand(mc))} href="#/rig/${esc(mc.id)}">
+        <div class="rig-top"><div><div class="t-brand">Machine · ${esc(rigSub(mc))}</div><div class="rig-name">${esc(rigName(mc))}</div></div>
           <span class="pill ${los.length ? 'pill-orange' : ''}">${los.length} loadout${los.length === 1 ? '' : 's'}</span></div>
         ${stripHtml(def)}
         <ul class="lo-name-list">${los.map((lo) => `<li><b>${lo.is_default ? '★ ' : ''}${esc(lo.name)}</b><span>${lo.mode === 'Bit' ? 'Pilot' : 'Pullback'} · ${esc(lo.part_count)}</span></li>`).join('') || '<li class="muted">No loadouts yet</li>'}</ul>
         <div class="rig-foot">${def ? `<span><b>${los.length} loadout${los.length === 1 ? '' : 's'}</b></span>` : '<span class="muted">No loadouts yet. Tap to build a class.</span>'}${ICON.chev}</div></a>`;
     }).join('') || `<div class="card empty"><h2>No machines yet</h2><p>Add a machine to start a loadout.</p><button class="btn btn-primary" id="addm2">+ Add machine</button></div>`}</div>
     ${finish?.pending ? `<div class="note" style="margin-top:12px"><span><b>Finish saving “${esc(finish.pending.name)}”.</b> Pick the machine.
-      <span class="chips" style="margin-top:8px">${finish.machines.map((mc) => `<button type="button" class="chip" data-finish="${esc(mc.id)}">${esc(rigName(mc))}</button>`).join('')}</span></span></div>` : ''}`;
+      <span class="chips" style="margin-top:8px">${finish.machines.map((mc) => `<button type="button" class="chip"${brandAttr(rigBrand(mc))} data-finish="${esc(mc.id)}">${esc(rigName(mc))}</button>`).join('')}</span></span></div>` : ''}`;
   const openAdd = () => requestAddOperator(count);
   $('#addm').addEventListener('click', openAdd);
   $$('[data-finish]').forEach((b) => b.addEventListener('click', async () => {
@@ -1559,20 +1579,20 @@ async function viewRig(id, isCurrent = () => true) {
   const los = lr.data || [], cat = machine(mc.machine_type_id);
   app.innerHTML = `
     <a class="linkbtn" href="#/garage" style="padding-left:0">‹ All machines</a>
-    <div class="rig-hero">
+    <div class="rig-hero"${brandAttr(rigBrand(mc))}>
       <div style="min-width:0"><div class="t-brand">Machine · ${esc(rigSub(mc))}</div><h1>${esc(rigName(mc))}</h1>
         <div class="small muted">${los.length} loadout${los.length === 1 ? '' : 's'} · ${esc(ME.company.name)}</div></div>
       <button class="iconbtn dark" id="mmenu" aria-label="Machine options">${ICON_MORE}</button></div>
-    <button class="btn btn-primary btn-block" id="newlo" style="margin:14px 0 4px" ${cat?.pipes.length ? '' : 'disabled'}>+ New loadout</button>
+    <button class="btn btn-primary btn-block"${brandAttr(rigBrand(mc))} id="newlo" style="margin:14px 0 4px" ${cat?.pipes.length ? '' : 'disabled'}>+ New loadout</button>
     <div class="section-head"><h2>Loadouts</h2><span class="small muted">Named presets. ⋯ renames, copies, or sets primary</span></div>
     <div class="lo-grid">${los.map((lo) => {
       const pipe = pipeOf(cat, lo.pipe_id), key = loKey(lo);
-      return `<article class="lo-card ${lo.is_default ? 'is-default' : ''}">
+      return `<article class="lo-card ${lo.is_default ? 'is-default' : ''}"${brandAttr(rigBrand(mc))}>
         <div class="lo-top"><div style="min-width:0"><div class="lo-name">${esc(lo.name)}${lo.is_default ? `<span class="pill pill-dark">${ICON_STAR}Primary</span>` : ''}</div>
           <div class="small muted">${esc(pipe?.name || 'Pipe')} · ${lo.mode === 'Bit' ? 'Pilot' : 'Pullback'} · ${esc(lo.part_count)} equipped</div></div>
           <button class="iconbtn" data-lomenu="${esc(lo.id)}" aria-label="Options for ${esc(lo.name)}">${ICON_MORE}</button></div>
         ${stripHtml(lo)}
-        ${key ? `<div class="lo-key"><span>${lo.mode === 'Bit' ? 'Bit' : 'Reamer'}</span><b>${esc(key.name)}</b>${key.pn ? `<code>#${esc(key.pn)}</code>` : ''}</div>` : ''}
+        ${key ? `<div class="lo-key"${brandAttr(partTheme(key))}><span>${lo.mode === 'Bit' ? 'Bit' : 'Reamer'}</span>${partChip(key)}<b>${esc(key.name)}</b>${key.pn ? `<code>#${esc(key.pn)}</code>` : ''}</div>` : ''}
         <div class="lo-actions"><button class="btn btn-outline" data-loedit="${esc(lo.id)}">Edit</button><a class="btn btn-primary" href="#/summary?c=${b64e(lo.config)}">Open brief</a></div>
       </article>`;
     }).join('') || `<div class="card empty"><h2>No loadouts yet</h2><p>Build one: lock the pipe, then equip each slot from the rig out to the bit.</p></div>`}</div>`;
@@ -1583,7 +1603,7 @@ async function viewRig(id, isCurrent = () => true) {
   $('#mmenu').addEventListener('click', () => machineMenu(mc, los.length));
 }
 function loMenu(lo, mc, los) {
-  openSheet(`<div class="sheet-top"><div><div class="small muted">${esc(rigName(mc))}</div><h2>${esc(lo.name)}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+  openSheet(`<div class="sheet-top"${brandAttr(rigBrand(mc))}><div><div class="small muted">${esc(rigName(mc))}</div><h2>${esc(lo.name)}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body stack">
       <label class="field"><span>Name</span><input id="lr" value="${esc(lo.name)}" maxlength="60"></label>
       <button class="btn btn-ghost btn-block" id="lrn">Rename</button>
@@ -1611,7 +1631,7 @@ function loMenu(lo, mc, los) {
   });
 }
 function machineMenu(mc, nLo) {
-  openSheet(`<div class="sheet-top"><div><div class="small muted">${esc(rigSub(mc))}</div><h2>${esc(rigName(mc))}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+  openSheet(`<div class="sheet-top"${brandAttr(rigBrand(mc))}><div><div class="small muted">${esc(rigSub(mc))}</div><h2>${esc(rigName(mc))}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body stack">
       <label class="field"><span>Unit name / number</span><input id="mn" value="${esc(mc.nickname || '')}" maxlength="60" placeholder="Unit 12"></label>
       <button class="btn btn-ghost btn-block" id="mns">Save name</button>
@@ -1624,7 +1644,7 @@ function machineMenu(mc, nLo) {
 
 /* loadout editor hooks used by the pipe + build steps */
 function loBanner(ctx, label) {
-  return `<div class="lo-banner"><div style="min-width:0"><small>${label}</small><b>${esc(ctx.loadout?.name || 'New loadout')}</b><span> · ${esc(rigName(ctx.machine))}</span></div>
+  return `<div class="lo-banner"${brandAttr(rigBrand(ctx.machine))}><div style="min-width:0"><small>${label}</small><b>${esc(ctx.loadout?.name || 'New loadout')}</b><span> · ${esc(rigName(ctx.machine))}</span></div>
     <button class="iconbtn dark" id="loexit" aria-label="Stop editing loadout">✕</button></div>`;
 }
 function mountLoBanner() {
@@ -1637,7 +1657,7 @@ function mountLoBanner() {
 }
 function loSaveSheet(cfg, ctx) {
   const def = ctx.loadout?.name || (cfg.mode === 'Bit' ? 'Pilot setup' : 'Backream setup');
-  openSheet(`<div class="sheet-top"><div><div class="small muted">${esc(rigName(ctx.machine))}</div><h2>${ctx.loadout ? 'Save loadout' : 'Save new loadout'}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
+  openSheet(`<div class="sheet-top"${brandAttr(rigBrand(ctx.machine))}><div><div class="small muted">${esc(rigName(ctx.machine))}</div><h2>${ctx.loadout ? 'Save loadout' : 'Save new loadout'}</h2></div><button class="iconbtn" data-close aria-label="Close">✕</button></div>
     <div class="sheet-body stack"><label class="field"><span>Loadout name</span><input id="lname" value="${esc(def)}" maxlength="60" placeholder="Rock setup, Sand pilot, Backream 12in…"></label>
       <div class="chips">${['Rock setup', 'Sand pilot', 'Clay pilot', 'Backream 12in'].map((s) => `<button class="chip" data-sug="${s}">${s}</button>`).join('')}</div>
       ${ctx.loadout ? `<label class="check"><input type="checkbox" id="lcopy"> Save as a new copy instead</label>` : ''}
@@ -1663,7 +1683,7 @@ async function saveLoadout(rawCfg, machineId, id, name) {
   const items = [...lineItems(rm, cfg, rows), ...altLineItems(RADIUS, cfg, rows)], c = await sb();
   const payload = { company_id: ME.company.id, machine_id: machineId, name: String(name || '').slice(0, 60), pipe_id: cfg.p, roadmap_id: cfg.r, mode: cfg.mode,
     config: JSON.parse(JSON.stringify(cfg)), part_count: items.length, updated_at: new Date().toISOString(),
-    items: items.map((l) => ({ sec: l.sec, type: l.part.type || null, name: l.part.name, pn: l.part.pn || null, img: validImgId(l.part.img) || null, qty: l.qty, acc: !!l.acc, ...(l.brand ? { brand: l.brand, alt: true } : {}) })) };
+    items: items.map((l) => ({ sec: l.sec, type: l.part.type || null, name: l.part.name, pn: l.part.pn || null, img: validImgId(l.part.img) || null, qty: l.qty, acc: !!l.acc, ...(l.brand ? { brand: l.brand } : {}), ...(l.alt ? { alt: true } : {}) })) };
   if (!id) { const { count } = await c.from('bdht_loadouts').select('id', { count: 'exact', head: true }).eq('machine_id', machineId); payload.is_default = !count; }
   const { data, error } = await (id ? c.from('bdht_loadouts').update(payload).eq('id', id).eq('company_id', ME.company.id) : c.from('bdht_loadouts').insert(payload)).select().single();
   if (error) throw error; return data;
@@ -1681,7 +1701,7 @@ async function saveToRigSection(cfg, sh) {
   const atLimit = !canAddMachine(counted.count || 0, isEntitled());
   const addLabel = atLimit ? 'Upgrade for another machine' : `+ Add a ${mm?.model || 'drill'}`;
   box.innerHTML = `<div class="form-sub"><b>Save on a machine</b><span class="small muted">Shared with ${esc(ME.company.name)}</span></div>
-    <div class="stack" style="margin-top:8px">${(data || []).map((mc) => `<button class="choice" data-rig="${esc(mc.id)}"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div>${ICON.chev}</button>`).join('') ||
+    <div class="stack" style="margin-top:8px">${(data || []).map((mc) => `<button class="choice"${brandAttr(rigBrand(mc))} data-rig="${esc(mc.id)}"><div class="pipe-ico">${ICON_RIG}</div><div class="c-main"><div class="c-title">${esc(rigName(mc))}</div><div class="c-sub">${esc(rigSub(mc))}</div></div>${ICON.chev}</button>`).join('') ||
       `<p class="small muted">No ${esc(mm?.model || '')} in your machines yet.</p><button class="btn ${atLimit ? 'btn-primary' : 'btn-ghost'} btn-block" id="addthis">${esc(addLabel)}</button>`}</div>`;
   $$('[data-rig]', box).forEach((b) => b.addEventListener('click', () => {
     const mc = data.find((x) => x.id === b.dataset.rig);
@@ -1773,7 +1793,10 @@ window.addEventListener('hashchange', () => {
 updateSavedBadge();
 startRecovery();
 currentHash = location.hash;
-loadCatalog().catch(() => {});
+loadCatalog().then(() => {
+  if (document.body.dataset.view === 'home') viewHome();
+  if (document.body.dataset.view === 'saved') viewSaved();
+}).catch(() => {});
 lastPath = location.hash.split('?')[0];
 route();
 // account state loads in the background; guests never wait on it

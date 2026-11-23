@@ -219,7 +219,7 @@ test('Radius alternates render escaped beside Ditch Witch options, respect the t
   assert.match(html, /id="other-brands" checked/);
   assert.match(html, /class="alts"[^>]*>[\s\S]*RAD-CN/);
   assert.match(html, /href="https:\/\/www\.radiushdd\.com\/p\/cn" target="_blank" rel="noopener noreferrer"/);
-  assert.match(html, /<details class="others">[\s\S]*RAD-EVIL/, 'unlinked same-type part shows under Other brands');
+  assert.match(html, /<details class="others" data-brand-theme="radius">[\s\S]*RAD-EVIL/, 'unlinked same-type part shows under Other brands');
   assert.doesNotMatch(html, /<img src=x/);
   assert.doesNotMatch(html, /javascript:|evil\.example/);
 
@@ -227,7 +227,7 @@ test('Radius alternates render escaped beside Ditch Witch options, respect the t
   html = element('#app').innerHTML;
   assert.match(html, /aria-pressed="true">On list/);
   assert.match(html, /Equip a Ditch Witch part in this slot to unlock the next one/);
-  assert.match(html, /mini-list[\s\S]*brand-chip">Radius<\/span> Radius Connector/);
+  assert.match(html, /mini-list[\s\S]*brand-chip" data-brand-theme="radius">Radius<\/span> Radius Connector/);
 
   ctx.cfg = vm.runInContext('buildCfg', ctx);
   await vm.runInContext('viewSummary(new URLSearchParams({ c: b64e(cfg) }))', ctx);
@@ -239,6 +239,27 @@ test('Radius alternates render escaped beside Ditch Witch options, respect the t
   html = element('#app').innerHTML;
   assert.match(html, /id="other-brands" >/);
   assert.doesNotMatch(html, /alt-part|class="others"/);
+});
+
+test('brand themes follow the rig and each part independently across the builder and summary', async () => {
+  const { ctx, element } = appContext();
+  ctx.mixed = structuredClone(roadmap);
+  const supplierPart = ctx.mixed.parts[1366];
+  Object.assign(supplierPart, { brand: 'Melfred Borzall', brandId: 'melfred-borzall', supplier: true });
+  ctx.cfg = { ...base, mode: 'Bit', sel: { 22632: [1366] } };
+  vm.runInContext('RM_CACHE.set(mixed.id, mixed); buildCfg = cfg; renderBuild(mixed);', ctx);
+  assert.equal(element('#stepper').dataset.brandTheme, 'vermeer');
+  assert.match(element('#app').innerHTML, /brand-chip" data-brand-theme="ditch-witch">Ditch Witch/);
+  assert.match(element('#app').innerHTML, /brand-chip" data-brand-theme="melfred-borzall">Melfred Borzall/);
+  assert.match(element('#app').innerHTML, /slot-filled" data-brand-theme="melfred-borzall"/);
+  vm.runInContext('showPart(mixed, 1366, false);', ctx);
+  assert.match(element('#sheet').innerHTML, /sheet-top" data-brand-theme="melfred-borzall"/);
+  await vm.runInContext('viewSummary(new URLSearchParams({ c: b64e(cfg) }));', ctx);
+  assert.equal(element('#app').dataset.brandTheme, 'vermeer');
+  assert.match(element('#app').innerHTML, /class="line [^"]*" data-brand-theme="melfred-borzall"/);
+  assert.match(vm.runInContext('savedRow({ cfg, title: "Pilot draft", ts: 0 })', ctx), /lo-card" data-brand-theme="vermeer"/);
+  assert.match(vm.runInContext('partChip({ brand: "Vermeer BORESTORE" })', ctx), /data-brand-theme="vermeer"/);
+  assert.match(vm.runInContext('partChip({ brand: "Another supplier" })', ctx), /data-brand-theme="neutral"/);
 });
 
 test('image fallback chain tries local, remote, then the Radius photo, then the placeholder', () => {

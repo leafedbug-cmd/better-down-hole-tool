@@ -632,11 +632,38 @@ function renderActiveSlotCandidates(rm, rows, activeRow, P, cfg) {
         return `<div class="part-block">${partRow(p, { selected: isEq, multi: s.multi, sel: !isPipe, isPipe })}${accHtml}${altsFor(p, s.id, cfg)}</div>`;
       }).join('')
     : `<div class="empty-box"><p>No parts match the current search or filters in ${esc(s.name)}.</p><button type="button" class="btn btn-outline btn-sm" id="slot-filter-reset">Clear slot filters</button></div>`;
+  const hasOtherSels = Object.entries(cfg.sel || {}).some(([k, v]) => +k !== s.id && Array.isArray(v) && v.length > 0);
+  const allPipeRow = hasOtherSels ? compute(rm, { ...cfg, sel: {} }).find((r) => r.sec.id === s.id) : null;
+  const candIds = new Set(activeRow.cands.map((o) => o.id));
+  const altPathOpts = allPipeRow ? allPipeRow.cands.filter((o) => !candIds.has(o.id)) : [];
+  const altPathHtml = altPathOpts.length
+    ? `<details class="alt-paths others" style="margin-top:8px"><summary><span>Other parts for this pipe <span class="muted">· ${altPathOpts.length} option${altPathOpts.length > 1 ? 's' : ''} (resets conflicting slots)</span></span></summary>
+        <div class="radius-others-list">${altPathOpts.map((opt) => {
+          const op = P[opt.id];
+          if (!op) return '';
+          const conn = connStr(op);
+          return `<div class="part part-row"${brandAttr(partTheme(op))}>
+            <div class="thumb part-thumb">${imgTag(op.img, 240, 120, op.name, '', dwFallback(op))}</div>
+            <div class="p-main part-main">
+              <div class="part-title-line p-name">${partChip(op)} <span class="part-name">${esc(op.name)}</span></div>
+              <div class="part-specs-line"><span class="p-pn part-pn">${op.pn ? `#${esc(op.pn)}` : '<span class="muted">Part # not listed</span>'}</span>${conn ? `<span class="p-conn part-conn">${esc(conn)}</span>` : ''}</div>
+            </div>
+            <div class="p-act part-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-info="${op.id}" aria-label="Details for ${esc(op.name)}">Details</button>
+              <button type="button" class="btn btn-outline btn-sm" data-pick-override="${op.id}">Switch &amp; equip</button>
+            </div></div>`;
+        }).join('')}</div></details>`
+    : '';
   const othersHtml = othersGroup(rm, activeRow, cfg, filtered.map((o) => P[o.id]?.pn).filter(Boolean));
   const pendingRadiusNote = activeRow.status === 'pending' && cfg.alt?.[s.id]?.length
     ? '<div class="rd-note" role="status"><span>Radius alternate added to the parts list. Equip a Ditch Witch part in this slot to unlock the next one.</span></div>'
     : '';
-  return `${partsHtml}${othersHtml}${pendingRadiusNote}`;
+  return `${partsHtml}${altPathHtml}${othersHtml}${pendingRadiusNote}`;
+}
+function nextOpenSlotAfterPick(rows, fromIdx) {
+  const prevOpen = [...rows.slice(0, fromIdx)].reverse().find((r) => r.status === 'pending' || r.status === 'blocked');
+  const nextOpen = rows.slice(fromIdx + 1).find((r) => r.status === 'pending' || r.status === 'blocked');
+  return prevOpen || nextOpen || rows.find((r) => r.status === 'pending' || r.status === 'blocked') || null;
 }
 function renderBuild(rm, focusNext) {
   const cfg = buildCfg, P = rm.parts, m = machine(cfg.m), p = pipeOf(m, cfg.p);
@@ -806,19 +833,29 @@ function renderBuild(rm, focusNext) {
     if (s.multi) {
       const set = new Set(cur.sel); set.has(id) ? set.delete(id) : set.add(id);
       cfg.sel[sid] = [...set];
+    } else if (cur.status === 'done' && cur.sel.includes(id)) {
+      delete cfg.sel[sid];
+      return { s, unequipped: true };
     } else cfg.sel[sid] = [id];
-    return s;
+    return { s, unequipped: false };
   };
   const bindCandidates = (root) => {
     if (!root) return;
     $$('[data-pick]', root).forEach((el) => el.addEventListener('click', (e) => {
       e.stopPropagation();
-      const s = pick(activeRow.sec.id, +el.dataset.pick);
-      if (!s.multi) {
-        const nxt = compute(rm, cfg).find((r) => r.status === 'pending' || r.status === 'blocked');
+      const { s, unequipped } = pick(activeRow.sec.id, +el.dataset.pick);
+      if (!s.multi && !unequipped) {
+        const nxt = nextOpenSlotAfterPick(compute(rm, cfg), activeIdx);
         if (nxt) activeSlotId = nxt.sec.id;
       }
-      renderBuild(rm, !s.multi ? activeRow.sec.id : null);
+      renderBuild(rm, !s.multi && !unequipped ? activeRow.sec.id : null);
+    }));
+    $$('[data-pick-override]', root).forEach((el) => el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cfg.sel = { [activeRow.sec.id]: [+el.dataset.pickOverride] };
+      const nxt = nextOpenSlotAfterPick(compute(rm, cfg), activeIdx);
+      if (nxt) activeSlotId = nxt.sec.id;
+      renderBuild(rm, activeRow.sec.id);
     }));
     $$('[data-info]', root).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); showPart(rm, +b.dataset.info); }));
     $$('[data-acc]', root).forEach((b) => b.addEventListener('click', () => { cfg.acc[b.dataset.acc] = +b.dataset.accid; renderBuild(rm); }));
@@ -982,8 +1019,10 @@ function showPart(rm, id, stacked) {
         const set = new Set(equipRow.sel); set.has(id) ? set.delete(id) : set.add(id);
         buildCfg.sel[sid] = [...set];
       } else {
+        const rowsBefore = compute(rm, buildCfg);
+        const idx = Math.max(0, rowsBefore.findIndex((r) => r.sec.id === sid));
         buildCfg.sel[sid] = [id];
-        const nxt = compute(rm, buildCfg).find((r) => r.status === 'pending' || r.status === 'blocked');
+        const nxt = nextOpenSlotAfterPick(compute(rm, buildCfg), idx);
         if (nxt) activeSlotId = nxt.sec.id;
       }
       closeSheet(); renderBuild(rm);

@@ -31,44 +31,77 @@ export function compute(rm, cfg) {
   const fitsAfter = (F, o) => !F || F.some((L) => linkOK(L, P[o.id], P));
   // collars are sleeves, not threaded joints: the part before a collar still mates with the part after it
   const after = (items, F) => (items.every((x) => x.part.type === 'Collar') ? (F ? [...items, ...F] : null) : items);
+  const nextF = (items, curF) => {
+    const matchedF = curF ? curF.filter((L) => items.some((x) => linkOK(L, x.part, P))) : null;
+    return after(items, matchedF?.length ? matchedF : curF);
+  };
   // Rank paths ending in an active tool (2), a discontinued tool (1), or no tool (0).
   const memo = new Map();
-  const canFinish = (i, F) => {
+  const canFinish = (i, F, honorSel = false) => {
     if (i >= n) return 2;
-    const k = `${i}|${F ? F.map((L) => L.part.id + ':' + L.accChoice).join(',') : '-'}`;
+    const k = `${honorSel ? 1 : 0}|${i}|${F ? F.map((L) => L.part.id + ':' + L.accChoice).join(',') : '-'}`;
     if (memo.has(k)) return memo.get(k);
-    const s = secs[i], fits = options(s).filter((o) => fitsAfter(F, o));
-    let rank = fits.length || required(s, i) ? 0 : canFinish(i + 1, F);
+    const s = secs[i];
+    const fits = options(s).filter((o) => (honorSel || !P[o.id].supplier) && fitsAfter(F, o));
+    const want = honorSel ? (cfg.sel[s.id] || []).filter((id) => options(s).some((o) => o.id === id)) : [];
+    if (want.length) {
+      const picked = fits.filter((o) => want.includes(o.id));
+      if (picked.length !== want.length) { memo.set(k, 0); return 0; }
+      const r = i === n - 1 && picked.every(discontinued) ? 1 : canFinish(i + 1, nextF(picked.map(item), F), true);
+      memo.set(k, r); return r;
+    }
+    let rank = fits.length || required(s, i) ? 0 : canFinish(i + 1, F, honorSel);
     for (const o of fits) {
-      rank = Math.max(rank, i === n - 1 && discontinued(o) ? 1 : canFinish(i + 1, after([item(o)], F)));
+      rank = Math.max(rank, i === n - 1 && discontinued(o) ? 1 : canFinish(i + 1, nextF([item(o)], F), honorSel));
       if (rank === 2) break;
     }
     memo.set(k, rank); return rank;
   };
-  let F = null, locked = false;
+  let F = null, blocked = false;
   secs.forEach((s, i) => {
-    const row = { sec: s, status: '', cands: [], sel: [], acc: {}, hidden: 0 };
+    const row = { sec: s, status: '', cands: [], sel: [], acc: {}, hidden: 0, downstreamFiltered: 0 };
     rows.push(row);
-    if (locked) { row.status = 'locked'; return; }
+    if (blocked) { row.status = 'locked'; return; }
     const fits = options(s).filter((o) => fitsAfter(F, o));
     if (!fits.length) {
       row.status = required(s, i) ? 'blocked' : 'skip';
-      locked = row.status === 'blocked';
+      blocked = row.status === 'blocked';
       return;
     }
+    const collarsInF = F ? F.filter((L) => L.part.type === 'Collar') : [];
+    const passthrough = !required(s, i) && F
+      ? F.filter((L) => L.part.type !== 'Collar'
+          && !fits.some((o) => linkOK(L, P[o.id], P) || collarsInF.some((C) => L.part.rc === C.part.id && linkOK(C, P[o.id], P))))
+      : [];
     const ranked = fits.map((o) => ({
-      option: o, rank: i === n - 1 && discontinued(o) ? 1 : canFinish(i + 1, after([item(o)], F)),
+      option: o, rank: i === n - 1 && discontinued(o) ? 1 : canFinish(i + 1, nextF([item(o)], F), false),
     }));
     const viable = ranked.filter(({ rank }) => rank > 0).sort((a, b) => b.rank - a.rank);
-    row.cands = viable.length ? viable.map(({ option }) => option) : fits;
+    const baseCands = viable.length ? viable.map(({ option }) => option) : fits;
+    const wantBase = (cfg.sel[s.id] || []).filter((id) => baseCands.some((o) => o.id === id));
+    const hasDownstreamSel = secs.slice(i + 1).some((ds) => (cfg.sel[ds.id] || []).length > 0);
+    if (hasDownstreamSel) {
+      const rankedDown = baseCands.map((o) => ({
+        option: o, rank: canFinish(i + 1, nextF([item(o)], F), true),
+      }));
+      const viableDown = rankedDown.filter(({ rank }) => rank > 0).sort((a, b) => b.rank - a.rank);
+      if (viableDown.length && wantBase.every((id) => viableDown.some((o) => o.id === id))) {
+        row.cands = viableDown.map(({ option }) => option);
+        row.downstreamFiltered = baseCands.length - row.cands.length;
+      } else {
+        row.cands = baseCands;
+      }
+    } else {
+      row.cands = baseCands;
+    }
     row.hidden = fits.length - row.cands.length;
     const want = (cfg.sel[s.id] || []).filter((id) => row.cands.some((o) => o.id === id));
     if (want.length) { row.sel = want; row.status = 'done'; }
-    else if (row.cands.length === 1) { row.sel = [row.cands[0].id]; row.status = 'auto'; }
-    else { row.status = 'pending'; locked = true; }
+    else if (row.cands.length === 1 && !passthrough.length) { row.sel = [row.cands[0].id]; row.status = 'auto'; }
+    else { row.status = 'pending'; }
     // auto-add an adapter/accessory on the upstream part when the chosen part only fits through it
-    if (F) for (const L of F) {
-      if (L.accChoice !== undefined || !L.accs.length) continue;
+    if (F && row.sel.length) for (const L of F) {
+      if (L.accChoice !== undefined || !L.accs.length || !L.row?.sel.includes(L.part.id)) continue;
       const needs = row.sel.map((id) => P[id]).filter((R) => !compat(L.part, R));
       if (!needs.length) continue;
       const a = L.accs.find((a) => needs.some((R) => compat(P[a], R)));
@@ -82,7 +115,11 @@ export function compute(rm, cfg) {
         if (ch > 0) row.acc[id] = { id: ch, auto: false };
         return { part: P[id], accs, accChoice: ch, row };
       });
-      F = after(items, F);
+      F = nextF(items, F);
+    } else if (row.cands.length) {
+      const items = row.cands.map((opt) => ({ part: P[opt.id], accs: opt.acc || [], accChoice: undefined, row }));
+      const candF = nextF(items, F);
+      F = passthrough.length ? [...(candF || []), ...passthrough] : candF;
     }
   });
   return rows;

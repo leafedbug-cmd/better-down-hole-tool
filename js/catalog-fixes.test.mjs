@@ -116,3 +116,24 @@ test('JT40 Forged HD shows the SaverLok ahead of its collar in both modes', () =
     assert.equal(rm.parts[second.opts[0].id].name, 'SaverLok® Collar');
   }
 });
+
+test('slots do not lock before upstream picks and selecting downstream constrains upstream', () => {
+  const rm = roadmap(7005);
+  for (const mode of ['Bit', 'Backreamer']) {
+    const cfg = config(rm, mode);
+    const initial = compute(rm, cfg);
+    assert.equal(initial.some((r) => r.status === 'locked'), false, `${mode}: no locked slots initially`);
+    const pipe = initial.find((r) => r.sec.name === 'Drill Pipe');
+    assert.equal(pipe?.status, 'auto');
+    const starter = initial.find((r) => r.sec.name === 'Transition Sub / Quick Connect');
+    assert.equal(starter?.status, 'pending');
+    assert.ok(starter.cands.length > 0, `${mode}: starter candidates ready immediately`);
+  }
+  // Pick a Starter Rod first on Backreamer, then work backwards to fill open upstream slots
+  const cfg = config(rm, 'Backreamer');
+  const starterRow = compute(rm, cfg).find((r) => r.sec.name === 'Transition Sub / Quick Connect');
+  cfg.sel[starterRow.sec.id] = [starterRow.cands[0].id];
+  const rows = equipFirst(rm, cfg);
+  assert.equal(isLoadoutReady(rows), true);
+  assert.deepEqual(rows.find((r) => r.sec.id === starterRow.sec.id)?.sel, [starterRow.cands[0].id]);
+});
